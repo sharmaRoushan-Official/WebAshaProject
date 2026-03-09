@@ -4,7 +4,7 @@
 
     <head>
         <meta charset="utf-8">
-        <title>Web Asha - {% block title %} {% endblock %}</title>
+        <title>WebAsha - {% block title %} {% endblock %}</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
         <meta content="" name="keywords">
         <meta content="" name="description">
@@ -44,28 +44,42 @@
 
         <!-- Topbar Start -->
         <div class="container-fluid bg-secondary px-5 d-none d-lg-block">
-            <div class="row gx-0 align-items-center" style="height: 45px;">
-                <div class="col-lg-8 text-center text-lg-start mb-lg-0">
-                    <div class="d-flex flex-wrap">
-                        <a href="#" class="text-light me-4"><i class="fas fa-map-marker-alt text-primary me-2"></i>Find A Location</a>
-                        <a href="#" class="text-light me-4"><i class="fas fa-phone-alt text-primary me-2"></i>+01234567890</a>
-                        <a href="#" class="text-light me-0"><i class="fas fa-envelope text-primary me-2"></i>Example@gmail.com</a>
+            <div class="row gx-0 align-items-center justify-content-between" style="height: 45px;">
+                <div class="d-flex flex-nowrap align-items-center" style="white-space: nowrap; overflow: visible;">
+                    <!-- General Enquiry - India -->
+                    <div class="d-flex align-items-center me-3">
+                        <i class="fas fa-flag text-white me-1" style="color: #ff0000 !important;"></i>
+                        <span class="text-light me-1">IND:</span>
+                        <a href="tel:+918010911256" class="text-light me-1">+91 (801) 091-1256</a>
+                        <span class="text-light small" style="font-size: 0.7rem;">General</span>
                     </div>
-                </div>
-                <div class="col-lg-4 text-center text-lg-end">
-                    <div class="d-flex justify-content-end">
-                        <div class="border-end border-start py-1">
-                            <a href="#" class="btn text-primary"><i class="fab fa-facebook-f"></i></a>
-                        </div>
-                        <div class="border-end py-1">
-                            <a href="#" class="btn text-primary"><i class="fab fa-twitter"></i></a>
-                        </div>
-                        <div class="border-end py-1">
-                            <a href="#" class="btn text-primary"><i class="fab fa-instagram"></i></a>
-                        </div>
-                        <div class="border-end py-1">
-                            <a href="#" class="btn text-primary"><i class="fab fa-linkedin-in"></i></a>
-                        </div>
+                    <!-- Admissions - India -->
+                    <div class="d-flex align-items-center me-3">
+                        <i class="fas fa-flag text-white me-1" style="color: #ff0000 !important;"></i>
+                        <span class="text-light me-1">IND:</span>
+                        <a href="tel:+918485847920" class="text-light me-1">+91 (848) 584-7920</a>
+                        <span class="text-light small" style="font-size: 0.7rem;">Admissions</span>
+                    </div>
+                    <!-- Support - India -->
+                    <div class="d-flex align-items-center me-3">
+                        <i class="fas fa-flag text-white me-1" style="color: #ff0000 !important;"></i>
+                        <span class="text-light me-1">IND:</span>
+                        <a href="tel:+919773998597" class="text-light me-1">+91 (977) 399-8597</a>
+                        <span class="text-light small" style="font-size: 0.7rem;">Support</span>
+                    </div>
+                    <!-- International Enquiries - USA -->
+                    <div class="d-flex align-items-center me-4">
+                        <i class="fas fa-flag-usa text-white me-1"></i>
+                        <span class="text-light me-1">USA:</span>
+                        <a href="tel:+19292439565" class="text-light me-1">+1 (929) 243-9565</a>
+                        <span class="text-light small" style="font-size: 0.7rem;">International</span>
+                    </div>
+                    <!-- Social Media Icons -->
+                    <div class="d-flex align-items-center">
+                        <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
             </div>
@@ -133,25 +147,33 @@
                     </div>
                     <div class="col-md-6 col-lg-6 col-xl-3">
                         <div class="footer-item d-flex flex-column">
-                            <h4 class="text-white mb-4">Address</h4>
+                            <h4 class="text-white mb-4">Contact Us</h4>
                             <div class="d-flex align-items-center mb-3">
-                                <a class="btn btn-lg-square btn-primary rounded-circle mx-2" href=""><i class="fas fa-map-marker-alt"></i></a>
+                                <i class="fas fa-flag text-white me-2" style="color: #ff0000 !important;"></i>
                                 <div class="text-white ms-2">
-                                    <p class="mb-0">0123.. Street, New York, USA</p>
+                                    <p class="mb-0">+91 (801) 091-1256</p>
+                                    <p class="mb-0 text-muted small">General Enquiry</p>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center mb-3">
-                                <a class="btn btn-lg-square btn-primary rounded-circle mx-2" href=""><i class="fa fa-phone-alt"></i></a>
+                                <i class="fas fa-flag text-white me-2" style="color: #ff0000 !important;"></i>
                                 <div class="text-white ms-2">
-                                    <p class="mb-0">+012 345 67890</p>
-                                    <p class="mb-0">+012 345 67890</p>
+                                    <p class="mb-0">+91 (848) 584-7920</p>
+                                    <p class="mb-0 text-muted small">Admissions</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-flag text-white me-2" style="color: #ff0000 !important;"></i>
+                                <div class="text-white ms-2">
+                                    <p class="mb-0">+91 (977) 399-8597</p>
+                                    <p class="mb-0 text-muted small">Support</p>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center">
-                                <a class="btn btn-lg-square btn-primary rounded-circle mx-2" href=""><i class="fas fa-envelope"></i></a>
+                                <i class="fas fa-flag-usa text-white me-2"></i>
                                 <div class="text-white ms-2">
-                                    <p class="mb-0">info@example.com</p>
-                                    <p class="mb-0">info@example.com</p>
+                                    <p class="mb-0">+1 (929) 243-9565</p>
+                                    <p class="mb-0 text-muted small">International Enquiries</p>
                                 </div>
                             </div>
                         </div>
