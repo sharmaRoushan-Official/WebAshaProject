@@ -1,753 +1,225 @@
 {% extends "mainApp/base.html" %}
 {% load static %}
 
-{% block title %}Events{% endblock %}
+{% block title %}IT Training Courses{% endblock %}
 
 {% block body %}
-<!-- Events Start -->
-<div class="container-fluid events py-5">
+<!-- Courses Start -->
+<div class="container-fluid courses py-5" style="background-color: #f8f9fa;">
     <div class="container py-5">
-        <div class="pb-5">
-            <div class="row g-4 align-items-end">
-                <div class="col-xl-8">
-                    <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Events</h4>
-                    <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Upcoming Events</h1>
-                </div>
-                <div class="col-xl-4 text-xl-end pb-3 wow fadeInUp" data-wow-delay="0.3s">
-                    <a class="btn btn-primary rounded-pill text-white py-3 px-5" href="#">View All Events</a>
-                </div>
-            </div>
-        </div>
-        <div class="row g-4 justify-content-center">
-            <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="event-item rounded">
-                    <div class="position-relative">
-                        <img src="{% static 'mainApp/img/service-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                        <div class="bg-primary text-white fw-bold rounded d-inline-block position-absolute p-2"
-                            style="top: 0; right: 0;">JAN 20</div>
-                        <div class="d-flex justify-content-between border-start border-end bg-white px-2 py-2 w-100 position-absolute"
-                            style="bottom: 0; left: 0; opacity: 0.8;">
-                            <a href="#" class="text-dark"><i class="fas fa-clock text-primary"></i> 08:00AM -
-                                10:00PM</a>
-                            <a href="#" class="text-dark"><span class="fas fa-map-marker-alt text-primary"></span> New
-                                York</a>
-                        </div>
-                    </div>
-                    <div class="border border-top-0 rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Open House - Springs Dance</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Watch Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="event-item rounded">
-                    <div class="position-relative">
-                        <img src="{% static 'mainApp/img/service-2.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                        <div class="bg-primary text-white rounded d-inline-block position-absolute p-2"
-                            style="top: 0; right: 0;">JUN 30</div>
-                        <div class="d-flex justify-content-between border-start border-end bg-white px-2 py-2 w-100 position-absolute"
-                            style="bottom: 0; left: 0; opacity: 0.8;">
-                            <a href="#" class="text-dark"><i class="fas fa-clock text-primary"></i> 08:00AM -
-                                10:00PM</a>
-                            <a href="#" class="text-dark"><span class="fas fa-map-marker-alt text-primary"></span> New
-                                York</a>
-                        </div>
-                    </div>
-                    <div class="border rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Open House And Registration</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Watch Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="event-item rounded">
-                    <div class="position-relative">
-                        <img src="{% static 'mainApp/img/service-3.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                        <div class="bg-primary text-white rounded d-inline-block position-absolute p-2"
-                            style="top: 0; right: 0;">MAY 15</div>
-                        <div class="d-flex justify-content-between border-start border-end bg-white px-2 py-2 w-100 position-absolute"
-                            style="bottom: 0; left: 0; opacity: 0.8;">
-                            <a href="#" class="text-dark"><i class="fas fa-clock text-primary"></i> 08:00AM -
-                                10:00PM</a>
-                            <a href="#" class="text-dark"><span class="fas fa-map-marker-alt text-primary"></span> New
-                                York</a>
-                        </div>
-                    </div>
-                    <div class="border rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Open House Morris Dance</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Watch Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
-                <div class="event-item rounded">
-                    <div class="position-relative">
-                        <img src="{% static 'mainApp/img/service-4.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                        <div class="bg-primary text-white rounded d-inline-block position-absolute p-2"
-                            style="top: 0; right: 0;">APR 2</div>
-                        <div class="d-flex justify-content-between border-start border-end bg-white px-2 py-2 w-100 position-absolute"
-                            style="bottom: 0; left: 0; opacity: 0.8;">
-                            <a href="#" class="text-dark"><i class="fas fa-clock text-primary"></i> 08:00AM -
-                                10:00PM</a>
-                            <a href="#" class="text-dark"><span class="fas fa-map-marker-alt text-primary"></span> New
-                                York</a>
-                        </div>
-                    </div>
-                    <div class="border rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Open House Dance Studio</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Watch Now</a>
-                    </div>
+        <!-- Hero Section -->
+        <div class="row g-4 mb-5">
+            <div class="col-12">
+                <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">IT Training Courses</h4>
+                <h1 class="display-2 mb-4 wow fadeInUp" data-wow-delay="0.3s">Browse Top IT Courses</h1>
+                <p class="lead text-muted mb-4">Discover professional IT training courses with certification. Learn from experts.</p>
+                <div class="input-group input-group-lg">
+                    <input type="search" class="form-control border-end-0 border-danger" placeholder="Search for Python, AWS, Cyber Security..." aria-label="Search">
+                    <span class="input-group-text bg-danger border-start-0">
+                        <i class="fas fa-search text-white"></i>
+                    </span>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<!-- Events End -->
 
-
-<!-- Counter Facts Start -->
-<div class="container-fluid counter-facts py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 col-sm-6 col-md-6 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="counter">
-                    <div class="counter-icon w-100 d-flex align-items-center justify-content-center">
-                        <h3>Dance Classes</h3>
-                    </div>
-                    <div class="counter-content d-flex align-items-center justify-content-center mt-4">
-                        <span class="counter-value" data-toggle="counter-up">158</span>
-                        <h4 class="text-secondary mb-0" style="font-weight: 600; font-size: 25px;">+</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-6 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="counter">
-                    <div class="counter-icon w-100 d-flex align-items-center justify-content-center">
-                        <h3>Best Instructor</h3>
-                    </div>
-                    <div class="counter-content d-flex align-items-center justify-content-center mt-4">
-                        <span class="counter-value" data-toggle="counter-up">49</span>
-                        <h4 class="text-secondary mb-0" style="font-weight: 600; font-size: 25px;">+</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-6 col-xl-3 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="counter">
-                    <div class="counter-icon w-100 d-flex align-items-center justify-content-center">
-                        <h3>Total Brunch</h3>
-                    </div>
-                    <div class="counter-content d-flex align-items-center justify-content-center mt-4">
-                        <span class="counter-value" data-toggle="counter-up">17</span>
-                        <h4 class="text-secondary mb-0" style="font-weight: 600; font-size: 25px;">+</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-md-6 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
-                <div class="counter">
-                    <div class="counter-icon w-100 d-flex align-items-center justify-content-center">
-                        <h3>Happy customer</h3>
-                    </div>
-                    <div class="counter-content d-flex align-items-center justify-content-center mt-4">
-                        <span class="counter-value" data-toggle="counter-up">567</span>
-                        <h4 class="text-secondary mb-0" style="font-weight: 600; font-size: 25px;">+</h4>
-                    </div>
-                </div>
-            </div>
+        <div class="text-center mb-5 wow fadeInUp" data-wow-delay="0.3s">
+            <a class="btn btn-danger btn-lg rounded-pill px-5 py-3 fw-bold" href="#">View All Courses</a>
         </div>
-    </div>
-</div>
-<!-- Counter Facts End -->
-
-
-<!-- Video Gallery Start -->
-<div class="container-fluid gallery py-5">
-    <div class="container py-5">
-        <div class="pb-5">
-            <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Dance Gallery</h4>
-            <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Our Dance class gallery</h1>
-        </div>
-        <div class="tab-class wow fadeInUp" data-wow-delay="0.1s">
-            <ul class="nav nav-pills d-inline-flex justify-content-center pb-4">
-                <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                    <a class="d-flex py-2 px-5 rounded-pill active" data-bs-toggle="pill" href="#GalleryTab-1">
-                        <span class="text-dark">All</span>
-                    </a>
-                </li>
-                <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                    <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-2">
-                        <span class="text-dark">Dance Practice</span>
-                    </a>
-                </li>
-                <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                    <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-3">
-                        <span class="text-dark">Dance Training</span>
-                    </a>
-                </li>
-                <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                    <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-4">
-                        <span class="text-dark">Dance Growth</span>
-                    </a>
-                </li>
-                <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                    <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-5">
-                        <span class="text-dark">Dance Improvement</span>
-                    </a>
-                </li>
-            </ul>
-
-            <div class="tab-content">
-                <div id="GalleryTab-1" class="tab-pane fade show p-0 active">
-                    <div class="row g-2">
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.1s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
+        <!-- Courses Layout -->
+        <div class="row g-4">
+            <!-- Sidebar -->
+            <div class="col-lg-4 order-2 order-lg-1">
+                <div class="card sticky-top" style="top: 20px;">
+                    <div class="card-header bg-white border-0 pb-0">
+                        <h5 class="fw-bold text-dark mb-3">Filters</h5>
+                    </div>
+                      <!-- Filter Form -->
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">Level</label>
+                                <select class="form-select form-select-sm">
+                                    <option>All</option>
+                                    <option>Beginner</option>
+                                    <option>Intermediate</option>
+                                    <option>Advanced</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">Price</label>
+                                <select class="form-select form-select-sm">
+                                    <option>All</option>
+                                    <option>< ₹5,000</option>
+                                    <option>₹5,000 - ₹15,000</option>
+                                    <option>> ₹15,000</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.5s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-dark">Duration</label>
+                                <select class="form-select form-select-sm">
+                                    <option>All</option>
+                                    <option>< 20 hours</option>
+                                    <option>20-40 hours</option>
+                                    <option>> 40 hours</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
+                            <button type="submit" class="btn btn-danger w-100 py-2 fw-medium">Apply Filters</button>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-link p-0 text-muted small">Clear all</button>
                             </div>
+                        </form>
+                    <div class="card-body p-3">
+                        <!-- Categories -->
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Categories</h6>
+                        <div class="categories-list mb-4">
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-crown me-2 text-danger"></i>Red Hat
+                            </a>
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-shield-alt me-2 text-danger"></i>Cybersecurity & Ethical Hacking - EC-Council
+                            </a>
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-hacker me-2 text-danger"></i>Cybersecurity & Ethical Hacking - OffSec
+                            </a>
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-network-wired me-2 text-danger"></i>Networking & Infrastructure (Cisco, VMware, Veritas)
+                            </a>
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-cloud me-2 text-danger"></i>Cloud (AWS, Azure, GCP)
+                            </a>
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-docker me-2 text-danger"></i>DevOps (Docker, Kubernetes)
+                            </a>
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-database me-2 text-danger"></i>Programming & Databases (Python, Oracle, SQL, Big Data)
+                            </a>
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-brain me-2 text-danger"></i>AI, ML & Data Science
+                            </a>
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-laptop-code me-2 text-danger"></i>Web & Digital Skills (Full Stack, Web Tech, Digital Marketing, Graphic Design)
+                            </a>
+                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
+                                <i class="fas fa-briefcase me-2 text-danger"></i>Corporate & Career Training (Soft Skills, Internships, Job-Oriented Programs)
+                            </a>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.9s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.1s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2 wow fadeInUp" data-wow-delay="0.5s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2 wow fadeInUp" data-wow-delay="0.9s">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
+                      
                     </div>
                 </div>
-                <div id="GalleryTab-2" class="tab-pane fade show p-0">
-                    <div class="row g-2">
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+            <!-- Main Courses Grid -->
+            <div class="col-lg-8 order-1 order-lg-2">
+{% include "mainApp/partials/_courses_grid.html" %}
                 </div>
-                <div id="GalleryTab-3" class="tab-pane fade show p-0">
-                    <div class="row g-2">
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="GalleryTab-4" class="tab-pane fade show p-0">
-                    <div class="row g-2">
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="GalleryTab-5" class="tab-pane fade show p-0">
-                    <div class="row g-2">
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                            <div class="video h-100">
-                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
-                                    style="object-fit: cover;" alt="">
-                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
-                                    <span></span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            </div>
+            <div class="col-12 text-center mt-5">
+                <button class="btn btn-outline-danger btn-lg rounded-pill px-5 py-3 fw-bold" onclick="loadMoreCourses()">Load More Courses</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Video -->
-<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content rounded-0">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Youtube Video</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- 16:9 aspect ratio -->
-                <div class="ratio ratio-16x9">
-                    <iframe class="embed-responsive-item" src="" id="video" allowfullscreen allowscriptaccess="always"
-                        allow="autoplay"></iframe>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Video Gallery End -->
+<style>
+/* Udemy-like clean styling - Red/White/Grey theme */
+.course-item {
+    border: 1px solid #dee2e6;
+    background: white;
+    cursor: pointer;
+}
+.course-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(220,53,69,0.15) !important;
+    border-color: #dc3545;
+}
+.course-img {
+    transition: transform 0.3s ease;
+}
+.course-item:hover .course-img {
+    transform: scale(1.05);
+}
+.category-item {
+    transition: all 0.3s ease;
+    border-radius: 8px !important;
+}
+.category-item:hover {
+    background: linear-gradient(90deg, #f8f9fa, #dc3545) !important;
+    color: white !important;
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(220,53,69,0.2);
+}
+.category-item:hover i {
+    color: white !important;
+}
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545, #c82333) !important;
+    border-color: #dc3545 !important;
+    transition: all 0.3s ease;
+}
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c82333, #bd2130) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(220,53,69,0.3) !important;
+}
+.card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.list-group-item {
+    border: none;
+    padding: 0.5rem 0;
+}
+.stars {
+    color: #ffc107 !important;
+}
+.course-duration {
+    background: #f8f9fa;
+    color: #dc3545;
+    font-weight: 600;
+}
+@media (max-width: 991px) {
+    .sticky-top {
+        position: relative !important;
+    }
+}
+</style>
 
+<script>
+let currentFilter = 'all';
+
+function filterCourses(category) {
+    currentFilter = category;
+    const courses = document.querySelectorAll('.course-item');
+    courses.forEach(course => {
+        if (category === 'all' || course.dataset.category === category) {
+            course.style.display = 'block';
+            course.parentElement.classList.remove('d-none');
+        } else {
+            course.style.display = 'none';
+            course.parentElement.classList.add('d-none');
+        }
+    });
+    // Update active category
+    document.querySelectorAll('.category-item').forEach(cat => cat.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function loadMoreCourses() {
+    alert('Load more courses functionality - connect to backend!');
+}
+
+// Add click listeners to categories
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.category-item').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const category = this.dataset.category || 'all';
+            filterCourses(category);
+        });
+    });
+});
+</script>
 
 {% endblock body %}
+
