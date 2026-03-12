@@ -18,9 +18,9 @@ def eventPage(request):
         return render(request, "mainApp/event.html")
 
 
-def blogPage(request):
+def certificationsPage(request):
     if request.method == "GET":
-        return render(request, "mainApp/blogs.html")
+        return render(request, "mainApp/certifications.html")
 
 
 def classPage(request):
