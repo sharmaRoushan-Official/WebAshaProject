@@ -77,10 +77,10 @@
 
         <!-- Navbar & Hero Start -->
         <div class="container-fluid position-relative p-0">
-            <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-3 py-lg-0">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-2 py-lg-1">
                 <a href="#" class="navbar-brand p-0">
                     <!-- <h1 class="text-primary m-0"><i class="fas fa-biohazard me-3"></i>WebAsha Technology</h1> -->
-                    <img src="{% static 'mainApp/img/logo.png' %}" alt="Logo">
+                    <img src="{% static 'mainApp/img/logo.png' %}" alt="Logo" style="height: 45px; vertical-align: middle;">
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                     <span class="fa fa-bars"></span>
@@ -89,8 +89,8 @@
                     <div class="navbar-nav ms-auto py-0">
                         <a href="{% url 'home' %}" class="nav-item nav-link">Home</a>
                         <a href="{% url 'about' %}" class="nav-item nav-link">About</a>
-                        <a href="{% url 'events' %}" class="nav-item nav-link">Events</a>
-                        <a href="{% url 'blogs' %}" class="nav-item nav-link">Blogs</a>
+                        <a href="{% url 'events' %}" class="nav-item nav-link">Courses</a>
+                        <a href="{% url 'certifications' %}" class="nav-item nav-link">Top Certifications</a>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                             <div class="dropdown-menu m-0">
@@ -98,8 +98,8 @@
                                 <a href="{% url 'training' %}" class="dropdown-item">Our Courses</a>
                                 <a href="{% url 'team' %}" class="dropdown-item">Our Team</a>
                                 <a href="{% url 'testimonial' %}" class="dropdown-item">Testimonial</a>
-                                <a href="{% url 'gallery' %}" class="dropdown-item">Dance Gallery</a>
-                                <a href="{% url '404' %}" class="dropdown-item">404 Page</a>
+                                <a href="{% url 'gallery' %}" class="dropdown-item">Gallery</a>
+                              
                             </div>
                         </div>
                         <a href="{% url 'contact' %}" class="nav-item nav-link">Contact Us</a>
