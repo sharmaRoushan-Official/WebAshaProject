@@ -1,46 +1,12 @@
 {% extends 'mainApp/base.html' %}
 {% load static %}
 {% block title %}Home{% endblock title %}
-<style>
-    .gallery-item {
-        position: relative;
-        overflow: hidden;
-        border-radius: 10px;
-    }
-    .gallery-item img {
-        transition: transform 0.3s ease;
-    }
-    .gallery-item:hover img {
-        transform: scale(1.1);
-    }
-    .gallery-item .zoom-icon {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-        background: rgba(0, 0, 0, 0.6);
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .gallery-item:hover .zoom-icon {
-        opacity: 1;
-    }
-    .zoom-icon i {
-        color: white;
-        font-size: 24px;
-    }
-</style>
+
 {% block body %}
 <!-- Carousel Start -->
 <div class="header-carousel owl-carousel">
     <div class="header-carousel-item">
-        <img src="{% static 'mainApp/img/slider/1.webp' %}" class="img-fluid w-100" alt="Image">
+        <img src="{% static 'mainApp/img/slider/1.ethicalHacking.png' %}" class="img-fluid w-100" alt="Image">
         <div class="carousel-caption">
             <div class="carousel-caption-content p-3" style="max-width: 900px;">
                 <h4 class="text-secondary text-uppercase sub-title fw-bold mb-4" style="letter-spacing: 3px;">Let's
@@ -59,7 +25,7 @@
         </div>
     </div>
     <div class="header-carousel-item">
-        <img src="{% static 'mainApp/img/carousel-2.jpg' %}" class="img-fluid w-100" alt="Image">
+        <img src="{% static 'mainApp/img/2.ethicalHacking.png' %}" class="img-fluid w-100" alt="Image">
         <div class="carousel-caption">
             <div class="carousel-caption-content p-3" style="max-width: 900px;">
                 <h4 class="text-secondary text-uppercase sub-title fw-bold mb-4" style="letter-spacing: 3px;">Let's
@@ -78,7 +44,27 @@
         </div>
     </div>
     <div class="header-carousel-item">
-        <img src="{% static 'mainApp/img/slider/2.webp' %}" class="img-fluid w-100" alt="Image">
+        <img src="{% static 'mainApp/img/slider/2.pythonSlider.webp' %}" class="img-fluid w-100" alt="Image">
+        <div class="carousel-caption">
+            <div class="carousel-caption-content p-3" style="max-width: 900px;">
+                <h4 class="text-secondary text-uppercase sub-title fw-bold mb-4" style="letter-spacing: 3px;">Let's
+                    Enroll</h4>
+                <h1 class="display-1 text-capitalize text-white mb-4">Learn From the Certified Instructors</h1>
+                <h3 class="fs-5">Advance Your Skills with Practicall,Job-Oriented Training.,
+                </h3>
+                <p>At WebAsha Technologies, we help you become a certified lprofessional in Red Hat, EC-Council, OffSec, AWS, and DevOps.Experience at interactive learning environment built for read success.</p>
+                <div class="pt-2">
+                    <a class="btn btn-primary rounded-pill text-white py-3 px-5 m-2 wow fadeInLeft"
+                        data-wow-delay="0.1s" href="#">Join Now</a>
+                    <a class="btn btn-secondary rounded-pill text-white py-3 px-5 m-2 wow fadeInRight"
+                        data-wow-delay="0.3s" href="#">Read More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-carousel-item">
+        <img src="{% static 'mainApp/img/slider/python2.gif' %}" class="img-fluid w-100" alt="Image">
         <div class="carousel-caption">
             <div class="carousel-caption-content p-3" style="max-width: 900px;">
                 <h4 class="text-secondary text-uppercase sub-title fw-bold mb-4" style="letter-spacing: 3px;">Let's
@@ -110,111 +96,34 @@
 </div>
 <!-- Banner End -->
 
-<!-- Why Choose WebAsha Technologies Start -->
+<!-- About Start -->
 <div class="container-fluid py-5">
     <div class="container py-5">
-        <div class="text-center mx-auto mb-5" style="max-width: 700px;">
-            <h4 class="text-danger sub-title fw-bold">Why Choose WebAsha</h4>
-            <h1 class="display-4 mb-4">Your Path to IT Success</h1>
-            <p class="mb-4">We transform your career through quality training and comprehensive support</p>
-        </div>
-        <div class="row g-4">
-            <!-- Expert Trainers -->
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="feature-card h-100 p-4 bg-white rounded-3 feature-card-hover">
-                    <div class="feature-icon mb-4 text-center">
-                        <i class="fas fa-chalkboard-teacher fa-3x text-danger"></i>
-                    </div>
-                    <h4 class="text-center mb-3">Expert Trainers</h4>
-                    <p class="text-center mb-0">Learn directly from certified professionals with years of industry experience. Our trainers bring real-world insights, making complex concepts easy to understand.</p>
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-5 wow fadeInLeft" data-wow-delay="0.1s">
+                <div class="border bg-danger rounded">
+                    <img src="{% static 'mainApp/img/about-3.png' %}" class="img-fluid w-100 rounded" alt="Image">
                 </div>
             </div>
-            <!-- Flexible Schedule -->
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.2s">
-                <div class="feature-card h-100 p-4 bg-white rounded-3 feature-card-hover">
-                    <div class="feature-icon mb-4 text-center">
-                        <i class="fas fa-clock fa-3x text-danger"></i>
-                    </div>
-                    <h4 class="text-center mb-3">Flexible Schedule</h4>
-                    <p class="text-center mb-0">We understand your time matters. Choose from weekday or weekend batches that fit your study, work, or personal schedule.</p>
-                </div>
-            </div>
-            <!-- Hands-on Training -->
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="feature-card h-100 p-4 bg-white rounded-3 feature-card-hover">
-                    <div class="feature-icon mb-4 text-center">
-                        <i class="fas fa-laptop-code fa-3x text-danger"></i>
-                    </div>
-                    <h4 class="text-center mb-3">Hands-on Training</h4>
-                    <p class="text-center mb-0">Every course includes practical assignments and real-world lab exercises to build confidence and prepare you for on-the-job challenges.</p>
-                </div>
-            </div>
-            <!-- Full Day Lab Support -->
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.4s">
-                <div class="feature-card h-100 p-4 bg-white rounded-3 feature-card-hover">
-                    <div class="feature-icon mb-4 text-center">
-                        <i class="fas fa-server fa-3x text-danger"></i>
-                    </div>
-                    <h4 class="text-center mb-3">Full Day Lab Support</h4>
-                    <p class="text-center mb-0">Access our labs all day long for additional practice and experimentation. Our technical team is available to assist you whenever you need help.</p>
-                </div>
-            </div>
-            <!-- Affordable Fee Structure -->
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="feature-card h-100 p-4 bg-white rounded-3 feature-card-hover">
-                    <div class="feature-icon mb-4 text-center">
-                        <i class="fas fa-hand-holding-usd fa-3x text-danger"></i>
-                    </div>
-                    <h4 class="text-center mb-3">Affordable Fee Structure</h4>
-                    <p class="text-center mb-0">Quality training doesn't have to be expensive. We offer competitive pricing and flexible payment options for students and professionals alike.</p>
-                </div>
-            </div>
-            <!-- Post Training Support -->
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.6s">
-                <div class="feature-card h-100 p-4 bg-white rounded-3 feature-card-hover">
-                    <div class="feature-icon mb-4 text-center">
-                        <i class="fas fa-user-friends fa-3x text-danger"></i>
-                    </div>
-                    <h4 class="text-center mb-3">Post Training Support</h4>
-                    <p class="text-center mb-0">Even after course completion, we offer mentorship, career guidance, and doubt-clearing sessions to help you succeed in your professional journey.</p>
-                </div>
-            </div>
-            <!-- Global Certification Preparation -->
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.7s">
-                <div class="feature-card h-100 p-4 bg-white rounded-3 feature-card-hover">
-                    <div class="feature-icon mb-4 text-center">
-                        <i class="fas fa-globe-americas fa-3x text-danger"></i>
-                    </div>
-                    <h4 class="text-center mb-3">Global Certification Preparation</h4>
-                    <p class="text-center mb-0">Our training programs are aligned with globally recognized certifications, enhancing your credibility and career prospects worldwide.</p>
-                </div>
-            </div>
-            <!-- Interview and Placement Assistance -->
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.8s">
-                <div class="feature-card h-100 p-4 bg-white rounded-3 feature-card-hover">
-                    <div class="feature-icon mb-4 text-center">
-                        <i class="fas fa-briefcase fa-3x text-danger"></i>
-                    </div>
-                    <h4 class="text-center mb-3">Interview & Placement Assistance</h4>
-                    <p class="text-center mb-0">Get resume-building assistance, mock interviews, and placement opportunities with our partnered IT companies to kickstart your career.</p>
-                </div>
+            <div class="col-lg-7 wow fadeInRight" data-wow-delay="0.3s">
+                <h4 class="text-danger sub-title fw-bold">about The Dance School</h4>
+                <h1 class="display-3 mb-4"><strong class="text-primary">JustDance</strong>, We have been teaching dance
+                    since 2001</h1>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sint commodi alias, eius incidunt similique
+                    exercitationem magni quod recusandae maiores ducimus non porro neque odio explicabo, doloribus
+                    deleniti rem sequi adipisci sed ab qui dolorem. Optio sint eius illum consequuntur. Odit.
+                </p>
+                <p class="mb-4">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Inventore illum nemo deserunt
+                    reiciendis perferendis incidunt ullam expedita dolor, voluptas repellat necessitatibus dolore
+                    repellendus dolorum, voluptate dolorem. Debitis quis ipsa ullam neque corrupti maxime ad magni,
+                    tempore, aperiam rerum, perspiciatis fuga.
+                </p>
+                <a class="btn btn-primary rounded-pill text-white py-3 px-5" href="#">Learn More</a>
             </div>
         </div>
     </div>
 </div>
-<style>
-.feature-card-hover {
-    border: 2px solid #dc3545;
-    box-shadow: 0 10px 30px rgba(220, 53, 69, 0.2);
-    transition: all 0.3s ease;
-}
-.feature-card-hover:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(220, 53, 69, 0.4);
-    border-color: #b02a37;
-}
-</style>
-<!-- Why Choose WebAsha Technologies End -->
+<!-- About End -->
 
 
 <!-- Counter Stats Start -->
@@ -622,96 +531,116 @@
 <div class="container-fluid team pb-5">
     <div class="container pb-5">
         <div class="pb-5">
-            <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Tech Mentors</h4>
-            <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Our Professional Instructors</h1>
+            <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Dance Teachers</h4>
+            <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Our Professional Instructor</h1>
         </div>
-    <div class="container-fluid team py-5 bg-light">
-    <div class="container py-5">
-        <div class="row g-4 justify-content-center">
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="team-item border rounded overflow-hidden">
-                    <div class="team-img bg-secondary rounded-top position-relative">
-<img src="{% static 'mainApp/img/trainer/trainer-profile-1.png' %}" class="img-fluid rounded-top w-100" style="height: 300px; object-fit: cover;" alt="Asha Kulkarni">
-                        <div class="team-icon d-flex justify-content-center">
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                    <div class="team-content text-center p-4">
-                        <h4 class="mb-1">Asha Kulkarni</h4>
-                        <p class="text-primary mb-0">Founder & CEO</p>
+        <div class="team-carousel owl-carousel pt-5 wow fadeInUp" data-wow-delay="0.1s">
+            <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.1s">
+                <div class="team-img bg-secondary rounded-top">
+                    <img src="{% static 'mainApp/img/team-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
+                    <div class="team-icon">
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-instagram"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="team-item border rounded overflow-hidden">
-                    <div class="team-img bg-secondary rounded-top position-relative">
-                        <img src="{% static 'mainApp/img/trainer/trainer-profile-2.png' %}" class="img-fluid rounded-top w-100" style="height: 300px; object-fit: cover;" alt="Rohit Patil">
-                        <div class="team-icon d-flex justify-content-center">
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                    <div class="team-content text-center p-4">
-                        <h4 class="mb-1">Rohit Patil</h4>
-                        <p class="text-primary mb-0">Lead Trainer</p>
-                    </div>
+                <div class="team-content text-center p-4">
+                    <a href="#" class="h4">Emily Ava</a>
+                    <p class="mb-0 text-primary">Instructor</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="team-item border rounded overflow-hidden">
-                    <div class="team-img bg-secondary rounded-top position-relative">
-<img src="{% static 'mainApp/img/trainer/trainer-profile-3.png' %}" class="img-fluid rounded-top w-100" style="height: 300px; object-fit: cover;" alt="Sneha Kulkarni">
-                        <div class="team-icon d-flex justify-content-center">
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                    <div class="team-content text-center p-4">
-                        <h4 class="mb-1">Sneha Kulkarni</h4>
-                        <p class="text-primary mb-0">Head - Placements</p>
+            <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.3s">
+                <div class="team-img bg-secondary rounded-top">
+                    <img src="{% static 'mainApp/img/team-2.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
+                    <div class="team-icon">
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-instagram"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 col-lg-3 wow fadeInUp" data-wow-delay="0.7s">
-                <div class="team-item border rounded overflow-hidden">
-                    <div class="team-img bg-secondary rounded-top position-relative">
-<img src="{% static 'mainApp/img/trainer/trainer-profile-4.png' %}" class="img-fluid rounded-top w-100" style="height: 300px; object-fit: cover;" alt="Vikram Joshi">
-                        <div class="team-icon d-flex justify-content-center">
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                    <div class="team-content text-center p-4">
-                        <h4 class="mb-1">Vikram Joshi</h4>
-                        <p class="text-primary mb-0">Security Trainer</p>
-                    </div>
+                <div class="team-content text-center p-4">
+                    <a href="#" class="h4">Emily Ava</a>
+                    <p class="mb-0 text-primary">Instructor</p>
                 </div>
             </div>
-        </div>
-        <div class="text-center mt-5 wow fadeInUp" data-wow-delay="0.9s">
-            <a class="btn btn-primary rounded-pill text-white py-3 px-5" href="{% url 'team' %}">View Full Team <i class="fas fa-arrow-right ms-2"></i></a>
+            <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.5s">
+                <div class="team-img bg-secondary rounded-top">
+                    <img src="{% static 'mainApp/img/team-3.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
+                    <div class="team-icon">
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-instagram"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="team-content text-center p-4">
+                    <a href="#" class="h4">Emily Ava</a>
+                    <p class="mb-0 text-primary">Instructor</p>
+                </div>
+            </div>
+            <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.7s">
+                <div class="team-img bg-secondary rounded-top">
+                    <img src="{% static 'mainApp/img/team-4.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
+                    <div class="team-icon">
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-instagram"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="team-content text-center p-4">
+                    <a href="#" class="h4">Emily Ava</a>
+                    <p class="mb-0 text-primary">Instructor</p>
+                </div>
+            </div>
+            <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.9s">
+                <div class="team-img bg-secondary rounded-top">
+                    <img src="{% static 'mainApp/img/team-4.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
+                    <div class="team-icon">
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-twitter"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-instagram"></i></a>
+                        <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="team-content text-center p-4">
+                    <a href="#" class="h4">Emily Ava</a>
+                    <p class="mb-0 text-primary">Instructor</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
 <!-- Team End -->
 
-
-
+<!-- Video Gallery Start -->
 <div class="container-fluid gallery pb-5">
     <div class="container pb-5">
         <div class="pb-5">
-            <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Our Gallery</h4>
-            <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Our Lab Gallery</h1>
+            <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Dance Gallery</h4>
+            <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Our Dance class gallery</h1>
         </div>
         <div class="tab-class wow fadeInUp" data-wow-delay="0.1s">
             <ul class="nav nav-pills d-inline-flex justify-content-center pb-4">
@@ -722,510 +651,543 @@
                 </li>
                 <li class="nav-item bg-light border border-primary rounded-pill mb-4">
                     <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-2">
-                        <span class="text-dark">Computer Lab</span>
+                        <span class="text-dark">Dance Practice</span>
                     </a>
                 </li>
                 <li class="nav-item bg-light border border-primary rounded-pill mb-4">
                     <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-3">
-                        <span class="text-dark">Ethical Lab</span>
+                        <span class="text-dark">Dance Training</span>
+                    </a>
+                </li>
+                <li class="nav-item bg-light border border-primary rounded-pill mb-4">
+                    <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-4">
+                        <span class="text-dark">Dance Growth</span>
+                    </a>
+                </li>
+                <li class="nav-item bg-light border border-primary rounded-pill mb-4">
+                    <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-5">
+                        <span class="text-dark">Dance Improvement</span>
                     </a>
                 </li>
             </ul>
 
             <div class="tab-content">
-                <!-- All Tab -->
                 <div id="GalleryTab-1" class="tab-pane fade show p-0 active">
                     <div class="row g-2">
-                        <!-- Computer Lab Images -->
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/1.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/1.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.1s">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/2.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/2.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.5s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/3.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/3.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.5s">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/4.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/4.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-4.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.9s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/5.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/5.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.9s">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-5.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.11s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/6.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/6.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.1s">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.12s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/7.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/7.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.13s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/8.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/8.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2 wow fadeInUp" data-wow-delay="0.5s">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-4.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.14s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/9.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/9.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.15s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/10.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/10.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.16s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/11.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/11.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.17s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/12.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/gallery/12.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <!-- Ethical Lab Images -->
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.2s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/1.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/1.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.4s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/2.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/2.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.6s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/3.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/3.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.8s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/4.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/4.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="1.0s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/5.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/5.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="1.1s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/6.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/6.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="1.2s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/7.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/7.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="1.3s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/8.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/8.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="1.4s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/9.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/9.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="1.5s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/10.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/10.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="1.6s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/11.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/11.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="1.7s">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/12.webp' %}" data-lightbox="gallery-all">
-                                    <img src="{% static 'mainApp/img/lab/12.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2 wow fadeInUp" data-wow-delay="0.9s">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-5.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Computer Lab Tab -->
                 <div id="GalleryTab-2" class="tab-pane fade show p-0">
                     <div class="row g-2">
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/1.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/1.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/2.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/2.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/3.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/3.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-4.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/4.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/4.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/5.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/5.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/6.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/6.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/7.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/7.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-4.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/8.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/8.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-5.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/9.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/9.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/10.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/10.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/11.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/11.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/gallery/12.webp' %}" data-lightbox="gallery-computer">
-                                    <img src="{% static 'mainApp/img/gallery/12.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Ethical Lab Tab -->
                 <div id="GalleryTab-3" class="tab-pane fade show p-0">
                     <div class="row g-2">
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/1.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/1.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/2.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/2.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/3.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/3.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-4.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-6.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="GalleryTab-4" class="tab-pane fade show p-0">
+                    <div class="row g-2">
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/4.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/4.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/5.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/5.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-4.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-5.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-6.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="GalleryTab-5" class="tab-pane fade show p-0">
+                    <div class="row g-2">
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/6.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/6.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                         <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/7.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/7.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-4.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/8.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/8.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/9.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/9.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/10.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/10.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/11.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/11.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-4.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                            <div class="gallery-item h-100">
-                                <a href="{% static 'mainApp/img/lab/12.webp' %}" data-lightbox="gallery-ethical">
-                                    <img src="{% static 'mainApp/img/lab/12.webp' %}" class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                    <div class="zoom-icon">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
+                            <div class="video h-100">
+                                <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded w-100 h-100"
+                                    style="object-fit: cover;" alt="">
+                                <button type="button" class="btn btn-play" data-bs-toggle="modal"
+                                    data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-bs-target="#videoModal">
+                                    <span></span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1234,7 +1196,7 @@
         </div>
     </div>
 </div>
-<!-- Image Gallery End -->
+
 <!-- Modal Video -->
 <div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
