@@ -1,4 +1,39 @@
+{% extends 'mainApp/base.html' %}
 {% load static %}
+
+{% block title %}Top Certifications{% endblock %}
+
+{% block body %}
+<!-- Blog Start -->
+<div class="container-fluid blog pb-5">
+    <div class="container pb-5">
+        <div class="pb-5">
+<h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Top Certifications</h4>
+            <h1 class="display-2 mb-4 wow fadeInUp" data-wow-delay="0.3s">Industry-Leading IT Certifications</h1>
+            <p class="lead text-muted mb-5 wow fadeInUp" data-wow-delay="0.5s">Earn globally recognized certifications in Cloud, Cybersecurity, DevOps, Networking, and more. Hands-on labs, expert trainers, exam success guarantee.</p>
+        </div>
+        <div class="row mb-4 g-2 justify-content-center">
+            <div class="col-auto">
+                <button class="btn btn-primary rounded-pill px-4 py-2 fs-6 filter-btn active" data-filter="all" style="min-width: 140px;"><i class="fas fa-th-large me-1"></i>All</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="cloud" style="min-width: 140px;">Cloud</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="cyber" style="min-width: 140px;">Cyber</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="network" style="min-width: 140px;">Network</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="devops" style="min-width: 140px;">DevOps</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="red-hat" style="min-width: 140px;">Red Hat</button>
+            </div>
+        </div>
+
+        {% load static %}
 <div class="row g-4">
     <div class="col-lg-3 col-md-6">
         <div class="card h-100 border-0 shadow-sm course-item" data-category="cloud">
@@ -18,7 +53,6 @@
         </div>
     </div>
 
-    <!-- Additional IT Certification Cards -->
     <div class="col-lg-3 col-md-6">
         <div class="card h-100 border-0 shadow-sm course-item" data-category="cloud">
             <div class="card-body p-4 d-flex flex-column">
@@ -87,8 +121,6 @@
             </div>
         </div>
     </div>
-</div>
-
     <div class="col-lg-3 col-md-6">
         <div class="card h-100 border-0 shadow-sm course-item" data-category="cyber">
             <div class="card-body p-4 d-flex flex-column">
@@ -101,7 +133,7 @@
                 <small class="text-muted mb-3 d-block">EC-Council Trainer</small>
                 <div class="mt-auto">
                     <div class="h6 fw-bold text-danger mb-3">₹24,999</div>
-                    <a href="#" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
+                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
                 </div>
             </div>
         </div>
@@ -118,7 +150,7 @@
                 <small class="text-muted mb-3 d-block">Cisco CCIE</small>
                 <div class="mt-auto">
                     <div class="h6 fw-bold text-danger mb-3">₹12,999</div>
-                    <a href="#" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
+                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
                 </div>
             </div>
         </div>
@@ -135,58 +167,7 @@
                 <small class="text-muted mb-3 d-block">DevOps Expert</small>
                 <div class="mt-auto">
                     <div class="h6 fw-bold text-danger mb-3">₹18,999</div>
-                    <a href="#" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="python">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">Python Django Full Stack</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★★</span>
-                    <span class="text-muted small ms-1">(4.9)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>25 hours</small>
-                <small class="text-muted mb-3 d-block">Python Architect</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹9,999</div>
-                    <a href="#" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="ai">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">Machine Learning & AI</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★☆</span>
-                    <span class="text-muted small ms-1">(4.8)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>55 hours</small>
-                <small class="text-muted mb-3 d-block">AI Scientist</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹29,999</div>
-                    <a href="#" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="web">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">MERN Stack Development</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★★</span>
-                    <span class="text-muted small ms-1">(4.9)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>22 hours</small>
-                <small class="text-muted mb-3 d-block">Full Stack Dev</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹11,999</div>
-                    <a href="#" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
+                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
                 </div>
             </div>
         </div>
@@ -203,9 +184,61 @@
                 <small class="text-muted mb-3 d-block">Red Hat Expert</small>
                 <div class="mt-auto">
                     <div class="h6 fw-bold text-danger mb-3">₹14,999</div>
-                    <a href="#" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
+                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+        <!-- CTA Section -->
+        <div class="text-center mt-5 pt-5 border-top">
+            <h2 class="display-4 fw-bold text-primary mb-4">Ready to Get Certified?</h2>
+            <p class="lead mb-4">Join 10,000+ professionals who accelerated their careers with WebAsha certifications.</p>
+            <a href="{% url 'contact' %}" class="btn btn-danger btn-lg rounded-pill px-5 py-3 fs-5">Start Your Journey Today</a>
+        </div>
+    </div>
+</div>
+<!-- Blog End -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const courses = document.querySelectorAll('.course-item');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active', 'btn-primary'));
+            filterBtns.forEach(b => b.classList.add('btn-outline-primary'));
+            btn.classList.remove('btn-outline-primary');
+            btn.classList.add('btn-primary', 'active');
+            
+            const filter = btn.dataset.filter;
+            
+            courses.forEach(course => {
+                const col = course.closest('.col-lg-3, .col-md-6');
+                if (filter === 'all' || course.dataset.category === filter) {
+                    col.classList.remove('d-none');
+                } else {
+                    col.classList.add('d-none');
+                }
+            });
+        });
+    });
+});
+</script>
+
+<style>
+.filter-btn {
+    transition: all 0.3s ease;
+}
+.course-item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.course-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+}
+</style>
+
+{% endblock body %}
+
