@@ -1,92 +1,262 @@
 {% extends 'mainApp/base.html' %}
 {% load static %}
 
-{% block title %}Our Classes{% endblock %}
+{% block title %}IT Training Programs - WebAsha Technologies{% endblock %}
 
 {% block body %}
-<!-- Dance Class Start -->
-<div class="container-fluid class bg-light py-5">
+<!-- Hero Section Start -->
+<div class="container-fluid py-5 bg-primary text-white">
     <div class="container py-5">
-        <div class="pb-5">
-            <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Our Dance Classes</h4>
-            <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Dance Classes for everyone</h1>
+        <div class="text-center mx-auto mb-5" style="max-width: 800px; margin-top: 30px;">
+            <h4 class="text-white sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Certification Training</h4>
+            <h1 class="display-3 mb-4 wow fadeInUp" data-wow-delay="0.3s">Job-Ready IT Skills Programs</h1>
+            <p class="fs-5 mb-0 wow fadeInUp" data-wow-delay="0.5s">Master industry-leading certifications with hands-on labs, expert mentorship, and guaranteed interview support.</p>
         </div>
         <div class="row g-4">
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="class-item bg-white rounded">
-                    <div class="class-img rounded-top">
-                        <img src="{% static 'mainApp/img/class-1.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                    </div>
-                    <div class="rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Classical Dance class</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Explore Details</a>
-                    </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="text-center">
+                    <i class="fas fa-certificate fa-3x text-warning mb-4"></i>
+                    <h4 class="mb-2">92% Pass Rate</h4>
+                    <p class="mb-0">Exam Success</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="class-item bg-white rounded">
-                    <div class="class-img rounded-top">
-                        <img src="{% static 'mainApp/img/class-2.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                    </div>
-                    <div class="rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Classical Dance class</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Explore Details</a>
-                    </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="text-center">
+                    <i class="fas fa-clock fa-3x text-warning mb-4"></i>
+                    <h4 class="mb-2">40-80 Hours</h4>
+                    <p class="mb-0">Course Duration</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="class-item bg-white rounded">
-                    <div class="class-img rounded-top">
-                        <img src="{% static 'mainApp/img/class-3.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                    </div>
-                    <div class="rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Classical Dance class</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Explore Details</a>
-                    </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                <div class="text-center">
+                    <i class="fas fa-laptop fa-3x text-warning mb-4"></i>
+                    <h4 class="mb-2">Live Labs</h4>
+                    <p class="mb-0">Hands-on Practice</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.7s">
-                <div class="class-item bg-white rounded">
-                    <div class="class-img rounded-top">
-                        <img src="{% static 'mainApp/img/class-4.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                    </div>
-                    <div class="rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Classical Dance class</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Explore Details</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.9s">
-                <div class="class-item bg-white rounded">
-                    <div class="class-img rounded-top">
-                        <img src="{% static 'mainApp/img/class-5.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                    </div>
-                    <div class="rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Classical Dance class</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Explore Details</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.11s">
-                <div class="class-item bg-white rounded">
-                    <div class="class-img rounded-top">
-                        <img src="{% static 'mainApp/img/class-6.jpg' %}" class="img-fluid rounded-top w-100" alt="Image">
-                    </div>
-                    <div class="rounded-bottom p-4">
-                        <a href="#" class="h4 mb-3 d-block">Classical Dance class</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Explore Details</a>
-                    </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
+                <div class="text-center">
+                    <i class="fas fa-handshake fa-3x text-warning mb-4"></i>
+                    <h4 class="mb-2">300+ Partners</h4>
+                    <p class="mb-0">Placements</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Dance Class End -->
-{% endblock body %}
+<!-- Hero Section End -->
 
+<!-- Filters Start -->
+<div class="container-fluid py-4 bg-light">
+    <div class="container">
+        <ul class="nav nav-pills justify-content-center mb-0">
+            <li class="nav-item">
+                <a class="nav-link active px-4 py-2" href="#all" data-bs-toggle="pill">All Courses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-4 py-2" href="#cloud" data-bs-toggle="pill">Cloud</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-4 py-2" href="#security" data-bs-toggle="pill">Security</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-4 py-2" href="#devops" data-bs-toggle="pill">DevOps</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-4 py-2" href="#linux" data-bs-toggle="pill">Linux</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- Filters End -->
+
+<!-- Classes Section Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="tab-content">
+            <!-- All Courses Tab -->
+            <div class="tab-pane fade show active" id="all">
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
+                            <div class="position-relative">
+                                <img src="{% static 'mainApp/img/slider/1.ethicalHacking.png' %}" class="img-fluid w-100 course-img" alt="RHCSA" style="height: 250px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 bg-success text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">Certification</div>
+                                <div class="position-absolute bottom-0 start-0 bg-primary text-white px-3 py-1 rounded-end fs-6 fw-bold m-3">Beginner</div>
+                            </div>
+                            <div class="p-4">
+                                <h4 class="course-title mb-2">RHCSA (EX200) - Red Hat Certified System Administrator</h4>
+                                <p class="text-muted mb-3">Master Linux administration, file systems, networking, security. 40+ hours hands-on labs. Official exam voucher included.</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-info fs-6">40 Hours</span>
+                                    <div class="d-flex">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <span class="ms-1 text-muted small">(150)</span>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.2s">
+                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
+                            <div class="position-relative">
+                                <img src="{% static 'mainApp/img/slider/3.pythonSlider.avif' %}" class="img-fluid w-100 course-img" alt="Python" style="height: 250px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 bg-success text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">Bootcamp</div>
+                                <div class="position-absolute bottom-0 start-0 bg-warning text-dark px-3 py-1 rounded-end fs-6 fw-bold m-3">Intermediate</div>
+                            </div>
+                            <div class="p-4">
+                                <h4 class="course-title mb-2">Python Programming Bootcamp</h4>
+                                <p class="text-muted mb-3">Core Python, Django, Data Science, Automation. Projects + Interview prep. Lifetime access to recordings.</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-info fs-6">60 Hours</span>
+                                    <div class="d-flex">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <span class="ms-1 text-muted small">(220)</span>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
+                            <div class="position-relative">
+                                <img src="{% static 'mainApp/img/slider/3.ethicalHacking.jpeg' %}" class="img-fluid w-100 course-img" alt="CEH" style="height: 250px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">CEH v12</div>
+                                <div class="position-absolute bottom-0 start-0 bg-warning text-dark px-3 py-1 rounded-end fs-6 fw-bold m-3">Advanced</div>
+                            </div>
+                            <div class="p-4">
+                                <h4 class="course-title mb-2">Certified Ethical Hacker (CEH v12)</h4>
+                                <p class="text-muted mb-3">Penetration testing, vulnerability assessment, network security. EC-Council accredited labs.</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-info fs-6">80 Hours</span>
+                                    <div class="d-flex">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="far fa-star text-warning"></i>
+                                        <span class="ms-1 text-muted small">(180)</span>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.4s">
+                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
+                            <div class="position-relative">
+                                <img src="{% static 'mainApp/img/slider/pythonSlider.jpeg' %}" class="img-fluid w-100 course-img" alt="AWS" style="height: 250px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 bg-info text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">AWS</div>
+                                <div class="position-absolute bottom-0 start-0 bg-success text-white px-3 py-1 rounded-end fs-6 fw-bold m-3">Intermediate</div>
+                            </div>
+                            <div class="p-4">
+                                <h4 class="course-title mb-2">AWS Solutions Architect Associate</h4>
+                                <p class="text-muted mb-3">Cloud infrastructure, EC2, S3, VPC, IAM. Real-world projects + exam simulator.</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-info fs-6">50 Hours</span>
+                                    <div class="d-flex">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <span class="ms-1 text-muted small">(95)</span>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
+                            <div class="position-relative">
+                                <img src="{% static 'mainApp/img/service-1.jpg' %}" class="img-fluid w-100 course-img" alt="DevOps" style="height: 250px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 badge bg-purple text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">DevOps</div>
+                                <div class="position-absolute bottom-0 start-0 bg-warning text-dark px-3 py-1 rounded-end fs-6 fw-bold m-3">Intermediate</div>
+                            </div>
+                            <div class="p-4">
+                                <h4 class="course-title mb-2">DevOps & CI/CD Pipeline Engineering</h4>
+                                <p class="text-muted mb-3">Jenkins, Docker, Kubernetes, Terraform, Ansible. Build production pipelines.</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-info fs-6">70 Hours</span>
+                                    <div class="d-flex">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star"></i>
+                                        <span class="ms-1 text-muted small">(120)</span>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.6s">
+                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
+                            <div class="position-relative">
+                                <img src="{% static 'mainApp/img/service-2.jpg' %}" class="img-fluid w-100 course-img" alt="Kubernetes" style="height: 250px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 bg-success text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">CKA</div>
+                                <div class="position-absolute bottom-0 start-0 bg-danger text-white px-3 py-1 rounded-end fs-6 fw-bold m-3">Advanced</div>
+                            </div>
+                            <div class="p-4">
+                                <h4 class="course-title mb-2">Certified Kubernetes Administrator (CKA)</h4>
+                                <p class="text-muted mb-3">CNCF certification. Deploy, manage, troubleshoot Kubernetes clusters.</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-info fs-6">60 Hours</span>
+                                    <div class="d-flex">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <span class="ms-1 text-muted small">(75)</span>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Add more cards as needed -->
+                </div>
+            </div>
+            <!-- Other tabs would have filtered content -->
+        </div>
+        <div class="text-center mt-5">
+            <a href="#" class="btn btn-primary btn-lg rounded-pill py-3 px-5 fw-bold">View All Programs <i class="fas fa-arrow-right ms-2"></i></a>
+        </div>
+    </div>
+</div>
+<!-- Classes Section End -->
+
+<style>
+.course-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.course-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+}
+.course-img {
+    transition: transform 0.3s ease;
+}
+.course-card:hover .course-img {
+    transform: scale(1.05);
+}
+.hover-shadow {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+</style>
+
+{% endblock %}
