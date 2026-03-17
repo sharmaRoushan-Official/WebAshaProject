@@ -5,7 +5,7 @@ from django.db import models
 
 class Course(models.Model):
     title = models.CharField(max_length=200)
-    description = models.TextField()
+    description = models.TextField(max_length=300)
     image = models.ImageField(upload_to='course_images/')
     course_number = models.IntegerField(unique=True)
     is_active = models.BooleanField(default=True)
