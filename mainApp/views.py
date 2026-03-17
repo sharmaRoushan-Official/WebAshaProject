@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from .models import Course
 
 # Create your views here.
 
@@ -28,9 +29,15 @@ def classPage(request):
         return render(request, "mainApp/classes.html")
 
 
-def trainingPage(request):
-    if request.method == "GET":
-        return render(request, "mainApp/training.html")
+def ourCoursesPage(request):
+    
+    course = Course.objects.filter(is_active=True).order_by('course_number')
+
+    context = {
+        "course": course
+    }
+    
+    return render(request, "mainApp/ourCourses.html", context)
 
 
 def teamPage(request):
@@ -56,3 +63,5 @@ def contactPage(request):
 def error404Page(request):
     if request.method == "GET":
         return render(request, "mainApp/404.html")
+    
+
