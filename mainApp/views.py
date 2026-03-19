@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Course
+from .models import Course, TeamMember
 
 # Create your views here.
 
@@ -11,7 +11,9 @@ def homePage(request):
 
 def aboutPage(request):
     if request.method == "GET":
-        return render(request, "mainApp/about.html")
+        members = TeamMember.objects.filter(is_active=True)
+        print("DATA:", members)   # 👈 DEBUG
+        return render(request, "mainApp/about.html", {"members": members})
 
 
 def eventPage(request):
@@ -63,5 +65,9 @@ def contactPage(request):
 def error404Page(request):
     if request.method == "GET":
         return render(request, "mainApp/404.html")
+
+
+
+# ourTeam 
     
 
