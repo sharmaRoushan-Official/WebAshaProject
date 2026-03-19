@@ -1,0 +1,32 @@
+{% extends 'mainApp/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Registration Success - WebAsha{% endblock %}
+
+{% block body %}
+<!-- Hero Start -->
+<div class="container-fluid bg-primary py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="text-center">
+            <h1 class="display-3 text-white animated slideInDown">Registration Successful!</h1>
+        </div>
+    </div>
+</div>
+<!-- Hero End -->
+
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="bg-light p-5 mb-4 text-center">
+                    <i class="fas fa-check-circle text-success fa-5x mb-4"></i>
+                    <h2 class="mb-4">Welcome to WebAsha!</h2>
+                    <p class="lead mb-4">Your account has been created successfully. You can now login with your email and password.</p>
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg rounded-pill px-5 py-3 me-3">Login Now</a>
+                    <a href="{% url 'home' %}" class="btn btn-outline-primary btn-lg rounded-pill px-5 py-3">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
