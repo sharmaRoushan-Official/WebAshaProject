@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 
 # Create your models here.
 
@@ -26,6 +27,17 @@ class Profile(models.Model):
     date_joined_institute = models.DateField(auto_now_add=True)
     is_student = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
+    password = models.CharField(
+        max_length=128,
+        blank=True,
+        validators=[
+            RegexValidator(
+                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$',
+                message="Password must contain uppercase, lowercase, number, special char, min 6 chars."
+            )
+        ],
+        help_text="At least 6 chars: 1 uppercase, 1 lowercase, 1 number, 1 special (@$!%*?&)."
+    )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     def __str__(self):

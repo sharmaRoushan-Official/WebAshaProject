@@ -1,0 +1,31 @@
+{% extends 'mainApp/base.html' %}
+
+{% block title %}Login Success - WebAsha{% endblock %}
+
+{% block body %}
+<!-- Hero Start -->
+<div class="container-fluid bg-success py-5 mb-5 page-header">
+    <div class="container py-5">
+        <div class="text-center">
+            <h1 class="display-3 text-white animated slideInDown">Login Successful!</h1>
+        </div>
+    </div>
+</div>
+<!-- Hero End -->
+
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="bg-light p-5 mb-4 text-center">
+                    <i class="fas fa-sign-in-alt text-success fa-5x mb-4"></i>
+                    <h2 class="mb-4">Welcome Back!</h2>
+                    <p class="lead mb-4">You have successfully logged in to your WebAsha account.</p>
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-lg rounded-pill px-5 py-3 me-3">Go to Home</a>
+                    <a href="{% url 'ourCourses' %}" class="btn btn-outline-primary btn-lg rounded-pill px-5 py-3">View Courses</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
