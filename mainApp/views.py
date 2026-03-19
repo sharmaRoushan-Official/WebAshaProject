@@ -12,11 +12,16 @@ from .forms import LoginForm, RegisterForm
 
 def homePage(request):
     # Add forms to context
+    courses = Course.objects.filter(is_active=True)
     context = {
         'login_form': LoginForm(),
         'register_form': RegisterForm(),
+        'courses': courses
     }
     return render(request, "mainApp/home.html", context)
+
+
+
 
 def aboutPage(request):
     if request.method == "GET":

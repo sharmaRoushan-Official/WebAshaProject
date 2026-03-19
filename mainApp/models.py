@@ -66,3 +66,26 @@ class TeamMember(models.Model):
 
     class Meta:
         ordering = ['order']
+
+
+
+
+# live Batches 
+
+class LiveCourse(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    image = models.ImageField(upload_to='courses/')
+    
+    is_live = models.BooleanField(default=False)   # for LIVE badge
+    start_day = models.CharField(max_length=50)    # e.g. Monday
+    start_time = models.CharField(max_length=50)   # e.g. 7 PM
+    
+    button_text = models.CharField(max_length=50, default="Join Batch")
+    button_link = models.URLField(blank=True, null=True)
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
