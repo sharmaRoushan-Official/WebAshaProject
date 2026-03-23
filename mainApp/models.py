@@ -111,6 +111,7 @@ class LiveCourse(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     image = models.ImageField(upload_to='courses/')
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
     is_live = models.BooleanField(default=False)   # for LIVE badge
     start_day = models.CharField(max_length=50)    # e.g. Monday
