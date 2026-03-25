@@ -1,12 +1,14 @@
 from django import forms
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.forms import PasswordChangeForm
+from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .models import Profile
-from django.core.validators import RegexValidator
+
 
 class LoginForm(forms.Form):
     email = forms.EmailField(label='Email', max_length=254, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Enter your email'}))
     password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter your password'}))
+
 
 class RegisterForm(forms.ModelForm):
     password_confirm = forms.CharField(label='Confirm Password', widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password'}))
@@ -41,3 +43,10 @@ class RegisterForm(forms.ModelForm):
             raise ValidationError("Passwords do not match.")
         return cleaned_data
 
+
+class ChangePasswordForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['old_password'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Current Password'})
+        self.fields['new_password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'New Password'})
+        self.fields['new_password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm New Password'})

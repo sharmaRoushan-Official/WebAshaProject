@@ -1,0 +1,108 @@
+{% extends 'mainApp/base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block body %}
+<!-- Page Header Start -->
+<div class="container-fluid page-header py-5 wow fadeIn" data-wow-delay="0.1s">
+    <div class="container text-center py-5">
+        <h1 class="display-2 text-white mb-4 animated animate__fadeInDown">My Profile</h1>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<!-- Profile Section Start -->
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                <div class="bg-white rounded p-5">
+                    {% if messages %}
+                        <div class="mb-4">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="row g-4">
+                        <div class="col-md-4 text-center">
+                            {% if profile.profile_image %}
+                                <img src="{{ profile.profile_image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <i class="fas fa-user-circle text-primary mb-3" style="font-size: 150px;"></i>
+                            {% endif %}
+                            <h4 class="mb-1">{{ profile.first_name }} {{ profile.last_name }}</h4>
+                            <p class="text-primary mb-0">{{ profile.email }}</p>
+                        </div>
+                        <div class="col-md-8">
+                            <h4 class="mb-4">Profile Information</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">First Name:</label>
+                                    <p class="form-control-plaintext">{{ profile.first_name|default:"Not set" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Last Name:</label>
+                                    <p class="form-control-plaintext">{{ profile.last_name|default:"Not set" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email:</label>
+                                    <p class="form-control-plaintext">{{ profile.email|default:"Not set" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone:</label>
+                                    <p class="form-control-plaintext">{{ profile.phone|default:"Not set" }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Address:</label>
+                                    <p class="form-control-plaintext">{{ profile.address|default:"Not set" }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Bio:</label>
+                                    <p class="form-control-plaintext">{{ profile.bio|default:"Not set" }}</p>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Member Since:</label>
+                                    <p class="form-control-plaintext">{{ profile.date_joined_institute }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </button>
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="bg-white rounded p-5 h-100">
+                    <h4 class="mb-4">Quick Actions</h4>
+                    <div class="d-flex flex-column gap-3">
+                        <a href="{% url 'ourCourses' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-book me-2"></i> Browse Courses
+                        </a>
+                        <a href="{% url 'classes' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-chalkboard-teacher me-2"></i> View Classes
+                        </a>
+                        <a href="{% url 'contact' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-envelope me-2"></i> Contact Support
+                        </a>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Profile Section End -->
+{% endblock %}

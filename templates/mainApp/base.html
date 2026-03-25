@@ -104,7 +104,25 @@
                         </div>
                         <a href="{% url 'contact' %}" class="nav-item nav-link">Contact Us</a>
                     </div>
-<a href="#" class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0" data-bs-toggle="modal" data-bs-target="#authModal">Register Now</a>
+                    {% if user.is_authenticated %}
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
+                            {% if user.profile.profile_image %}
+                                <img src="{{ user.profile.profile_image.url }}" alt="Profile" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                            {% else %}
+                                <i class="fas fa-user-circle text-primary fs-4 me-2"></i>
+                            {% endif %}
+                            {{ user.profile.first_name }} {{ user.profile.last_name }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end m-0">
+                            <a href="{% url 'profile' %}" class="dropdown-item">View Profile</a>
+                            <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#changePasswordModal">Change Password</a>
+                            <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="#" class="btn btn-primary rounded-pill text-white py-2 px-4 flex-wrap flex-sm-shrink-0" data-bs-toggle="modal" data-bs-target="#authModal">Register Now</a>
+                    {% endif %}
                 </div>
             </nav>
             <!-- Auth Modal -->
@@ -171,6 +189,9 @@
             </div>
         </div>
         <!-- Navbar & Hero End -->
+
+        <!-- Change Password Modal - Global -->
+        {% include 'mainApp/partials/_change_password_modal.html' %}
 
         {% block body %}
 
@@ -293,6 +314,9 @@
     <script src="{% static 'mainApp/lib/lightbox/js/lightbox.min.js' %}"></script>
     
 
+    <!-- Change Password JS -->
+    <script src="{% static 'mainApp/js/change_password.js' %}"></script>
+    
     <!-- Template Javascript -->
     <script src="{% static 'mainApp/js/main.js' %}"></script>
 

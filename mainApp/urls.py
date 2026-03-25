@@ -1,5 +1,5 @@
 from django.urls import path
-
+from django.shortcuts import render
 from .views import *
 
 urlpatterns = [
@@ -19,4 +19,10 @@ urlpatterns = [
     path("login/", login_view, name="login"),
     path("registration-success/", lambda request: render(request, 'mainApp/registration_success.html'), name="registration_success"),
     path("login-success/", lambda request: render(request, 'mainApp/login_success.html'), name="login_success"),
+    path("profile/", profile_view, name="profile"),
+    
+    # Change Password API (for modal)
+    path("api/change-password/", change_password_api, name="change_password_api"),
+    
+    path("logout/", logout_view, name="logout"),
 ]
