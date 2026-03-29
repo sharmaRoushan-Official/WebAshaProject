@@ -4,222 +4,739 @@
 {% block title %}IT Training Courses{% endblock %}
 
 {% block body %}
-<!-- Courses Start -->
-<div class="container-fluid courses py-5" style="background-color: #f8f9fa;">
-    <div class="container py-5">
-        <!-- Hero Section -->
-        <div class="row g-4 mb-5">
-            <div class="col-12">
-                <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">IT Training Courses</h4>
-                <h1 class="display-2 mb-4 wow fadeInUp" data-wow-delay="0.3s">Browse Top IT Courses</h1>
-                <p class="lead text-muted mb-4">Discover professional IT training courses with certification. Learn from experts.</p>
-                <div class="input-group input-group-lg">
-                    <input type="search" class="form-control border-end-0 border-danger" placeholder="Search for Python, AWS, Cyber Security..." aria-label="Search">
-                    <span class="input-group-text bg-danger border-start-0">
-                        <i class="fas fa-search text-white"></i>
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <div class="text-center mb-5 wow fadeInUp" data-wow-delay="0.3s">
-            <a class="btn btn-danger btn-lg rounded-pill px-5 py-3 fw-bold" href="#">View All Courses</a>
-        </div>
-        <!-- Courses Layout -->
-        <div class="row g-4">
-            <!-- Sidebar -->
-            <div class="col-lg-4 order-2 order-lg-1">
-                <div class="card sticky-top" style="top: 20px;">
-                    <div class="card-header bg-white border-0 pb-0">
-                        <h5 class="fw-bold text-dark mb-3">Filters</h5>
-                    </div>
-                      <!-- Filter Form -->
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-dark">Level</label>
-                                <select class="form-select form-select-sm">
-                                    <option>All</option>
-                                    <option>Beginner</option>
-                                    <option>Intermediate</option>
-                                    <option>Advanced</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-dark">Price</label>
-                                <select class="form-select form-select-sm">
-                                    <option>All</option>
-                                    <option>< ₹5,000</option>
-                                    <option>₹5,000 - ₹15,000</option>
-                                    <option>> ₹15,000</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-dark">Duration</label>
-                                <select class="form-select form-select-sm">
-                                    <option>All</option>
-                                    <option>< 20 hours</option>
-                                    <option>20-40 hours</option>
-                                    <option>> 40 hours</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-danger w-100 py-2 fw-medium">Apply Filters</button>
-                            <div class="mt-3">
-                                <button type="button" class="btn btn-link p-0 text-muted small">Clear all</button>
-                            </div>
-                        </form>
-                    <div class="card-body p-3">
-                        <!-- Categories -->
-                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Categories</h6>
-                        <div class="categories-list mb-4">
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-crown me-2 text-danger"></i>Red Hat
-                            </a>
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-shield-alt me-2 text-danger"></i>Cybersecurity & Ethical Hacking - EC-Council
-                            </a>
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-hacker me-2 text-danger"></i>Cybersecurity & Ethical Hacking - OffSec
-                            </a>
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-network-wired me-2 text-danger"></i>Networking & Infrastructure (Cisco, VMware, Veritas)
-                            </a>
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-cloud me-2 text-danger"></i>Cloud (AWS, Azure, GCP)
-                            </a>
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-docker me-2 text-danger"></i>DevOps (Docker, Kubernetes)
-                            </a>
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-database me-2 text-danger"></i>Programming & Databases (Python, Oracle, SQL, Big Data)
-                            </a>
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-brain me-2 text-danger"></i>AI, ML & Data Science
-                            </a>
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-laptop-code me-2 text-danger"></i>Web & Digital Skills (Full Stack, Web Tech, Digital Marketing, Graphic Design)
-                            </a>
-                            <a href="#" class="category-item d-block p-2 rounded mb-2 text-decoration-none text-dark fw-medium border-start border-3 border-danger ps-3 bg-light hover-shadow">
-                                <i class="fas fa-briefcase me-2 text-danger"></i>Corporate & Career Training (Soft Skills, Internships, Job-Oriented Programs)
-                            </a>
-                        </div>
-                      
-                    </div>
-                </div>
-            </div>
-            <!-- Main Courses Grid -->
-            <div class="col-lg-8 order-1 order-lg-2">
-{% include "mainApp/partials/_courses_grid.html" %}
-                </div>
-            </div>
-            <div class="col-12 text-center mt-5">
-                <button class="btn btn-outline-danger btn-lg rounded-pill px-5 py-3 fw-bold" onclick="loadMoreCourses()">Load More Courses</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <style>
-/* Udemy-like clean styling - Red/White/Grey theme */
-.course-item {
-    border: 1px solid #dee2e6;
-    background: white;
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Epilogue:wght@300;400;500&display=swap');
+
+  /* ══ Global Page Variables ══ */
+  :root {
+    --red:      #e83a3a;
+    --red-dark: #c42e2e;
+    --red-dim:  rgba(232,58,58,0.10);
+    --red-glow: rgba(232,58,58,0.22);
+    --ink:      #0e1017;
+    --page-bg:  #f2f3f7;
+    --card-bg:  #ffffff;
+    --muted:    #6b7280;
+    --border:   #e5e7eb;
+    --font-h:   'Syne', sans-serif;
+    --font-b:   'Epilogue', sans-serif;
+
+    /* sidebar */
+    --sb-bg:       #111318;
+    --sb-surface:  #191c24;
+    --sb-border:   rgba(255,255,255,0.07);
+    --sb-text:     #e8e6e1;
+    --sb-label:    #9a9da8;
+    --sb-input-bg: #21242f;
+    --sb-hover:    #1e2130;
+    --sb-muted:    #6b6e7a;
+  }
+
+  body { font-family: var(--font-b); }
+
+  /* ══ Hero ══ */
+  .crs-hero {
+    background: var(--ink);
+    padding: 72px 0 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .crs-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 55% 90% at 5% 50%, rgba(232,58,58,0.14) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 60% at 95% 30%, rgba(232,58,58,0.08) 0%, transparent 65%);
+  }
+  .crs-hero-inner { position: relative; z-index: 1; }
+
+  .crs-hero .sub-label {
+    font-family: var(--font-h);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .crs-hero .sub-label::before {
+    content: '';
+    width: 28px; height: 2px;
+    background: var(--red);
+    border-radius: 2px;
+  }
+
+  .crs-hero h1 {
+    font-family: var(--font-h);
+    font-size: clamp(34px, 5.5vw, 58px);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  .crs-hero h1 span { color: var(--red); }
+
+  .crs-hero p {
+    color: rgba(255,255,255,0.5);
+    font-size: 15px;
+    max-width: 480px;
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  /* Search bar */
+  .crs-search {
+    display: flex;
+    max-width: 540px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .crs-search:focus-within {
+    border-color: rgba(232,58,58,0.55);
+    box-shadow: 0 0 0 4px var(--red-glow);
+  }
+  .crs-search input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 13px 18px;
+    color: #fff;
+    font-family: var(--font-b);
+    font-size: 14px;
+  }
+  .crs-search input::placeholder { color: rgba(255,255,255,0.3); }
+  .crs-search button {
+    background: var(--red);
+    border: none;
+    padding: 0 22px;
+    color: #fff;
+    font-size: 14px;
     cursor: pointer;
-}
-.course-item:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(220,53,69,0.15) !important;
-    border-color: #dc3545;
-}
-.course-img {
-    transition: transform 0.3s ease;
-}
-.course-item:hover .course-img {
-    transform: scale(1.05);
-}
-.category-item {
-    transition: all 0.3s ease;
-    border-radius: 8px !important;
-}
-.category-item:hover {
-    background: linear-gradient(90deg, #f8f9fa, #dc3545) !important;
-    color: white !important;
-    transform: translateX(5px);
-    box-shadow: 0 4px 12px rgba(220,53,69,0.2);
-}
-.category-item:hover i {
-    color: white !important;
-}
-.hover-shadow {
-    transition: all 0.3s ease;
-}
-.btn-danger {
-    background: linear-gradient(135deg, #dc3545, #c82333) !important;
-    border-color: #dc3545 !important;
-    transition: all 0.3s ease;
-}
-.btn-danger:hover {
-    background: linear-gradient(135deg, #c82333, #bd2130) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(220,53,69,0.3) !important;
-}
-.card {
-    border: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-.list-group-item {
-    border: none;
-    padding: 0.5rem 0;
-}
-.stars {
-    color: #ffc107 !important;
-}
-.course-duration {
-    background: #f8f9fa;
-    color: #dc3545;
+    transition: background 0.2s;
+    border-radius: 0 11px 11px 0;
+  }
+  .crs-search button:hover { background: var(--red-dark); }
+
+  /* Hero stats strip */
+  .hero-stats {
+    display: flex;
+    gap: 32px;
+    margin-top: 36px;
+    flex-wrap: wrap;
+  }
+  .hero-stat-num {
+    font-family: var(--font-h);
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .hero-stat-lbl {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+  }
+  .hero-stat-sep {
+    width: 1px;
+    background: rgba(255,255,255,0.1);
+    align-self: stretch;
+  }
+
+  /* ══ Page Body ══ */
+  .crs-body {
+    background: var(--page-bg);
+    padding: 48px 0 80px;
+  }
+
+  /* ══ Sidebar ══ */
+  .sb-wrap {
+    font-family: var(--font-b);
+    background: var(--sb-bg);
+    border-radius: 14px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    border: 1px solid var(--sb-border);
+    overflow: hidden;
+    position: sticky;
+    top: 20px;
+  }
+  .sb-accent-bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--red) 0%, #ff7043 100%);
+  }
+
+  /* Sidebar header */
+  .sb-header {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid var(--sb-border);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .sb-header-icon {
+    width: 28px; height: 28px;
+    background: var(--red-dim);
+    border: 1px solid rgba(232,58,58,0.28);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--red);
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .sb-header h5 {
+    font-family: var(--font-h);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--sb-text);
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  .sb-badge {
+    margin-left: auto;
+    background: var(--red-dim);
+    color: var(--red);
+    border: 1px solid rgba(232,58,58,0.22);
+    border-radius: 100px;
+    font-size: 9px;
     font-weight: 600;
-}
-@media (max-width: 991px) {
-    .sticky-top {
-        position: relative !important;
-    }
-}
+    letter-spacing: 0.1em;
+    padding: 2px 9px;
+    text-transform: uppercase;
+    font-family: var(--font-h);
+  }
+
+  /* Filter group */
+  .sb-filters {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--sb-border);
+  }
+  .sb-section-label {
+    font-family: var(--font-h);
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--sb-muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .sb-filter-row { margin-bottom: 11px; }
+  .sb-filter-row label {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--sb-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .sb-select {
+    width: 100%;
+    background: var(--sb-input-bg);
+    color: var(--sb-text);
+    border: 1px solid var(--sb-border);
+    border-radius: 8px;
+    padding: 8px 30px 8px 11px;
+    font-family: var(--font-b);
+    font-size: 13px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6e7a' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .sb-select:focus {
+    border-color: rgba(232,58,58,0.45);
+    box-shadow: 0 0 0 3px var(--red-glow);
+  }
+  .sb-select option { background: #21242f; color: var(--sb-text); }
+
+  .sb-btn-apply {
+    width: 100%;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 10px 0;
+    font-family: var(--font-h);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    margin-top: 4px;
+  }
+  .sb-btn-apply:hover {
+    background: var(--red-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px var(--red-glow);
+  }
+  .sb-btn-clear {
+    background: none; border: none;
+    color: var(--sb-muted);
+    font-family: var(--font-b);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 7px 0 0;
+    display: block; width: 100%;
+    text-align: center;
+    transition: color 0.2s;
+  }
+  .sb-btn-clear:hover { color: var(--red); }
+
+  /* Categories */
+  .sb-categories { padding: 16px 18px 18px; }
+
+  .sb-cat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    text-decoration: none;
+    color: var(--sb-text);
+    font-size: 12.5px;
+    font-weight: 400;
+    margin-bottom: 3px;
+    transition: background 0.18s, color 0.18s, padding-left 0.18s;
+    border: 1px solid transparent;
+    line-height: 1.35;
+  }
+  .sb-cat-item:hover {
+    background: var(--sb-hover);
+    border-color: var(--sb-border);
+    padding-left: 14px;
+    color: #fff;
+  }
+  .sb-cat-item.active {
+    background: var(--red-dim);
+    border-color: rgba(232,58,58,0.28);
+    color: var(--red);
+  }
+  .sb-cat-icon {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--sb-muted);
+    flex-shrink: 0;
+    transition: background 0.18s, color 0.18s;
+  }
+  .sb-cat-item:hover .sb-cat-icon,
+  .sb-cat-item.active .sb-cat-icon {
+    background: var(--red-dim);
+    color: var(--red);
+  }
+  .sb-cat-label { flex: 1; }
+  .sb-cat-arrow {
+    font-size: 9px; color: var(--sb-muted);
+    opacity: 0; transition: opacity 0.18s, transform 0.18s;
+    transform: translateX(-4px);
+  }
+  .sb-cat-item:hover .sb-cat-arrow { opacity: 1; transform: translateX(0); }
+
+  .sb-divider { height: 1px; background: var(--sb-border); margin: 0 18px; }
+
+  /* ══ Course Cards ══ */
+  .crs-grid-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .crs-grid-header h4 {
+    font-family: var(--font-h);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0;
+  }
+  .crs-sort {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 28px 7px 12px;
+    font-family: var(--font-b);
+    font-size: 12.5px;
+    color: var(--ink);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .course-item {
+    background: var(--card-bg);
+    border-radius: 13px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .course-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(232,58,58,0.13);
+    border-color: rgba(232,58,58,0.35);
+  }
+  .course-img-wrap {
+    position: relative;
+    overflow: hidden;
+    height: 170px;
+  }
+  .course-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s;
+  }
+  .course-item:hover .course-img-wrap img { transform: scale(1.06); }
+
+  .course-badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: var(--red);
+    color: #fff;
+    font-family: var(--font-h);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 100px;
+  }
+  .course-body {
+    padding: 16px 18px 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .course-cat-tag {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--red);
+    font-weight: 600;
+    font-family: var(--font-h);
+    margin-bottom: 6px;
+  }
+  .course-title {
+    font-family: var(--font-h);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+  .course-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .course-meta span { display: flex; align-items: center; gap: 4px; }
+  .course-meta i { font-size: 10px; color: var(--red); }
+
+  .course-footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .course-price {
+    font-family: var(--font-h);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .course-price .original {
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: line-through;
+    font-weight: 400;
+    margin-left: 5px;
+    font-family: var(--font-b);
+  }
+  .course-enroll {
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-family: var(--font-h);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .course-enroll:hover {
+    background: var(--red);
+    transform: translateY(-1px);
+  }
+
+  /* Stars */
+  .stars { color: #f59e0b; font-size: 11px; }
+
+  /* Load More */
+  .load-more-btn {
+    background: transparent;
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    border-radius: 100px;
+    padding: 13px 44px;
+    font-family: var(--font-h);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+  .load-more-btn:hover {
+    background: var(--ink);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(14,16,23,0.2);
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .sb-wrap        { animation: fadeUp 0.45s cubic-bezier(.22,1,.36,1) 0.1s both; }
+  .crs-grid-wrap  { animation: fadeUp 0.45s cubic-bezier(.22,1,.36,1) 0.2s both; }
+
+  @media (max-width: 991px) {
+    .sb-wrap { position: relative !important; top: auto; }
+  }
 </style>
+
+<!-- ── Hero ── -->
+<div class="crs-hero">
+  <div class="container crs-hero-inner">
+    <p class="sub-label">Professional IT Training</p>
+    <h1>Browse Top <span>IT Courses</span></h1>
+    <p>Discover expert-led courses with industry certifications. Build real skills, get hired faster.</p>
+
+    <div class="crs-search">
+      <input type="search" placeholder="Search Python, AWS, Cyber Security…">
+      <button><i class="fas fa-search"></i></button>
+    </div>
+
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">120+</div>
+        <div class="hero-stat-lbl">Courses</div>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div>
+        <div class="hero-stat-num">15K+</div>
+        <div class="hero-stat-lbl">Students</div>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div>
+        <div class="hero-stat-num">98%</div>
+        <div class="hero-stat-lbl">Pass Rate</div>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div>
+        <div class="hero-stat-num">50+</div>
+        <div class="hero-stat-lbl">Certifications</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Body ── -->
+<div class="crs-body">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- ── Sidebar ── -->
+      <div class="col-lg-3 order-2 order-lg-1">
+        <div class="sb-wrap">
+          <div class="sb-accent-bar"></div>
+
+          <div class="sb-header">
+            <div class="sb-header-icon"><i class="fas fa-sliders-h"></i></div>
+            <h5>Filters</h5>
+            <span class="sb-badge">Refine</span>
+          </div>
+
+          <div class="sb-filters">
+            <div class="sb-section-label">Narrow Results</div>
+
+            <div class="sb-filter-row">
+              <label>Level</label>
+              <select class="sb-select">
+                <option>All Levels</option>
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Advanced</option>
+              </select>
+            </div>
+
+            <div class="sb-filter-row">
+              <label>Price</label>
+              <select class="sb-select">
+                <option>Any Price</option>
+                <option>Under ₹5,000</option>
+                <option>₹5,000 – ₹15,000</option>
+                <option>Above ₹15,000</option>
+              </select>
+            </div>
+
+            <div class="sb-filter-row" style="margin-bottom:14px;">
+              <label>Duration</label>
+              <select class="sb-select">
+                <option>Any Duration</option>
+                <option>Under 20 hrs</option>
+                <option>20 – 40 hrs</option>
+                <option>Over 40 hrs</option>
+              </select>
+            </div>
+
+            <button type="submit" class="sb-btn-apply">
+              <i class="fas fa-check me-1"></i> Apply Filters
+            </button>
+            <button type="button" class="sb-btn-clear">
+              <i class="fas fa-times me-1"></i> Clear all
+            </button>
+          </div>
+
+          <div class="sb-divider"></div>
+
+          <div class="sb-categories">
+            <div class="sb-section-label">Categories</div>
+
+            <a href="#" class="sb-cat-item active">
+              <span class="sb-cat-icon"><i class="fas fa-crown"></i></span>
+              <span class="sb-cat-label">Red Hat</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+            <a href="#" class="sb-cat-item">
+              <span class="sb-cat-icon"><i class="fas fa-shield-alt"></i></span>
+              <span class="sb-cat-label">Cybersecurity — EC-Council</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+            <a href="#" class="sb-cat-item">
+              <span class="sb-cat-icon"><i class="fas fa-user-secret"></i></span>
+              <span class="sb-cat-label">Cybersecurity — OffSec</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+            <a href="#" class="sb-cat-item">
+              <span class="sb-cat-icon"><i class="fas fa-network-wired"></i></span>
+              <span class="sb-cat-label">Networking &amp; Infrastructure</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+            <a href="#" class="sb-cat-item">
+              <span class="sb-cat-icon"><i class="fas fa-cloud"></i></span>
+              <span class="sb-cat-label">Cloud — AWS, Azure, GCP</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+            <a href="#" class="sb-cat-item">
+              <span class="sb-cat-icon"><i class="fab fa-docker"></i></span>
+              <span class="sb-cat-label">DevOps — Docker &amp; K8s</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+            <a href="#" class="sb-cat-item">
+              <span class="sb-cat-icon"><i class="fas fa-database"></i></span>
+              <span class="sb-cat-label">Programming &amp; Databases</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+            <a href="#" class="sb-cat-item">
+              <span class="sb-cat-icon"><i class="fas fa-brain"></i></span>
+              <span class="sb-cat-label">AI, ML &amp; Data Science</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+            <a href="#" class="sb-cat-item">
+              <span class="sb-cat-icon"><i class="fas fa-laptop-code"></i></span>
+              <span class="sb-cat-label">Web &amp; Digital Skills</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+            <a href="#" class="sb-cat-item">
+              <span class="sb-cat-icon"><i class="fas fa-briefcase"></i></span>
+              <span class="sb-cat-label">Corporate &amp; Career</span>
+              <i class="fas fa-chevron-right sb-cat-arrow"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Main Grid ── -->
+      <div class="col-lg-9 order-1 order-lg-2 crs-grid-wrap">
+        <div class="crs-grid-header">
+          <h4>All Courses <span style="color:var(--muted);font-weight:400;font-size:14px;margin-left:6px;">120 results</span></h4>
+          <select class="crs-sort">
+            <option>Sort: Most Popular</option>
+            <option>Sort: Newest</option>
+            <option>Sort: Price: Low to High</option>
+            <option>Sort: Price: High to Low</option>
+          </select>
+        </div>
+
+        {% include "mainApp/partials/_courses_grid.html" %}
+      </div>
+
+    </div>
+
+    <!-- Load More -->
+    <div class="text-center mt-5">
+      <button class="load-more-btn" onclick="loadMoreCourses()">
+        <i class="fas fa-plus me-2"></i>Load More Courses
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
 let currentFilter = 'all';
 
 function filterCourses(category) {
-    currentFilter = category;
-    const courses = document.querySelectorAll('.course-item');
-    courses.forEach(course => {
-        if (category === 'all' || course.dataset.category === category) {
-            course.style.display = 'block';
-            course.parentElement.classList.remove('d-none');
-        } else {
-            course.style.display = 'none';
-            course.parentElement.classList.add('d-none');
-        }
-    });
-    // Update active category
-    document.querySelectorAll('.category-item').forEach(cat => cat.classList.remove('active'));
-    event.target.classList.add('active');
+  currentFilter = category;
+  document.querySelectorAll('.course-item').forEach(course => {
+    const show = category === 'all' || course.dataset.category === category;
+    course.style.display = show ? 'block' : 'none';
+    course.parentElement.classList.toggle('d-none', !show);
+  });
+  document.querySelectorAll('.sb-cat-item').forEach(c => c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
 }
 
 function loadMoreCourses() {
-    alert('Load more courses functionality - connect to backend!');
+  alert('Load more courses — connect to backend!');
 }
 
-// Add click listeners to categories
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.category-item').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const category = this.dataset.category || 'all';
-            filterCourses(category);
-        });
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.sb-cat-item').forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      const category = this.dataset.category || 'all';
+      filterCourses.call(this, category);
     });
+  });
 });
 </script>
 
 {% endblock body %}
-
