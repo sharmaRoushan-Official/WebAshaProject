@@ -1,0 +1,663 @@
+{% extends 'mainApp/base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} — WebAsha{% endblock %}
+
+{% block body %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Epilogue:wght@300;400;500&display=swap');
+
+:root {
+  --red:       #e83a3a;
+  --red-dark:  #c42e2e;
+  --red-dim:   rgba(232,58,58,0.10);
+  --red-glow:  rgba(232,58,58,0.22);
+  --ink:       #0e1017;
+  --ink-soft:  #1a1d26;
+  --page-bg:   #f2f3f7;
+  --card-bg:   #ffffff;
+  --muted:     #6b7280;
+  --border:    #e5e7eb;
+  --gold:      #f59e0b;
+  --green:     #10b981;
+  --font-h:    'Syne', sans-serif;
+  --font-b:    'Epilogue', sans-serif;
+}
+* { box-sizing: border-box; }
+body { font-family: var(--font-b); background: var(--page-bg); }
+
+/* ── Breadcrumb bar ── */
+.cd-topbar {
+  background: var(--ink-soft);
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.cd-breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12.5px; color: rgba(255,255,255,0.45);
+  flex-wrap: wrap;
+}
+.cd-breadcrumb a {
+  color: rgba(255,255,255,0.55); text-decoration: none;
+  transition: color 0.2s;
+}
+.cd-breadcrumb a:hover { color: var(--red); }
+.cd-breadcrumb .sep { font-size: 10px; opacity: 0.4; }
+.cd-breadcrumb .current { color: rgba(255,255,255,0.85); }
+
+.back-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 7px 14px;
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-family: var(--font-h);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+  margin-right: 16px;
+}
+.back-btn:hover {
+  background: var(--red-dim);
+  border-color: rgba(232,58,58,0.35);
+  color: var(--red);
+}
+
+/* ── Hero Banner ── */
+.cd-hero {
+  background: var(--ink);
+  padding: 52px 0 56px;
+  position: relative; overflow: hidden;
+}
+.cd-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 50% 100% at 0% 50%, rgba(232,58,58,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 70% at 100% 20%, rgba(232,58,58,0.07) 0%, transparent 60%);
+}
+.cd-hero-inner {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr 340px;
+  gap: 48px; align-items: center;
+}
+@media(max-width:900px) {
+  .cd-hero-inner { grid-template-columns: 1fr; }
+  .cd-hero-preview { display: none; }
+}
+
+/* Left text */
+.cd-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--red-dim); border: 1px solid rgba(232,58,58,0.28);
+  border-radius: 100px; padding: 4px 14px;
+  font-family: var(--font-h); font-size: 10px;
+  font-weight: 700; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--red);
+  margin-bottom: 18px;
+}
+.cd-hero h1 {
+  font-family: var(--font-h);
+  font-size: clamp(24px, 3.5vw, 42px);
+  font-weight: 800; color: #fff;
+  line-height: 1.15; margin-bottom: 18px;
+  letter-spacing: -0.01em;
+}
+.cd-hero .tagline {
+  color: rgba(255,255,255,0.55); font-size: 15px;
+  line-height: 1.7; margin-bottom: 22px; max-width: 520px;
+}
+.cd-rating-row {
+  display: flex; align-items: center; gap: 12px;
+  flex-wrap: wrap; margin-bottom: 20px;
+}
+.stars-lg { color: var(--gold); font-size: 14px; letter-spacing: 2px; }
+.rating-num {
+  font-family: var(--font-h); font-size: 14px;
+  font-weight: 700; color: #fff;
+}
+.rating-count { font-size: 13px; color: rgba(255,255,255,0.4); }
+.cd-meta-row {
+  display: flex; gap: 20px; flex-wrap: wrap;
+  font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 10px;
+}
+.cd-meta-row span { display: flex; align-items: center; gap: 6px; }
+.cd-meta-row i { color: var(--red); font-size: 11px; }
+
+/* Right: preview card (desktop floating) */
+.cd-hero-preview {
+  background: #fff; border-radius: 16px;
+  overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+}
+.preview-img { position: relative; height: 200px; }
+.preview-img img { width: 100%; height: 100%; object-fit: cover; }
+.preview-play {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.35);
+}
+.preview-play-btn {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(255,255,255,0.92); border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--ink); cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+.preview-play-btn:hover { transform: scale(1.1); background: #fff; }
+.preview-body { padding: 22px 22px 24px; }
+.preview-price {
+  font-family: var(--font-h); font-size: 28px;
+  font-weight: 800; color: var(--ink); margin-bottom: 4px;
+}
+.preview-orig {
+  font-size: 13px; color: var(--muted);
+  text-decoration: line-through; margin-bottom: 16px;
+}
+.enroll-btn-lg {
+  width: 100%; background: var(--red); color: #fff;
+  border: none; border-radius: 10px; padding: 14px 0;
+  font-family: var(--font-h); font-size: 15px;
+  font-weight: 700; letter-spacing: 0.04em;
+  cursor: pointer; transition: background 0.2s, transform 0.15s;
+  margin-bottom: 10px;
+}
+.enroll-btn-lg:hover {
+  background: var(--red-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px var(--red-glow);
+}
+.wishlist-btn {
+  width: 100%; background: transparent; color: var(--ink);
+  border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 0;
+  font-family: var(--font-h); font-size: 13px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.wishlist-btn:hover { border-color: var(--red); color: var(--red); }
+.preview-guarantee {
+  text-align: center; font-size: 11.5px;
+  color: var(--muted); margin-top: 12px;
+}
+.preview-guarantee i { color: var(--green); margin-right: 4px; }
+
+/* ── Body layout ── */
+.cd-body { padding: 48px 0 80px; }
+.cd-layout {
+  display: grid; grid-template-columns: 1fr 340px;
+  gap: 40px; align-items: start;
+}
+@media(max-width:900px) {
+  .cd-layout { grid-template-columns: 1fr; }
+}
+
+/* Content sections */
+.cd-section {
+  background: var(--card-bg); border-radius: 14px;
+  border: 1px solid var(--border); padding: 32px 36px;
+  margin-bottom: 24px;
+}
+@media(max-width:600px) { .cd-section { padding: 22px 18px; } }
+
+.cd-sec-title {
+  font-family: var(--font-h); font-size: 18px;
+  font-weight: 700; color: var(--ink);
+  margin-bottom: 20px; padding-bottom: 14px;
+  border-bottom: 2px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.cd-sec-title i { color: var(--red); font-size: 15px; }
+
+/* What you'll learn */
+.learn-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media(max-width:580px) { .learn-grid { grid-template-columns: 1fr; } }
+.learn-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: 13.5px; color: #374151; line-height: 1.5;
+}
+.learn-item i { color: var(--green); font-size: 12px; margin-top: 3px; flex-shrink: 0; }
+
+/* Requirements */
+.req-list { list-style: none; padding: 0; margin: 0; }
+.req-list li {
+  display: flex; gap: 10px; align-items: flex-start;
+  font-size: 13.5px; color: #374151; line-height: 1.55;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+}
+.req-list li:last-child { border-bottom: none; }
+.req-list li::before {
+  content: '▸'; color: var(--red); font-size: 11px;
+  margin-top: 3px; flex-shrink: 0;
+}
+
+/* Curriculum */
+.curriculum-item {
+  background: var(--page-bg); border-radius: 10px;
+  border: 1px solid var(--border); margin-bottom: 8px;
+  overflow: hidden;
+}
+.curriculum-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; cursor: pointer;
+  transition: background 0.2s;
+}
+.curriculum-header:hover { background: #ebebef; }
+.curr-title {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-h); font-size: 13.5px;
+  font-weight: 600; color: var(--ink);
+}
+.curr-num {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: var(--ink); color: var(--red);
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.curr-meta { font-size: 11.5px; color: var(--muted); display: flex; gap: 12px; }
+.curr-lessons { padding: 0 18px 14px; }
+.curr-lesson-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; font-size: 13px; color: #374151;
+  border-bottom: 1px solid var(--border);
+}
+.curr-lesson-item:last-child { border-bottom: none; }
+.curr-lesson-item i { color: var(--muted); font-size: 11px; flex-shrink: 0; }
+.curr-lesson-dur { margin-left: auto; font-size: 11.5px; color: var(--muted); }
+
+/* Instructor */
+.instructor-card {
+  display: flex; gap: 18px; align-items: flex-start;
+}
+.inst-avatar {
+  width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--ink), #2a2538);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-h); font-size: 26px; font-weight: 700;
+  color: var(--red); border: 3px solid var(--border);
+}
+.inst-name {
+  font-family: var(--font-h); font-size: 17px;
+  font-weight: 700; color: var(--ink); margin-bottom: 4px;
+}
+.inst-role { font-size: 13px; color: var(--red); margin-bottom: 8px; font-weight: 500; }
+.inst-bio { font-size: 13.5px; color: var(--muted); line-height: 1.65; }
+.inst-stats { display: flex; gap: 18px; margin-bottom: 10px; flex-wrap: wrap; }
+.inst-stat { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.inst-stat i { color: var(--red); font-size: 11px; }
+
+/* ── Sidebar (desktop sticky) ── */
+.cd-sticky-card {
+  background: var(--card-bg); border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.09);
+  overflow: hidden; position: sticky; top: 20px;
+}
+.cd-sticky-img { height: 200px; overflow: hidden; position: relative; }
+.cd-sticky-img img { width: 100%; height: 100%; object-fit: cover; }
+.cd-sticky-body { padding: 24px 24px 26px; }
+.sticky-price {
+  font-family: var(--font-h); font-size: 28px;
+  font-weight: 800; color: var(--ink); margin-bottom: 3px;
+}
+.sticky-orig {
+  font-size: 13px; color: var(--muted);
+  text-decoration: line-through; margin-bottom: 18px;
+}
+.enroll-btn-sticky {
+  width: 100%; background: var(--red); color: #fff;
+  border: none; border-radius: 10px; padding: 14px 0;
+  font-family: var(--font-h); font-size: 15px;
+  font-weight: 700; letter-spacing: 0.04em;
+  cursor: pointer; transition: background 0.2s, transform 0.15s;
+  margin-bottom: 10px; display: block; text-align: center;
+  text-decoration: none;
+}
+.enroll-btn-sticky:hover {
+  background: var(--red-dark); color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px var(--red-glow);
+}
+.wishlist-btn-s {
+  width: 100%; background: transparent; color: var(--ink);
+  border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 0;
+  font-family: var(--font-h); font-size: 13px;
+  font-weight: 600; cursor: pointer; transition: all 0.2s;
+  margin-bottom: 18px;
+}
+.wishlist-btn-s:hover { border-color: var(--red); color: var(--red); }
+.includes-list { list-style: none; padding: 0; margin: 0; }
+.includes-list li {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: #374151; padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+}
+.includes-list li:last-child { border-bottom: none; }
+.includes-list li i { color: var(--red); font-size: 12px; width: 16px; text-align: center; }
+.guarantee-note {
+  text-align: center; font-size: 11.5px; color: var(--muted);
+  margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+}
+.guarantee-note i { color: var(--green); }
+
+/* Mobile enroll bar */
+.mobile-enroll-bar {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; border-top: 1px solid var(--border);
+  padding: 14px 20px; z-index: 999;
+  flex-direction: column; gap: 4px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+}
+.mobile-enroll-bar .mob-price {
+  font-family: var(--font-h); font-size: 20px;
+  font-weight: 800; color: var(--ink);
+}
+@media(max-width: 900px) {
+  .mobile-enroll-bar { display: flex; }
+  .cd-body { padding-bottom: 120px; }
+}
+.mob-enroll {
+  background: var(--red); color: #fff; border: none;
+  border-radius: 9px; padding: 12px 24px;
+  font-family: var(--font-h); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s; white-space: nowrap;
+}
+.mob-enroll:hover { background: var(--red-dark); }
+
+/* Related courses */
+.related-title {
+  font-family: var(--font-h); font-size: 16px;
+  font-weight: 700; color: var(--ink); margin-bottom: 16px;
+  padding-bottom: 12px; border-bottom: 2px solid var(--border);
+}
+.related-card {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+  text-decoration: none; transition: background 0.2s;
+}
+.related-card:last-child { border-bottom: none; }
+.related-card:hover { opacity: 0.8; }
+.related-thumb {
+  width: 70px; height: 52px; border-radius: 7px;
+  object-fit: cover; flex-shrink: 0;
+}
+.related-info .rt { font-family: var(--font-h); font-size: 12.5px; font-weight: 600; color: var(--ink); line-height: 1.35; margin-bottom: 4px; }
+.related-info .rp { font-family: var(--font-h); font-size: 13px; font-weight: 700; color: var(--red); }
+
+/* Tags */
+.tag-list { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.tag {
+  background: var(--page-bg); border: 1px solid var(--border);
+  border-radius: 100px; padding: 4px 12px;
+  font-size: 11.5px; color: var(--muted); font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.cd-section { animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both; }
+.cd-section:nth-child(1) { animation-delay: 0.05s; }
+.cd-section:nth-child(2) { animation-delay: 0.12s; }
+.cd-section:nth-child(3) { animation-delay: 0.18s; }
+.cd-section:nth-child(4) { animation-delay: 0.24s; }
+.cd-section:nth-child(5) { animation-delay: 0.30s; }
+</style>
+
+<!-- Topbar / Breadcrumb -->
+<div class="cd-topbar">
+  <div class="container">
+    <div class="cd-breadcrumb">
+      <a href="{% url 'ourCourses' %}" class="back-btn">
+        <i class="fas fa-arrow-left"></i> All Courses
+      </a>
+      <a href="{% url 'home' %}">Home</a>
+      <span class="sep">›</span>
+      <a href="{% url 'ourCourses' %}">Courses</a>
+      <span class="sep">›</span>
+      <span class="current">{{ course.title|truncatewords:6 }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Hero Banner -->
+<div class="cd-hero">
+  <div class="container">
+    <div class="cd-hero-inner">
+      <!-- Left -->
+      <div>
+        <div class="cd-label"><i class="fas fa-certificate"></i> Certified Program</div>
+        <h1>{{ course.title }}</h1>
+        <p class="tagline">{{ course.description|truncatewords:28 }}</p>
+
+        <div class="cd-rating-row">
+          <span class="stars-lg">★★★★★</span>
+          <span class="rating-num">4.9</span>
+          <span class="rating-count">(1,248 ratings) · 5,430 students</span>
+        </div>
+
+        <div class="cd-meta-row">
+          <span><i class="fas fa-user-tie"></i> WebAsha Technologies</span>
+          <span><i class="fas fa-calendar-alt"></i> Last updated 2024</span>
+          <span><i class="fas fa-globe"></i> English / Hindi</span>
+        </div>
+        <div class="cd-meta-row">
+          <span><i class="fas fa-clock"></i> 40 total hours</span>
+          <span><i class="fas fa-book-open"></i> 120 lectures</span>
+          <span><i class="fas fa-signal"></i> All Levels</span>
+        </div>
+      </div>
+
+      <!-- Right: preview card -->
+      <div class="cd-hero-preview">
+        <div class="preview-img">
+          <img src="{{ course.image.url }}" alt="{{ course.title }}">
+          <div class="preview-play">
+            <button class="preview-play-btn"><i class="fas fa-play"></i></button>
+          </div>
+        </div>
+        <div class="preview-body">
+          <div class="preview-price">₹{{ course.price }}</div>
+          <div class="preview-orig">₹{{ course.price|add:5000 }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
+          <button class="enroll-btn-lg"><i class="fas fa-bolt me-2"></i>Enroll Now</button>
+          <button class="wishlist-btn"><i class="fas fa-heart me-2"></i>Add to Wishlist</button>
+          <p class="preview-guarantee"><i class="fas fa-shield-alt"></i> 30-Day Money-Back Guarantee</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="cd-body">
+  <div class="container">
+    <div class="cd-layout">
+
+      <!-- ── Left Column ── -->
+      <div>
+
+        <!-- What you'll learn -->
+        <div class="cd-section">
+          <div class="cd-sec-title"><i class="fas fa-graduation-cap"></i> What You'll Learn</div>
+          <div class="learn-grid">
+            <div class="learn-item"><i class="fas fa-check-circle"></i> Master core concepts and real-world application</div>
+            <div class="learn-item"><i class="fas fa-check-circle"></i> Prepare for industry-recognized certification exams</div>
+            <div class="learn-item"><i class="fas fa-check-circle"></i> Hands-on labs and practical exercises included</div>
+            <div class="learn-item"><i class="fas fa-check-circle"></i> Build a professional portfolio of projects</div>
+            <div class="learn-item"><i class="fas fa-check-circle"></i> Learn from real-world industry scenarios</div>
+            <div class="learn-item"><i class="fas fa-check-circle"></i> Access lifetime course materials & updates</div>
+            <div class="learn-item"><i class="fas fa-check-circle"></i> Understand best practices used by professionals</div>
+            <div class="learn-item"><i class="fas fa-check-circle"></i> Career guidance and job placement support</div>
+          </div>
+        </div>
+
+        <!-- Requirements -->
+        <div class="cd-section">
+          <div class="cd-sec-title"><i class="fas fa-list-check"></i> Requirements</div>
+          <ul class="req-list">
+            <li>Basic understanding of computers and operating systems</li>
+            <li>Stable internet connection for online labs and resources</li>
+            <li>A laptop or PC with minimum 8GB RAM recommended</li>
+            <li>Willingness to learn and dedicate 1–2 hours daily</li>
+            <li>No prior certification required — beginner-friendly</li>
+          </ul>
+        </div>
+
+        <!-- Course Description -->
+        <div class="cd-section">
+          <div class="cd-sec-title"><i class="fas fa-info-circle"></i> Course Description</div>
+          <p style="font-size:14px;color:#374151;line-height:1.75;margin-bottom:14px;">
+            {{ course.description }}
+          </p>
+          <p style="font-size:14px;color:#374151;line-height:1.75;margin-bottom:14px;">
+            This course is designed and delivered by industry professionals at WebAsha Technologies with years of hands-on experience. You'll gain both theoretical knowledge and practical skills that are directly applicable in the workplace.
+          </p>
+          <p style="font-size:14px;color:#374151;line-height:1.75;">
+            Upon successful completion, you will receive a WebAsha certificate of completion and be prepared to sit for the official vendor certification exam.
+          </p>
+          <div class="tag-list">
+            <span class="tag">IT Training</span>
+            <span class="tag">Certification</span>
+            <span class="tag">Hands-on Labs</span>
+            <span class="tag">Career Growth</span>
+            <span class="tag">Expert Instructors</span>
+          </div>
+        </div>
+
+        <!-- Curriculum -->
+        <div class="cd-section">
+          <div class="cd-sec-title"><i class="fas fa-layer-group"></i> Course Curriculum</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">
+            <strong style="color:var(--ink);">12 sections · 120 lectures · 40 total hours</strong>
+          </p>
+
+          {% for i in "123456"|make_list %}
+          <div class="curriculum-item">
+            <div class="curriculum-header">
+              <div class="curr-title">
+                <span class="curr-num">{{ forloop.counter }}</span>
+                Module {{ forloop.counter }}: Core Concepts & Fundamentals
+              </div>
+              <div class="curr-meta">
+                <span>8 lectures</span>
+                <span>3h 20m</span>
+              </div>
+            </div>
+            {% if forloop.first %}
+            <div class="curr-lessons">
+              <div class="curr-lesson-item">
+                <i class="fas fa-play-circle"></i>
+                Introduction & Course Overview
+                <span class="curr-lesson-dur">12:30</span>
+              </div>
+              <div class="curr-lesson-item">
+                <i class="fas fa-play-circle"></i>
+                Setting Up Your Environment
+                <span class="curr-lesson-dur">18:45</span>
+              </div>
+              <div class="curr-lesson-item">
+                <i class="fas fa-file-alt"></i>
+                Lab Exercise 1 — Hands-on Practice
+                <span class="curr-lesson-dur">30:00</span>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Instructor -->
+        <div class="cd-section">
+          <div class="cd-sec-title"><i class="fas fa-chalkboard-teacher"></i> Your Instructor</div>
+          <div class="instructor-card">
+            <div class="inst-avatar">W</div>
+            <div>
+              <div class="inst-name">WebAsha Expert Team</div>
+              <div class="inst-role">Senior IT Trainer & Certification Specialist</div>
+              <div class="inst-stats">
+                <span class="inst-stat"><i class="fas fa-star"></i> 4.9 Rating</span>
+                <span class="inst-stat"><i class="fas fa-users"></i> 15,000+ Students</span>
+                <span class="inst-stat"><i class="fas fa-play-circle"></i> 120+ Courses</span>
+                <span class="inst-stat"><i class="fas fa-award"></i> 10+ Years Exp.</span>
+              </div>
+              <p class="inst-bio">
+                Our team of certified professionals brings real-world expertise from top enterprise environments. We specialize in turning complex IT concepts into actionable, exam-ready knowledge.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Right Sidebar ── -->
+      <div>
+        <div class="cd-sticky-card">
+          <div class="cd-sticky-img">
+            <img src="{{ course.image.url }}" alt="{{ course.title }}">
+          </div>
+          <div class="cd-sticky-body">
+            <div class="sticky-price">₹{{ course.price }}</div>
+            <div class="sticky-orig">₹{{ course.price|add:5000 }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
+
+            <a href="#" class="enroll-btn-sticky">
+              <i class="fas fa-bolt me-2"></i>Enroll Now
+            </a>
+            <button class="wishlist-btn-s"><i class="fas fa-heart me-2"></i>Add to Wishlist</button>
+
+            <p style="font-family:var(--font-h);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">This course includes:</p>
+            <ul class="includes-list">
+              <li><i class="fas fa-video"></i> 40 hours on-demand video</li>
+              <li><i class="fas fa-file-alt"></i> 25 downloadable resources</li>
+              <li><i class="fas fa-laptop"></i> Hands-on lab exercises</li>
+              <li><i class="fas fa-infinity"></i> Full lifetime access</li>
+              <li><i class="fas fa-mobile-alt"></i> Access on mobile & desktop</li>
+              <li><i class="fas fa-certificate"></i> Certificate of completion</li>
+              <li><i class="fas fa-headset"></i> Mentor support included</li>
+            </ul>
+
+            <div class="guarantee-note">
+              <i class="fas fa-shield-alt"></i> 30-Day Money-Back Guarantee
+            </div>
+          </div>
+        </div>
+
+        <!-- Related courses would go here if passed from view -->
+        {% if related_courses %}
+        <div class="cd-sticky-card" style="margin-top:20px;">
+          <div class="cd-sticky-body">
+            <div class="related-title">Related Courses</div>
+            {% for rc in related_courses %}
+            <a href="{% url 'courseDetail' rc.id %}" class="related-card">
+              <img src="{{ rc.image.url }}" class="related-thumb" alt="{{ rc.title }}">
+              <div class="related-info">
+                <div class="rt">{{ rc.title|truncatewords:6 }}</div>
+                <div class="rp">₹{{ rc.price }}</div>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Enroll Bar -->
+<div class="mobile-enroll-bar">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+    <div>
+      <div class="mob-price">₹{{ course.price }}</div>
+      <div style="font-size:11px;color:var(--muted);text-decoration:line-through;">₹{{ course.price|add:5000 }}</div>
+    </div>
+    <button class="mob-enroll"><i class="fas fa-bolt me-1"></i> Enroll Now</button>
+  </div>
+</div>
+
+{% endblock body %}

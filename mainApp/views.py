@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.shortcuts import get_object_or_404
 import json
 from .models import Course, Profile, TeamMember
 from .forms import LoginForm, RegisterForm, ChangePasswordForm
@@ -249,3 +250,16 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Logged out successfully!')
     return redirect('home')
+
+
+def course_detail(request, course_id):
+    course = get_object_or_404(Course, id=course_id, is_active=True)
+    related_courses = Course.objects.filter(is_active=True).exclude(id=course_id)[:4]
+    context = {
+        "course": course,
+        "related_courses": related_courses,
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+    }
+    return render(request, "mainApp/Coursedetail.html", context)

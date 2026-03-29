@@ -9,6 +9,7 @@ urlpatterns = [
     path("certifications/", certificationsPage, name="certifications"),
     path("classes/", classPage, name="classes"),
     path("ourCourses/", ourCoursesPage, name="ourCourses"),
+    path("course/<int:course_id>/", course_detail, name="courseDetail"),
     path("team/", teamPage, name="team"),
     path("testimonial/", testimonialPage, name="testimonial"),
     path("gallery/", galleryPage, name="gallery"),

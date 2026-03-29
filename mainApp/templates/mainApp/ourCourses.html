@@ -1,180 +1,313 @@
 {% extends 'mainApp/base.html' %}
 {% load static %}
 
-{% block title %}Dance Training{% endblock %}
+{% block title %}Our Courses — WebAsha{% endblock %}
 
 {% block body %}
 
-<!-- Training Start -->
-<div class="container-fluid training py-5">
-    <div class="container py-5">
-        <div class="pb-5">
-            <div class="row g-4 align-items-end">
-                <div class="col-xl-8">
-                    <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Our Courses</h4>
-                    <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Our WebAsha Courses</h1>
-                </div>
-                <div class="col-xl-4 text-xl-end wow fadeInUp" data-wow-delay="0.3s">
-                    <a class="btn btn-primary rounded-pill text-white py-3 px-5" href="#">View All Courses</a>
-                </div>
-            </div>
-        </div>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Epilogue:wght@300;400;500&display=swap');
 
+:root {
+  --red:       #e83a3a;
+  --red-dark:  #c42e2e;
+  --red-dim:   rgba(232,58,58,0.10);
+  --red-glow:  rgba(232,58,58,0.22);
+  --ink:       #0e1017;
+  --page-bg:   #f2f3f7;
+  --card-bg:   #ffffff;
+  --muted:     #6b7280;
+  --border:    #e5e7eb;
+  --font-h:    'Syne', sans-serif;
+  --font-b:    'Epilogue', sans-serif;
+}
+body { font-family: var(--font-b); }
 
-        <div class="container mt-5">
-            <h2>Our Courses</h2>
-           
-            <div class="row">
+/* Hero */
+.crs-hero {
+  background: var(--ink);
+  padding: 72px 0 60px;
+  position: relative; overflow: hidden;
+}
+.crs-hero::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 90% at 5% 50%,  rgba(232,58,58,0.14) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 60% at 95% 30%, rgba(232,58,58,0.08) 0%, transparent 65%);
+}
+.hero-inner { position: relative; z-index: 1; }
+.hero-sub {
+  font-family: var(--font-h); font-size: 11px;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.hero-sub::before {
+  content: ''; width: 28px; height: 2px;
+  background: var(--red); border-radius: 2px;
+}
+.crs-hero h1 {
+  font-family: var(--font-h);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 800; color: #fff;
+  line-height: 1.1; margin-bottom: 14px;
+}
+.crs-hero h1 span { color: var(--red); }
+.crs-hero .lead-txt {
+  color: rgba(255,255,255,0.5); font-size: 15px;
+  max-width: 480px; margin-bottom: 30px; line-height: 1.7;
+}
+.crs-search {
+  display: flex; max-width: 520px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: 12px; overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.crs-search:focus-within {
+  border-color: rgba(232,58,58,0.5);
+  box-shadow: 0 0 0 4px var(--red-glow);
+}
+.crs-search input {
+  flex: 1; background: transparent; border: none; outline: none;
+  padding: 13px 18px; color: #fff;
+  font-family: var(--font-b); font-size: 14px;
+}
+.crs-search input::placeholder { color: rgba(255,255,255,0.3); }
+.crs-search button {
+  background: var(--red); border: none;
+  padding: 0 22px; color: #fff; font-size: 14px;
+  cursor: pointer; transition: background 0.2s;
+  border-radius: 0 11px 11px 0;
+}
+.crs-search button:hover { background: var(--red-dark); }
+.hero-stats {
+  display: flex; gap: 32px; margin-top: 34px; flex-wrap: wrap;
+}
+.hs-num {
+  font-family: var(--font-h); font-size: 22px;
+  font-weight: 700; color: #fff; line-height: 1; margin-bottom: 3px;
+}
+.hs-lbl { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+.hs-sep { width: 1px; background: rgba(255,255,255,0.1); align-self: stretch; }
 
-                {% for c in course %}
-                <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
+/* Body */
+.crs-body { background: var(--page-bg); padding: 52px 0 90px; }
+.grid-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+}
+.grid-header h4 {
+  font-family: var(--font-h); font-size: 20px;
+  font-weight: 700; color: var(--ink); margin: 0;
+}
+.grid-sort {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 28px 8px 12px;
+  font-family: var(--font-b); font-size: 13px; color: var(--ink);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b7280' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 9px center;
+  cursor: pointer; outline: none;
+}
 
-                    <div class="training-item bg-white rounded">
+/* Card */
+.course-card {
+  background: var(--card-bg); border-radius: 14px;
+  border: 1px solid var(--border); overflow: hidden;
+  display: flex; flex-direction: column; height: 100%;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+.course-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 45px rgba(232,58,58,0.13);
+  border-color: rgba(232,58,58,0.3);
+}
+.cc-img-wrap { position: relative; overflow: hidden; height: 185px; }
+.cc-img-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.35s;
+}
+.course-card:hover .cc-img-wrap img { transform: scale(1.06); }
+.cc-num {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--ink); color: var(--red);
+  font-family: var(--font-h); font-size: 13px; font-weight: 700;
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(232,58,58,0.3);
+}
+.cc-popular {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--red); color: #fff;
+  font-family: var(--font-h); font-size: 9px;
+  font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 10px;
+  border-radius: 100px;
+}
+.cc-body {
+  padding: 18px 20px 20px;
+  display: flex; flex-direction: column; flex: 1;
+}
+.cc-cat {
+  font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--red);
+  font-weight: 600; font-family: var(--font-h); margin-bottom: 7px;
+}
+.cc-title {
+  font-family: var(--font-h); font-size: 15px;
+  font-weight: 700; color: var(--ink);
+  line-height: 1.35; margin-bottom: 10px;
+  text-decoration: none; display: block;
+}
+.cc-title:hover { color: var(--red); }
+.cc-desc {
+  font-size: 13px; color: var(--muted);
+  line-height: 1.65; margin-bottom: 14px; flex: 1;
+}
+.cc-meta {
+  display: flex; gap: 14px;
+  font-size: 11.5px; color: var(--muted);
+  margin-bottom: 12px; flex-wrap: wrap;
+}
+.cc-meta span { display: flex; align-items: center; gap: 5px; }
+.cc-meta i { font-size: 10px; color: var(--red); }
+.stars { color: #f59e0b; font-size: 11px; }
+.cc-footer {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding-top: 14px; border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+.cc-price {
+  font-family: var(--font-h); font-size: 17px;
+  font-weight: 700; color: var(--ink);
+}
+.cc-price .orig {
+  font-size: 11px; color: var(--muted);
+  text-decoration: line-through; font-weight: 400;
+  margin-left: 6px; font-family: var(--font-b);
+}
+.cc-btn {
+  background: var(--ink); color: #fff;
+  border: none; border-radius: 9px; padding: 9px 18px;
+  font-family: var(--font-h); font-size: 12px;
+  font-weight: 600; letter-spacing: 0.04em;
+  cursor: pointer; text-decoration: none;
+  transition: background 0.2s, transform 0.15s; display: inline-block;
+}
+.cc-btn:hover { background: var(--red); color: #fff; transform: translateY(-1px); }
 
-                        <div class="training-img rounded-top position-relative">
+/* Empty */
+.empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+.empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.3; display: block; }
 
-                            <img src="{{ c.image.url }}" class="img-fluid rounded-top w-100" alt="{{ c.title }}">
+/* Load more */
+.load-more-btn {
+  background: transparent; border: 2px solid var(--ink);
+  color: var(--ink); border-radius: 100px;
+  padding: 13px 48px; font-family: var(--font-h);
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  letter-spacing: 0.05em; transition: all 0.2s;
+}
+.load-more-btn:hover {
+  background: var(--ink); color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(14,16,23,0.2);
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.grid-wrap { animation: fadeUp 0.45s cubic-bezier(.22,1,.36,1) 0.15s both; }
+</style>
 
-                            <h1 class="fs-1 fw-bold bg-primary text-white d-inline-block rounded p-2 position-absolute"
-                                style="top: 0; left: 0;">
-                                {{ c.course_number }}
-                            </h1>
-
-                        </div>
-
-                        <div class="rounded-bottom border border-top-0 p-4">
-
-                            <a href="#" class="h4 mb-3 d-block">
-                                {{ c.title }}
-                            </a>
-
-                            <div class="price fw-bold text-success fs-3 mb-3">₹{{ c.price }}</div>
-
-                            <p class="mb-3">
-                                {{ c.description|truncatewords:20 }}
-                            </p>
-
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">
-                                Read More
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                {% empty %}
-                <p>No courses available</p>
-                {% endfor %}
-
-            </div>
-        </div>
-
-
-
-        <!-- <div class="row g-4">
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="training-item bg-white rounded">
-                    <div class="training-img rounded-top">
-                        <img src="{% static 'mainApp/img/courses/red_hat_enterprise_linux_8.png' %}"
-                            class="img-fluid rounded-top w-100" alt="Image">
-                        <h1 class="fs-1 fw-bold bg-primary text-white d-inline-block rounded p-2 position-absolute"
-                            style="top: 0; left: 0;">01</h1>
-                    </div>
-
-                    <div class="rounded-bottom border border-top-0 p-4">
-                        <a href="#" class="h4 mb-3 d-block ">Red Hat</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="training-item bg-white rounded">
-                    <div class="training-img rounded-top">
-                        <img src="{% static 'mainApp/img/courses/enp08222023-what-is-ethical-hacking.avif' %}"
-                            class="img-fluid rounded-top w-100" alt="Image">
-                        <h1 class="fs-1 fw-bold bg-primary text-white d-inline-block rounded p-2 position-absolute"
-                            style="top: 0; left: 0;">02</h1>
-                    </div>
-                    <div class="rounded-bottom border border-top-0 p-4">
-                        <a href="#" class="h4 mb-3 d-block">Cybersecurity & Ethical Hacking-EC-Council</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="training-item bg-white rounded">
-                    <div class="training-img rounded-top">
-                        <img src="{% static 'mainApp/img/courses/cybersecurity-offsec.png' %}"
-                            class="img-fluid rounded-top w-100" alt="Image">
-                        <h1 class="fs-1 fw-bold bg-primary text-white d-inline-block rounded p-2 position-absolute"
-                            style="top: 0; left: 0;">03</h1>
-                    </div>
-                    <div class="rounded-bottom border border-top-0 p-4">
-                        <a href="#" class="h4 mb-3 d-block">Cybersecurity & Ethical Hacking Offsec</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.7s">
-                <div class="training-item bg-white rounded">
-                    <div class="training-img rounded-top">
-                        <img src="{% static 'mainApp/img/courses/Networking&Infrastructure.png' %}"
-                            class="img-fluid rounded-top w-100" alt="Image">
-                        <h1 class="fs-1 fw-bold bg-primary text-white d-inline-block rounded p-2 position-absolute"
-                            style="top: 0; left: 0;">04</h1>
-                    </div>
-                    <div class="rounded-bottom border border-top-0 p-4">
-                        <a href="#" class="h4 mb-3 d-block">Networking & Infrastructure (Cisco, VMWare,Vertias)</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.9s">
-                <div class="training-item bg-white rounded">
-                    <div class="training-img rounded-top">
-                        <img src="{% static 'mainApp/img/service-1.jpg' %}" class="img-fluid rounded-top w-100"
-                            alt="Image">
-                        <h1 class="fs-1 fw-bold bg-primary text-white d-inline-block rounded p-2 position-absolute"
-                            style="top: 0; left: 0;">05</h1>
-                    </div>
-                    <div class="rounded-bottom border border-top-0 p-4">
-                        <a href="#" class="h4 mb-3 d-block">Personalized Learning</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.11s">
-                <div class="training-item bg-white rounded">
-                    <div class="training-img rounded-top">
-                        <img src="{% static 'mainApp/img/service-2.jpg' %}" class="img-fluid rounded-top w-100"
-                            alt="Image">
-                        <h1 class="fs-1 fw-bold bg-primary text-white d-inline-block rounded p-2 position-absolute"
-                            style="top: 0; left: 0;">06</h1>
-                    </div>
-
-                    <div class="rounded-bottom border border-top-0 p-4">
-                        <a href="#" class="h4 mb-3 d-block">Convenient Dancing</a>
-                        <p class="mb-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magni vero excepturi
-                            blanditiis quidem</p>
-                        <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                    </div>
-                </div>
-            </div>
-        </div> -->
+<!-- Hero -->
+<div class="crs-hero">
+  <div class="container hero-inner">
+    <p class="hero-sub">Professional IT Training</p>
+    <h1>Our <span>WebAsha</span> Courses</h1>
+    <p class="lead-txt">Expert-led certification programs in Cybersecurity, Cloud, DevOps, AI and more. Learn, certify, get hired.</p>
+    <div class="crs-search">
+      <input type="search" placeholder="Search Python, AWS, Cyber Security…">
+      <button><i class="fas fa-search"></i></button>
     </div>
+    <div class="hero-stats">
+      <div><div class="hs-num">120+</div><div class="hs-lbl">Courses</div></div>
+      <div class="hs-sep"></div>
+      <div><div class="hs-num">15K+</div><div class="hs-lbl">Students</div></div>
+      <div class="hs-sep"></div>
+      <div><div class="hs-num">98%</div><div class="hs-lbl">Pass Rate</div></div>
+      <div class="hs-sep"></div>
+      <div><div class="hs-num">50+</div><div class="hs-lbl">Certifications</div></div>
+    </div>
+  </div>
 </div>
 
-<!-- Training End -->
+<!-- Grid -->
+<div class="crs-body">
+  <div class="container">
+    <div class="grid-header">
+      <h4>All Courses
+        <span style="color:var(--muted);font-weight:400;font-size:14px;margin-left:8px;">
+          {{ course|length }} result{{ course|length|pluralize }}
+        </span>
+      </h4>
+      <select class="grid-sort">
+        <option>Sort: Most Popular</option>
+        <option>Sort: Newest</option>
+        <option>Sort: Price: Low → High</option>
+        <option>Sort: Price: High → Low</option>
+      </select>
+    </div>
+
+    <div class="row g-4 grid-wrap">
+      {% for c in course %}
+      <div class="col-sm-6 col-lg-4">
+        <div class="course-card">
+          <div class="cc-img-wrap">
+            <img src="{{ c.image.url }}" alt="{{ c.title }}">
+            <div class="cc-num">{{ c.course_number }}</div>
+            {% if forloop.first %}<span class="cc-popular">Popular</span>{% endif %}
+          </div>
+          <div class="cc-body">
+            <div class="cc-cat">IT Training</div>
+            <a href="{% url 'courseDetail' c.id %}" class="cc-title">{{ c.title }}</a>
+            <p class="cc-desc">{{ c.description|truncatewords:18 }}</p>
+            <div class="cc-meta">
+              <span><i class="fas fa-clock"></i> 40 hrs</span>
+              <span><i class="fas fa-signal"></i> All Levels</span>
+              <span><i class="fas fa-certificate"></i> Certified</span>
+            </div>
+            <div class="stars mb-3">★★★★★
+              <span style="color:var(--muted);font-size:11px;margin-left:4px;">(4.9)</span>
+            </div>
+            <div class="cc-footer">
+              <div class="cc-price">₹{{ c.price }}</div>
+              <a href="{% url 'courseDetail' c.id %}" class="cc-btn">Read More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="empty-state">
+          <i class="fas fa-book-open"></i>
+          No courses available at the moment. Check back soon!
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if course %}
+    <div class="text-center mt-5">
+      <button class="load-more-btn">
+        <i class="fas fa-plus me-2"></i>Load More Courses
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
 {% endblock body %}
