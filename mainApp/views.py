@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -184,8 +184,26 @@ def login_view(request):
     return render(request, 'mainApp/login.html', context)
 
 @login_required
+def get_profile_or_create(request):
+    """Get profile or create minimal one if missing"""
+    try:
+        return Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        # Create minimal profile
+        profile = Profile.objects.create(
+            user=request.user,
+            first_name=request.user.first_name or '',
+            last_name=request.user.last_name or '',
+            email=request.user.email or '',
+            phone='',  # Will show 'Not set' in template
+            address='', 
+        )
+        messages.success(request, 'Welcome! Your profile has been created.')
+        return profile
+
+@login_required
 def profile_view(request):
-    profile = Profile.objects.get(user=request.user)
+    profile = get_profile_or_create(request)
     context = {
         'profile': profile,
         'login_form': LoginForm(),
@@ -287,7 +305,12 @@ def add_to_cart(request):
     if not course_id:
         return JsonResponse({'success': False, 'error': 'No course ID'})
     course = get_object_or_404(Course, id=course_id)
-    profile = Profile.objects.get(user=request.user)
+    
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except Profile.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Profile not found'})
+    
     transaction, created = CourseTransaction.objects.get_or_create(
         user=profile,
         course=course,
@@ -301,15 +324,24 @@ def add_to_cart(request):
     return JsonResponse({'success': True, 'message': 'Added to cart' if created else 'Already in cart', 'count': count})
 
 @login_required
-def cart_view(request):
+def remove_from_cart(request, transaction_id):
+    transaction = get_object_or_404(CourseTransaction, pk=transaction_id, user__user=request.user, status='pending', is_active=True)
+    transaction.is_active = False
+    transaction.save()
     profile = Profile.objects.get(user=request.user)
+    count = profile.coursetransactions.filter(status='pending', is_active=True).count()
+    return JsonResponse({'success': True, 'count': count})
+
+@login_required
+def cart_view(request):
+    profile = get_profile_or_create(request)
     cart_items = profile.coursetransactions.filter(status='pending', is_active=True)
     total = sum(item.amount for item in cart_items)
     return render(request, 'mainApp/cart.html', {'cart_items': cart_items, 'total': total})
 
 @login_required
 def purchase_cart(request):
-    profile = Profile.objects.get(user=request.user)
+    profile = get_profile_or_create(request)
     cart_items = profile.coursetransactions.filter(status='pending', is_active=True)
     if cart_items.exists():
         for item in cart_items:
@@ -321,6 +353,6 @@ def purchase_cart(request):
 
 @login_required
 def my_courses(request):
-    profile = Profile.objects.get(user=request.user)
+    profile = get_profile_or_create(request)
     transactions = profile.coursetransactions.filter(status='completed').select_related('course')
     return render(request, 'mainApp/my-courses.html', {'purchased': transactions, 'profile': profile})
