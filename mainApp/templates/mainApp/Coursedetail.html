@@ -464,7 +464,11 @@ body { font-family: var(--font-b); background: var(--page-bg); }
         <div class="preview-body">
           <div class="preview-price">₹{{ course.price }}</div>
           <div class="preview-orig">₹{{ course.price|add:5000 }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
-          <button class="enroll-btn-lg"><i class="fas fa-bolt me-2"></i>Enroll Now</button>
+          {% if user.is_authenticated %}
+            <a href="#" class="enroll-btn-lg add-to-cart" data-course="{{ course.id }}"><i class="fas fa-cart-plus me-2"></i>Add to Cart</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="enroll-btn-lg"><i class="fas fa-sign-in-alt me-2"></i>Login to Enroll</a>
+            {% endif %}
           <button class="wishlist-btn"><i class="fas fa-heart me-2"></i>Add to Wishlist</button>
           <p class="preview-guarantee"><i class="fas fa-shield-alt"></i> 30-Day Money-Back Guarantee</p>
         </div>
@@ -604,9 +608,15 @@ body { font-family: var(--font-b); background: var(--page-bg); }
             <div class="sticky-price">₹{{ course.price }}</div>
             <div class="sticky-orig">₹{{ course.price|add:5000 }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
 
-            <a href="#" class="enroll-btn-sticky">
-              <i class="fas fa-bolt me-2"></i>Enroll Now
+            {% if user.is_authenticated %}
+            <a href="#" class="enroll-btn-sticky add-to-cart" data-course="{{ course.id }}">
+              <i class="fas fa-cart-plus me-2"></i>Add to Cart
             </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="enroll-btn-sticky">
+              <i class="fas fa-sign-in-alt me-2"></i>Login to Enroll
+            </a>
+            {% endif %}
             <button class="wishlist-btn-s"><i class="fas fa-heart me-2"></i>Add to Wishlist</button>
 
             <p style="font-family:var(--font-h);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">This course includes:</p>
@@ -660,4 +670,5 @@ body { font-family: var(--font-b); background: var(--page-bg); }
   </div>
 </div>
 
+<script src="{% static 'mainApp/js/cart.js' %}"></script>
 {% endblock body %}

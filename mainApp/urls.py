@@ -26,4 +26,8 @@ urlpatterns = [
     path("api/change-password/", change_password_api, name="change_password_api"),
     
     path("logout/", logout_view, name="logout"),
+    path("cart/", cart_view, name="cart"),
+    path("purchase/", purchase_cart, name="purchase"),
+    path("my-courses/", my_courses, name="my_courses"),
+    path("ajax/add-to-cart/", add_to_cart, name="add_to_cart"),
 ]

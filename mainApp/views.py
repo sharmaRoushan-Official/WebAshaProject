@@ -8,8 +8,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import get_object_or_404
 import json
-from .models import Course, Profile, TeamMember
+from .models import Course, Profile, TeamMember, CourseTransaction
 from .forms import LoginForm, RegisterForm, ChangePasswordForm
+import uuid
+from django.utils import timezone
 
 # Create your views here.
 
@@ -251,15 +253,74 @@ def logout_view(request):
     messages.success(request, 'Logged out successfully!')
     return redirect('home')
 
+# Helper function to get cart count
+def get_cart_count(request):
+    """Get the number of items in user's cart"""
+    if request.user.is_authenticated:
+        try:
+            profile = Profile.objects.get(user=request.user)
+            return profile.coursetransactions.filter(status='pending', is_active=True).count()
+        except Profile.DoesNotExist:
+            return 0
+    return 0
 
 def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id, is_active=True)
     related_courses = Course.objects.filter(is_active=True).exclude(id=course_id)[:4]
+    
+    # Get cart count using helper function
+    cart_count = get_cart_count(request)
+    
     context = {
         "course": course,
         "related_courses": related_courses,
         'login_form': LoginForm(),
         'register_form': RegisterForm(),
         'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+        'cart_count': cart_count  # Pass the cart count directly
     }
     return render(request, "mainApp/Coursedetail.html", context)
+
+@login_required
+def add_to_cart(request):
+    course_id = request.GET.get('course_id')
+    if not course_id:
+        return JsonResponse({'success': False, 'error': 'No course ID'})
+    course = get_object_or_404(Course, id=course_id)
+    profile = Profile.objects.get(user=request.user)
+    transaction, created = CourseTransaction.objects.get_or_create(
+        user=profile,
+        course=course,
+        defaults={
+            'transaction_id': f"cart_{uuid.uuid4().hex[:12]}",
+            'amount': course.price,
+            'status': 'pending'
+        }
+    )
+    count = profile.coursetransactions.filter(status='pending', is_active=True).count()
+    return JsonResponse({'success': True, 'message': 'Added to cart' if created else 'Already in cart', 'count': count})
+
+@login_required
+def cart_view(request):
+    profile = Profile.objects.get(user=request.user)
+    cart_items = profile.coursetransactions.filter(status='pending', is_active=True)
+    total = sum(item.amount for item in cart_items)
+    return render(request, 'mainApp/cart.html', {'cart_items': cart_items, 'total': total})
+
+@login_required
+def purchase_cart(request):
+    profile = Profile.objects.get(user=request.user)
+    cart_items = profile.coursetransactions.filter(status='pending', is_active=True)
+    if cart_items.exists():
+        for item in cart_items:
+            item.status = 'completed'
+            item.transaction_id = f"txn_{uuid.uuid4().hex[:12]}"
+            item.save()
+        messages.success(request, f'Purchased {cart_items.count()} courses!')
+    return redirect('my_courses')
+
+@login_required
+def my_courses(request):
+    profile = Profile.objects.get(user=request.user)
+    transactions = profile.coursetransactions.filter(status='completed').select_related('course')
+    return render(request, 'mainApp/my-courses.html', {'purchased': transactions, 'profile': profile})

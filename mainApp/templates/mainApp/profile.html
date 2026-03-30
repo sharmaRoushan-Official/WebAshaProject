@@ -641,6 +641,14 @@
             <span class="ql-icon"><i class="fas fa-book"></i></span>
             Browse Courses
           </a>
+          <a href="{% url 'cart' %}" class="quick-link">
+            <span class="ql-icon"><i class="fas fa-shopping-cart"></i></span>
+            Cart ({{ cart_count }})
+          </a>
+          <a href="{% url 'my_courses' %}" class="quick-link">
+            <span class="ql-icon"><i class="fas fa-graduation-cap"></i></span>
+            My Courses
+          </a>
           <a href="{% url 'classes' %}" class="quick-link">
             <span class="ql-icon"><i class="fas fa-chalkboard-teacher"></i></span>
             View Classes

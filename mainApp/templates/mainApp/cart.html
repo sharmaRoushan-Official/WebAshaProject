@@ -1,0 +1,44 @@
+{% extends 'mainApp/base.html' %}
+{% load static %}
+{% block title %}Shopping Cart{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+  <h1 class="mb-4">Your Cart ({{ cart_items.count }})</h1>
+  {% if cart_items %}
+    <div class="d-flex justify-content-between mb-4">
+      <h3>Cart Items ({{ cart_items.count }})</h3>
+      <a href="{% url 'my_courses' %}" class="btn btn-outline-primary">My Courses</a>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Course</th>
+          <th>Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+        <tr>
+          <td>{{ item.course.title }}</td>
+          <td>₹{{ item.amount }}</td>
+          <td>
+            <a href="#" class="btn btn-danger btn-sm remove-cart" data-id="{{ item.id }}">Remove</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="text-end">
+      <h3>Total: ₹{{ total }}</h3>
+      <a href="{% url 'purchase' %}" class="btn btn-success btn-lg">Purchase Now</a>
+    </div>
+  {% else %}
+    <p class="alert alert-info">Your cart is empty.</p>
+  {% endif %}
+</div>
+<script>
+  // Remove item AJAX here
+</script>
+{% endblock %}

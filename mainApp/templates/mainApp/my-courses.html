@@ -1,0 +1,20 @@
+{% extends 'mainApp/base.html' %}
+{% load static %}
+{% block title %}My Courses{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+  <h1>My Courses ({{ purchased|length }})</h1>
+  {% for item in purchased %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5>{{ item.course.title }}</h5>
+        <p>Purchased on {{ item.purchase_date }}</p>
+        <a href="{% url 'courseDetail' item.course.id %}" class="btn btn-primary">Access Course</a>
+      </div>
+    </div>
+  {% empty %}
+    <p>No purchased courses yet. <a href="{% url 'ourCourses' %}">Browse Courses</a></p>
+  {% endfor %}
+</div>
+{% endblock %}
