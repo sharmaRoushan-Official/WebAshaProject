@@ -202,6 +202,30 @@ def get_profile_or_create(request):
         return profile
 
 @login_required
+def ajax_course_status(request, course_id):
+    """AJAX endpoint: Check if course purchased/incart/available"""
+    profile = get_profile_or_create(request)
+    
+    # Check completed purchase
+    if profile.coursetransactions.filter(course_id=course_id, status='completed').exists():
+        return JsonResponse({
+            'status': 'purchased',
+            'count': get_cart_count(request)
+        })
+    
+    # Check pending cart
+    if profile.coursetransactions.filter(course_id=course_id, status='pending', is_active=True).exists():
+        return JsonResponse({
+            'status': 'incart',
+            'count': get_cart_count(request)
+        })
+    
+    return JsonResponse({
+        'status': 'available',
+        'count': get_cart_count(request)
+    })
+
+@login_required
 def profile_view(request):
     profile = get_profile_or_create(request)
     context = {

@@ -1,20 +1,64 @@
 // Cart functionality for course detail and cart page
 document.addEventListener('DOMContentLoaded', function() {
-  // Add to cart buttons
+  // Function to check course status and update button
+  function checkCourseStatus(courseId, btn) {
+    fetch(`/ajax/course-status/${courseId}/`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'purchased') {
+        btn.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i>Purchased ✓';
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-success', 'disabled-btn');
+        btn.style.cursor = 'default';
+        btn.href = '{% url "my_courses" %}';  // For <a> tags
+        btn.onclick = (e) => { window.location.href = '{% url "my_courses" %}'; e.preventDefault(); };
+      } else if (data.status === 'incart') {
+        btn.innerHTML = '<i class="fas fa-check me-2"></i>In Cart';
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-success');
+        btn.onclick = null;  // Remove any navigation
+      } else {  // available
+        btn.innerHTML = '<i class="fas fa-cart-plus me-2"></i>Add to Cart';
+        btn.classList.remove('btn-success');
+        btn.classList.add('btn-primary');
+      }
+      // Update cart badges
+      const cartBadges = document.querySelectorAll('.cart-badge');
+      cartBadges.forEach(badge => {
+        badge.textContent = data.count;
+        badge.style.display = data.count > 0 ? 'inline' : 'none';
+      });
+    })
+    .catch(err => console.error('Status check error:', err));
+  }
+
+  // Add to cart buttons - check status first
   const addToCartBtns = document.querySelectorAll('.add-to-cart');
   addToCartBtns.forEach(btn => {
+    // Initial status check on load
+    if (btn.dataset.course) {
+      checkCourseStatus(btn.dataset.course, btn);
+    }
+
     btn.addEventListener('click', function(e) {
       e.preventDefault();
       const courseId = this.dataset.course;
-      const btn = this;
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+      if (!courseId || this.classList.contains('disabled-btn')) {
+        if (this.classList.contains('disabled-btn')) {
+          window.location.href = '{% url "my_courses" %}';
+        }
+        return;
+      }
+
+      const originalBtn = this;
+      originalBtn.disabled = true;
+      originalBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
       
       fetch(`/ajax/add-to-cart/?course_id=${courseId}`, {
         method: 'GET',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
       })
       .then(response => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -22,30 +66,23 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .then(data => {
         if (data.success) {
-          btn.innerHTML = '<i class="fas fa-check me-2"></i>In Cart';
-          btn.classList.add('btn-success');
-          btn.classList.remove('btn-primary');
-          // Update navbar badges
-          const cartBadges = document.querySelectorAll('.cart-badge');
-          cartBadges.forEach(badge => {
-            badge.textContent = data.count;
-            badge.style.display = data.count > 0 ? 'block' : 'none';
-          });
+          // Re-check status (might be incart now)
+          checkCourseStatus(courseId, originalBtn);
         } else {
           alert(data.error || data.message || 'Failed to add to cart');
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fas fa-cart-plus me-2"></i>Add to Cart';
-          btn.classList.remove('btn-success');
-          btn.classList.add('btn-primary');
+          originalBtn.disabled = false;
+          originalBtn.innerHTML = '<i class="fas fa-cart-plus me-2"></i>Add to Cart';
+          originalBtn.classList.remove('btn-success');
+          originalBtn.classList.add('btn-primary');
         }
       })
       .catch(error => {
         console.error('Add to cart error:', error);
         alert('Error adding to cart. Please login and try again.');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-cart-plus me-2"></i>Add to Cart';
-        btn.classList.remove('btn-success');
-        btn.classList.add('btn-primary');
+        originalBtn.disabled = false;
+        originalBtn.innerHTML = '<i class="fas fa-cart-plus me-2"></i>Add to Cart';
+        originalBtn.classList.remove('btn-success');
+        originalBtn.classList.add('btn-primary');
       });
     });
   });
@@ -58,15 +95,13 @@ document.addEventListener('DOMContentLoaded', function() {
       if (!confirm('Remove this course from cart?')) return;
       const transactionId = this.dataset.id;
       const row = this.closest('tr');
-      const btn = this;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
-      btn.disabled = true;
+      const btnCopy = this;  // Avoid rebind
+      btnCopy.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
+      btnCopy.disabled = true;
 
       fetch(`/ajax/remove-from-cart/${transactionId}/`, {
         method: 'POST',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
       })
       .then(response => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -75,26 +110,30 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(data => {
         if (data.success) {
           row.remove();
+          // Update all add-to-cart buttons that might be incart
+          document.querySelectorAll('.add-to-cart').forEach(b => {
+            if (b.dataset.course) checkCourseStatus(b.dataset.course, b);
+          });
+          // Update badges
           const cartBadges = document.querySelectorAll('.cart-badge');
           cartBadges.forEach(badge => {
             badge.textContent = data.count;
-            badge.style.display = data.count > 0 ? 'block' : 'none';
+            badge.style.display = data.count > 0 ? 'inline' : 'none';
           });
-          // Update totals/header
-          const totalEl = document.querySelector('.text-end h3');
-          if (totalEl && data.count > 0) {
-            // Refresh page or update total (simple: reload for now)
-          }
           if (data.count === 0) {
-            document.querySelector('.container').innerHTML = '<div class="alert alert-info text-center my-5"><h4>Your cart is empty</h4><a href="{% url \'ourCourses\' %}" class="btn btn-primary">Continue Shopping</a></div>';
+            document.querySelector('.cart-items-container')?.remove();
+            const container = document.querySelector('.container');
+            if (container) {
+              container.innerHTML = '<div class="alert alert-info text-center my-5"><h4>Your cart is empty</h4><a href="{% url \'ourCourses\' %}" class="btn btn-primary">Continue Shopping</a></div>';
+            }
           }
         }
       })
       .catch(error => {
         console.error('Remove error:', error);
         alert('Failed to remove item');
-        btn.innerHTML = 'Remove';
-        btn.disabled = false;
+        btnCopy.innerHTML = 'Remove';
+        btnCopy.disabled = false;
       });
     });
   });

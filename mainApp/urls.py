@@ -31,4 +31,6 @@ urlpatterns = [
     path("my-courses/", my_courses, name="my_courses"),
     path("ajax/add-to-cart/", add_to_cart, name="add_to_cart"),
     path("ajax/remove-from-cart/<int:transaction_id>/", remove_from_cart, name="remove_from_cart"),
+    path("ajax/course-status/<int:course_id>/", ajax_course_status, name="course_status"),
 ]
+
