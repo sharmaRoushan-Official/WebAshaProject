@@ -1,1120 +1,400 @@
-{% extends 'mainApp/base.html' %}
+{% extends "mainApp/base.html" %}
 {% load static %}
-{% block title %}Home{% endblock title %}
+
+{% block title %}Home - Empowering Careers{% endblock %}
 
 {% block body %}
 
-<!-- Carousel Start -->
-<div class="header-carousel owl-carousel owl-theme">
-    <div class="item">
-        <img src="{% static 'mainApp/img/slider/1.ethicalHacking.png' %}" class="img-fluid w-100" alt="Image">
-        <div class="carousel-caption">
-            <div class="carousel-caption-content p-3" style="max-width: 900px;">
-                <h4 class="text-secondary text-uppercase sub-title fw-bold mb-4" style="letter-spacing: 3px;">Let's
-                    Enroll</h4>
-                <h1 class="display-1 text-capitalize text-white mb-4">Learn From the Certified Instructors</h1>
-                <h3 class="fs-5">Advance Your Skills with Practical, Job-Oriented Training.</h3>
-                <p>At WebAsha Technologies, we help you become a certified professional in Red Hat, EC-Council, OffSec,
-                    AWS, and DevOps. Experience an interactive learning environment built for real success.</p>
-                <div class="pt-2">
-                    <a class="btn btn-primary rounded-pill text-white py-3 px-5 m-2 wow fadeInLeft"
-                        data-wow-delay="0.1s" href="#">Join Now</a>
-                    <a class="btn btn-secondary rounded-pill text-white py-3 px-5 m-2 wow fadeInRight"
-                        data-wow-delay="0.3s" href="#">Read More</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="item">
-        <img src="{% static 'mainApp/img/slider/3.pythonSlider.avif' %}" class="img-fluid w-100" alt="Image">
-        <div class="carousel-caption">
-            <div class="carousel-caption-content p-3" style="max-width: 900px;">
-                <h4 class="text-secondary text-uppercase sub-title fw-bold mb-4" style="letter-spacing: 3px;">Let's
-                    Enroll</h4>
-                <h1 class="display-1 text-capitalize text-white mb-4">Learn From the Certified Instructors</h1>
-                <h3 class="fs-5">Advance Your Skills with Practical, Job-Oriented Training.</h3>
-                <p>At WebAsha Technologies, we help you become a certified professional in Red Hat, EC-Council, OffSec,
-                    AWS, and DevOps. Experience an interactive learning environment built for real success.</p>
-                <div class="pt-2">
-                    <a class="btn btn-primary rounded-pill text-white py-3 px-5 m-2 wow fadeInLeft"
-                        data-wow-delay="0.1s" href="#">Join Now</a>
-                    <a class="btn btn-secondary rounded-pill text-white py-3 px-5 m-2 wow fadeInRight"
-                        data-wow-delay="0.3s" href="#">Read More</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="item">
-        <img src="{% static 'mainApp/img/slider/3.ethicalHacking.jpeg' %}" class="img-fluid w-100" alt="Image">
-        <div class="carousel-caption">
-            <div class="carousel-caption-content p-3" style="max-width: 900px;">
-                <h4 class="text-secondary text-uppercase sub-title fw-bold mb-4" style="letter-spacing: 3px;">Let's
-                    Enroll</h4>
-                <h1 class="display-1 text-capitalize text-white mb-4">Learn From the Certified Instructors</h1>
-                <h3 class="fs-5">Advance Your Skills with Practical, Job-Oriented Training.</h3>
-                <p>At WebAsha Technologies, we help you become a certified professional in Red Hat, EC-Council, OffSec,
-                    AWS, and DevOps. Experience an interactive learning environment built for real success.</p>
-                <div class="pt-2">
-                    <a class="btn btn-primary rounded-pill text-white py-3 px-5 m-2 wow fadeInLeft"
-                        data-wow-delay="0.1s" href="#">Join Now</a>
-                    <a class="btn btn-secondary rounded-pill text-white py-3 px-5 m-2 wow fadeInRight"
-                        data-wow-delay="0.3s" href="#">Read More</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="item">
-        <img src="{% static 'mainApp/img/slider/pythonSlider.jpeg' %}" class="img-fluid w-100" alt="Image">
-        <div class="carousel-caption">
-            <div class="carousel-caption-content p-3" style="max-width: 900px;">
-                <h4 class="text-secondary text-uppercase sub-title fw-bold mb-4" style="letter-spacing: 3px;">Let's
-                    Enroll</h4>
-                <h1 class="display-1 text-capitalize text-white mb-4">Learn From the Certified Instructors</h1>
-                <h3 class="fs-5">Advance Your Skills with Practical, Job-Oriented Training.</h3>
-                <p>At WebAsha Technologies, we help you become a certified professional in Red Hat, EC-Council, OffSec,
-                    AWS, and DevOps. Experience an interactive learning environment built for real success.</p>
-                <div class="pt-2">
-                    <a class="btn btn-primary rounded-pill text-white py-3 px-5 m-2 wow fadeInLeft"
-                        data-wow-delay="0.1s" href="#">Join Now</a>
-                    <a class="btn btn-secondary rounded-pill text-white py-3 px-5 m-2 wow fadeInRight"
-                        data-wow-delay="0.3s" href="#">Read More</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Carousel End -->
-
-<!-- Banner Start -->
-<div class="container-fluid bg-danger wow zoomInDown" data-wow-delay="0.1s">
-    <div class="container">
-        <div class="d-flex flex-column flex-lg-row align-items-center justify-content-center text-center p-5">
-            <h1 class="me-4"><span class="fw-normal">Kickstart your IT career with</span><span>expert training
-                    today</span></h1>
-            <a href="#" class="text-white fw-bold fs-2"> <i class="fa fa-phone me-1"></i> +91 (8010) 911-256</a>
-        </div>
-    </div>
-</div>
-<!-- Banner End -->
-
-{% include 'mainApp/partials/_about_section.html' %}
-
-<!-- Counter Stats Start -->
-<div class="container-fluid counter-facts py-5" style="background-image: url('{% static " mainApp/img/map-bg.png" %}');
-    background-size: cover; background-position: center; background-repeat: no-repeat;">
+<!-- Hero Section Start -->
+<div class="container-fluid position-relative pt-5 bg-light">
     <div class="container py-5">
-        <div class="text-center mx-auto mb-5" style="max-width: 700px;">
-            <h4 class="text-primary sub-title fw-bold">Why Choose Us</h4>
-            <h1 class="display-4 mb-0" style="color: #dc3545;">Numbers That Speak</h1>
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.1s">
+                <h1 class="display-4 fw-bold mb-4" style="color: #1e2a41;">
+                    Master In-Demand Skills <span class="text-primary">From Industry Leaders</span>
+                </h1>
+                <p class="lead text-secondary mb-4">
+                    Join WebAsha's official partnership programs and get certified by the world's top tech companies. 
+                    Hands-on training, real-world projects, and career support to accelerate your professional journey.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#courses" class="btn btn-primary rounded-pill py-3 px-5 btn-lg">
+                        Explore Courses <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="{% url 'contact' %}" class="btn btn-outline-primary rounded-pill py-3 px-5 btn-lg">
+                        Contact Advisor
+                    </a>
+                </div>
+                <div class="d-flex flex-wrap gap-4 mt-5">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-primary fs-3 me-2"></i>
+                        <span>Official Certifications</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-chalkboard-user text-primary fs-3 me-2"></i>
+                        <span>Live Instructor-Led</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-briefcase text-primary fs-3 me-2"></i>
+                        <span>Placement Assistance</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="position-relative">
+                    <img src="{% static 'mainApp/img/hero-img.png' %}" alt="Students Learning" class="img-fluid rounded-4 shadow-lg">
+                    <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary rounded-4 opacity-10" style="z-index: -1; transform: translate(20px, 20px);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Hero Section End -->
+
+<!-- Stats Section Start -->
+<div class="container-fluid bg-primary text-white py-5">
+    <div class="container py-4">
+        <div class="row g-4 text-center">
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="counter-item">
+                    <i class="fas fa-users fa-3x mb-3"></i>
+                    <h2 class="counter text-white" data-toggle="counter-up">25000</h2>
+                    <p class="mb-0">Happy Learners</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="counter-item">
+                    <i class="fas fa-certificate fa-3x mb-3"></i>
+                    <h2 class="counter text-white" data-toggle="counter-up">85</h2>
+                    <p class="mb-0">Certification Programs</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                <div class="counter-item">
+                    <i class="fas fa-chalkboard-user fa-3x mb-3"></i>
+                    <h2 class="counter text-white" data-toggle="counter-up">150</h2>
+                    <p class="mb-0">Expert Instructors</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
+                <div class="counter-item">
+                    <i class="fas fa-building fa-3x mb-3"></i>
+                    <h2 class="counter text-white" data-toggle="counter-up">1200</h2>
+                    <p class="mb-0">Corporate Partners</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Stats Section End -->
+
+<!-- Featured Courses Section -->
+<div id="courses" class="container-fluid py-5 bg-light">
+    <div class="container py-5">
+        <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 700px;">
+            <h5 class="text-primary text-uppercase mb-3">Top Rated Programs</h5>
+            <h1 class="display-5 fw-bold">Featured Courses & Certifications</h1>
+            <p class="text-secondary mt-3">Get trained with official curriculum and earn globally recognized credentials.</p>
         </div>
         <div class="row g-4">
-            <div class="col-12 col-sm-6 col-lg-3 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="counter-item text-center">
-                    <div class="counter-icon mb-3">
-                        <i class="fas fa-users" style="color: #dc3545;"></i>
-                    </div>
-                    <div class="counter-content">
-                        <h2 class="counter-value" data-toggle="counter-up" style="color: #dc3545;">5000</h2>
-                        <p class="mb-0" style="color: #dc3545;">Students Trained</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-3 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="counter-item text-center">
-                    <div class="counter-icon mb-3">
-                        <i class="fas fa-check-circle" style="color: #dc3545;"></i>
-                    </div>
-                    <div class="counter-content">
-                        <h2 class="counter-value" data-toggle="counter-up" style="color: #dc3545;">92</h2>
-                        <p class="mb-0" style="color: #dc3545;">Pass / Success Rate</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6 col-lg-3 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="counter-item text-center">
-                    <div class="counter-icon mb-3">
-                        <i class="fas fa-handshake" style="color: #dc3545;"></i>
-                    </div>
-                    <div class="counter-content">
-                        <h2 class="counter-value" data-toggle="counter-up" style="color: #dc3545;">300</h2>
-                        <p class="mb-0" style="color: #dc3545;">Hiring Partners</p>
+            <!-- Course 1 -->
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                    <img src="{% static 'mainApp/img/course-1.jpg' %}" class="card-img-top" alt="Data Science" style="height: 200px; object-fit: cover;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="badge bg-primary rounded-pill px-3 py-2">Data Science</span>
+                            <span class="text-muted"><i class="fas fa-star text-warning"></i> 4.9 (2k+)</span>
+                        </div>
+                        <h5 class="card-title fw-bold">Professional Data Science Bootcamp</h5>
+                        <p class="card-text text-secondary">Master Python, ML, AI, and big data tools. Build real-world projects.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <i class="fas fa-clock me-1 text-primary"></i> 32 Weeks
+                                <i class="fas fa-users ms-3 me-1 text-primary"></i> Live Online
+                            </div>
+                            <a href="{% url 'ourCourses' %}" class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-sm-6 col-lg-3 wow fadeInUp" data-wow-delay="0.7s">
-                <div class="counter-item text-center">
-                    <div class="counter-icon mb-3">
-                        <i class="fas fa-calendar-alt" style="color: #dc3545;"></i>
+            <!-- Course 2 -->
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                    <img src="{% static 'mainApp/img/course-2.jpg' %}" class="card-img-top" alt="Cloud Computing" style="height: 200px; object-fit: cover;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="badge bg-primary rounded-pill px-3 py-2">Cloud Computing</span>
+                            <span class="text-muted"><i class="fas fa-star text-warning"></i> 4.8 (1.5k+)</span>
+                        </div>
+                        <h5 class="card-title fw-bold">AWS Solutions Architect Certification</h5>
+                        <p class="card-text text-secondary">Complete AWS training with hands-on labs. Prep for official exam.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <i class="fas fa-clock me-1 text-primary"></i> 16 Weeks
+                                <i class="fas fa-users ms-3 me-1 text-primary"></i> Self-Paced
+                            </div>
+                            <a href="{% url 'ourCourses' %}" class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
+                        </div>
                     </div>
-                    <div class="counter-content">
-                        <h2 class="counter-value" data-toggle="counter-up" style="color: #dc3545;">10</h2>
-                        <p class="mb-0" style="color: #dc3545;">Years Experience</p>
+                </div>
+            </div>
+            <!-- Course 3 -->
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                    <img src="{% static 'mainApp/img/course-3.jpg' %}" class="card-img-top" alt="Full Stack" style="height: 200px; object-fit: cover;">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="badge bg-primary rounded-pill px-3 py-2">Web Development</span>
+                            <span class="text-muted"><i class="fas fa-star text-warning"></i> 4.9 (3k+)</span>
+                        </div>
+                        <h5 class="card-title fw-bold">Full Stack Web Development</h5>
+                        <p class="card-text text-secondary">MERN stack, Django, APIs, and modern frontend frameworks.</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <i class="fas fa-clock me-1 text-primary"></i> 24 Weeks
+                                <i class="fas fa-users ms-3 me-1 text-primary"></i> Live Online
+                            </div>
+                            <a href="{% url 'ourCourses' %}" class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5">
+            <a href="{% url 'ourCourses' %}" class="btn btn-primary rounded-pill py-3 px-5">View All Courses <i class="fas fa-arrow-right ms-2"></i></a>
+        </div>
+    </div>
+</div>
+<!-- Featured Courses End -->
+
+<!-- Why Choose Us Section -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-6 wow fadeInLeft" data-wow-delay="0.1s">
+                <img src="{% static 'mainApp/img/why-us.png' %}" class="img-fluid rounded-4 shadow" alt="Why WebAsha">
+            </div>
+            <div class="col-lg-6 wow fadeInRight" data-wow-delay="0.3s">
+                <h5 class="text-primary text-uppercase mb-3">Why Choose Us</h5>
+                <h1 class="display-5 fw-bold mb-4">Official Training Partners of Top Tech Brands</h1>
+                <p class="text-secondary mb-4">We don't just teach — we certify. Our official partnerships mean you get authentic curriculum, exam vouchers, and industry-recognized badges.</p>
+                <div class="row g-4">
+                    <div class="col-sm-6">
+                        <div class="d-flex">
+                            <i class="fas fa-gem text-primary fa-2x me-3"></i>
+                            <div>
+                                <h5>Official Courseware</h5>
+                                <p class="text-secondary">Direct from technology creators.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex">
+                            <i class="fas fa-chalkboard text-primary fa-2x me-3"></i>
+                            <div>
+                                <h5>Expert Instructors</h5>
+                                <p class="text-secondary">Certified professionals with real experience.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex">
+                            <i class="fas fa-laptop-code text-primary fa-2x me-3"></i>
+                            <div>
+                                <h5>Hands-On Labs</h5>
+                                <p class="text-secondary">Real cloud environments & projects.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex">
+                            <i class="fas fa-briefcase text-primary fa-2x me-3"></i>
+                            <div>
+                                <h5>Placement Support</h5>
+                                <p class="text-secondary">Resume prep, interviews, and job leads.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Counter Stats End -->
+<!-- Why Choose Us End -->
 
-<!-- Live Programs IT in WebAsha Start -->
-<div class="container-fluid training py-5">
+<!-- Top Certifications Section -->
+<div class="container-fluid py-5 bg-light">
     <div class="container py-5">
-        <div class="pb-5">
-            <div class="row g-4 align-items-end">
-                <div class="col-xl-8">
-                    <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Live Programs of IT
-                        in WebAsha</h4>
-                    <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Join Live Batch Today</h1>
+        <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 700px;">
+            <h5 class="text-primary text-uppercase mb-3">Get Certified</h5>
+            <h1 class="display-5 fw-bold">Most Popular Certifications</h1>
+            <p class="text-secondary mt-3">Boost your career with these high-demand credentials.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="bg-white p-4 rounded-4 text-center shadow-sm h-100">
+                    <i class="fab fa-aws fa-3x text-primary mb-3"></i>
+                    <h5>AWS Certified Solutions Architect</h5>
+                    <p class="text-secondary small">Associate Level</p>
                 </div>
-                <div class="col-xl-4 text-xl-end wow fadeInUp" data-wow-delay="0.3s">
-                    <a class="btn btn-primary rounded-pill text-white py-3 px-5" href="/classes/">View All Programs</a>
+            </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="bg-white p-4 rounded-4 text-center shadow-sm h-100">
+                    <i class="fab fa-microsoft fa-3x text-primary mb-3"></i>
+                    <h5>Microsoft Azure Administrator</h5>
+                    <p class="text-secondary small">AZ-104</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                <div class="bg-white p-4 rounded-4 text-center shadow-sm h-100">
+                    <i class="fab fa-google fa-3x text-primary mb-3"></i>
+                    <h5>Google Professional Cloud Architect</h5>
+                    <p class="text-secondary small">GCP</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
+                <div class="bg-white p-4 rounded-4 text-center shadow-sm h-100">
+                    <i class="fab fa-python fa-3x text-primary mb-3"></i>
+                    <h5>Certified Data Scientist</h5>
+                    <p class="text-secondary small">Python & ML</p>
                 </div>
             </div>
         </div>
-
-        <div class="training-carousel owl-carousel pt-5 wow fadeInUp" data-wow-delay="0.1s">
-
-            {% for course in courses %}
-            <div class="training-item bg-white rounded wow fadeInUp" data-wow-delay="0.1s">
-
-                <div class="training-img rounded-top">
-
-                    <img src="{{ course.image.url }}" class="img-fluid rounded-top w-100" alt="{{ course.title }}">
-
-                    <!-- SAME AS STATIC -->
-                    <h1 class="fs-1 fw-bold bg-primary text-white d-inline-block rounded p-2 position-absolute"
-                        style="top: 0; left: 0;">LIVE</h1>
-
-                </div>
-
-                <div class="rounded-bottom border border-top-0 p-4">
-
-                    <a href="{{ course.button_link|default:'/classes/' }}" class="h4 mb-3 d-block">
-                        {{ course.title }}
-                    </a>
-
-                    <p class="mb-3">
-                        {{ course.description }}
-                    </p>
-
-                    <div class="h5 fw-bold text-danger mb-2">₹{{ course.price }}</div>
-
-                    <a class="btn btn-primary rounded-pill text-white py-2 px-4"
-                        href="{{ course.button_link|default:'/classes/' }}">
-                        {{ course.button_text|default:"Join Batch" }}
-                    </a>
-
-                </div>
-
-            </div>
-            {% endfor %}
-
+        <div class="text-center mt-5">
+            <a href="{% url 'certifications' %}" class="btn btn-outline-primary rounded-pill py-3 px-5">View All Certifications <i class="fas fa-arrow-right ms-2"></i></a>
         </div>
-        <!-- IT Training Classes Start -->
-        <div class="container-fluid class bg-light py-5">
-            <div class="container py-5">
-                <div class="pb-5">
-                    <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Featured IT Courses
-                    </h4>
-                    <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Certification Training Programs</h1>
+    </div>
+</div>
+<!-- Top Certifications End -->
+
+<!-- Testimonials Section -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 700px;">
+            <h5 class="text-primary text-uppercase mb-3">Success Stories</h5>
+            <h1 class="display-5 fw-bold">What Our Students Say</h1>
+            <p class="text-secondary mt-3">Join thousands of professionals who transformed their careers with WebAsha.</p>
+        </div>
+        <div class="owl-carousel testimonial-carousel wow fadeInUp" data-wow-delay="0.3s">
+            <div class="testimonial-item bg-light rounded-4 p-4 mx-2">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{% static 'mainApp/img/testimonial-1.jpg' %}" class="img-fluid rounded-circle" style="width: 60px; height: 60px;" alt="User">
+                    <div class="ms-3">
+                        <h6 class="mb-0">Priya Sharma</h6>
+                        <small>Data Analyst at Accenture</small>
+                    </div>
                 </div>
-                <div class="class-carousel owl-carousel pt-5 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="class-item bg-white rounded wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="class-img rounded-top">
-                            <img src="{% static 'mainApp/img/slider/1.ethicalHacking.png' %}"
-                                class="img-fluid rounded-top w-100" alt="RHCSA">
-                        </div>
-                        <div class="rounded-bottom p-4">
-                            <a href="/classes/" class="h4 mb-3 d-block">RHCSA - Red Hat Certified System
-                                Administrator</a>
-                            <p class="mb-3">Master Linux administration with 40+ hours hands-on labs. File systems,
-                                networking, security. Official Red Hat exam voucher included. 92% pass rate.</p>
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="/classes/">Enroll Now</a>
-                        </div>
+                <p class="text-secondary">"The AWS certification training was top-notch. The instructors are industry experts and the hands-on labs gave me the confidence to pass the exam on my first try!"</p>
+                <div class="text-warning">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+            </div>
+            <div class="testimonial-item bg-light rounded-4 p-4 mx-2">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{% static 'mainApp/img/testimonial-2.jpg' %}" class="img-fluid rounded-circle" style="width: 60px; height: 60px;" alt="User">
+                    <div class="ms-3">
+                        <h6 class="mb-0">Rahul Mehta</h6>
+                        <small>Full Stack Developer</small>
                     </div>
-                    <div class="class-item bg-white rounded wow fadeInUp" data-wow-delay="0.3s">
-                        <div class="class-img rounded-top">
-                            <img src="{% static 'mainApp/img/slider/3.pythonSlider.avif' %}"
-                                class="img-fluid rounded-top w-100" alt="Python">
-                        </div>
-                        <div class="rounded-bottom p-4">
-                            <a href="/classes/" class="h4 mb-3 d-block">Python Programming Bootcamp</a>
-                            <p class="mb-3">60 hours Core Python, Django web development, Data Science, Automation
-                                scripts. Real projects, interview preparation, lifetime video access.</p>
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="/classes/">Enroll Now</a>
-                        </div>
+                </div>
+                <p class="text-secondary">"WebAsha's Full Stack program changed my career. The curriculum is up-to-date, projects are real-world, and placement team helped me land my dream job."</p>
+                <div class="text-warning">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+            </div>
+            <div class="testimonial-item bg-light rounded-4 p-4 mx-2">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{% static 'mainApp/img/testimonial-3.jpg' %}" class="img-fluid rounded-circle" style="width: 60px; height: 60px;" alt="User">
+                    <div class="ms-3">
+                        <h6 class="mb-0">Anjali Nair</h6>
+                        <small>Cloud Engineer at TCS</small>
                     </div>
-                    <div class="class-item bg-white rounded wow fadeInUp" data-wow-delay="0.5s">
-                        <div class="class-img rounded-top">
-                            <img src="{% static 'mainApp/img/slider/3.ethicalHacking.jpeg' %}"
-                                class="img-fluid rounded-top w-100" alt="CEH">
-                        </div>
-                        <div class="rounded-bottom p-4">
-                            <a href="/classes/" class="h4 mb-3 d-block">Certified Ethical Hacker (CEH v12)</a>
-                            <p class="mb-3">EC-Council accredited penetration testing course. Vulnerability assessment,
-                                network security, 80 hours advanced labs. Industry-recognized certification.</p>
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="/classes/">Enroll Now</a>
-                        </div>
-                    </div>
-                    <div class="class-item bg-white rounded wow fadeInUp" data-wow-delay="0.7s">
-                        <div class="class-img rounded-top">
-                            <img src="{% static 'mainApp/img/slider/pythonSlider.jpeg' %}"
-                                class="img-fluid rounded-top w-100" alt="AWS">
-                        </div>
-                        <div class="rounded-bottom p-4">
-                            <a href="/classes/" class="h4 mb-3 d-block">AWS Solutions Architect Associate</a>
-                            <p class="mb-3">Cloud infrastructure design with EC2, S3, VPC, IAM. 50 hours real-world
-                                projects, exam simulator included. AWS certification prep.</p>
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="/classes/">Enroll Now</a>
-                        </div>
-                    </div>
-                    <div class="class-item bg-white rounded wow fadeInUp" data-wow-delay="0.9s">
-                        <div class="class-img rounded-top">
-                            <img src="{% static 'mainApp/img/service-2.jpg' %}" class="img-fluid rounded-top w-100"
-                                alt="CKA">
-                        </div>
-                        <div class="rounded-bottom p-4">
-                            <a href="/classes/" class="h4 mb-3 d-block">Certified Kubernetes Administrator (CKA)</a>
-                            <p class="mb-3">CNCF official certification training. Deploy, manage, troubleshoot
-                                Kubernetes clusters. 60 hours advanced container orchestration labs.</p>
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="/classes/">Enroll Now</a>
-                        </div>
-                    </div>
+                </div>
+                <p class="text-secondary">"The support from instructors and the career guidance team is exceptional. I highly recommend WebAsha for anyone looking to upskill and get certified."</p>
+                <div class="text-warning">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
                 </div>
             </div>
         </div>
-        <!-- IT Training Classes End -->
+    </div>
+</div>
+<!-- Testimonials End -->
 
-        <!-- Events Start -->
-        <div class="container-fluid events py-5">
-            <div class="container py-5">
-                <div class="pb-5">
-                    <div class="row g-4 align-items-end">
-                        <div class="col-xl-8">
-                            <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Upcoming
-                                Courses</h4>
-                            <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Upcoming Courses</h1>
-                        </div>
-                        <div class="col-xl-4 text-xl-end pb-3 wow fadeInUp" data-wow-delay="0.3s">
-                            <a class="btn btn-danger rounded-pill text-white py-3 px-5" href="/event/">View All
-                                Courses</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="row g-4 justify-content-center">
-                    {% include "mainApp/partials/_courses_grid.html" %}
-                </div>
+<!-- CTA Section -->
+<div class="container-fluid bg-primary text-white py-5">
+    <div class="container py-4">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8 text-center text-lg-start">
+                <h1 class="display-5 fw-bold mb-3">Ready to Advance Your Career?</h1>
+                <p class="lead mb-0">Enroll today and get access to exclusive learning resources, certification vouchers, and career coaching.</p>
+            </div>
+            <div class="col-lg-4 text-center text-lg-end">
+                {% if not user.is_authenticated %}
+                <a href="#" class="btn btn-light text-primary rounded-pill py-3 px-5 fw-bold" data-bs-toggle="modal" data-bs-target="#authModal">Get Started Now <i class="fas fa-arrow-right ms-2"></i></a>
+                {% else %}
+                <a href="{% url 'ourCourses' %}" class="btn btn-light text-primary rounded-pill py-3 px-5 fw-bold">Browse Courses <i class="fas fa-arrow-right ms-2"></i></a>
+                {% endif %}
             </div>
         </div>
-        <!-- Events End -->
+    </div>
+</div>
+<!-- CTA End -->
 
-        <!-- Blogs Start -->
-        <div class="container-fluid blog pb-5">
-            <div class="container pb-5">
-                <div class="pb-5">
-                    <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">WebAsha Tech Blog
-                    </h4>
-                    <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Latest IT Training Articles & Tech
-                        News</h1>
+<!-- Blog / News Section -->
+<div class="container-fluid py-5 bg-light">
+    <div class="container py-5">
+        <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 700px;">
+            <h5 class="text-primary text-uppercase mb-3">Latest Updates</h5>
+            <h1 class="display-5 fw-bold">Tech News & Insights</h1>
+            <p class="text-secondary mt-3">Stay updated with the latest trends in technology and career growth.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                    <img src="{% static 'mainApp/img/blog-1.jpg' %}" class="card-img-top" alt="AI Trends">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3 text-muted small">
+                            <span><i class="fas fa-calendar-alt me-1"></i> March 15, 2025</span>
+                            <span class="ms-3"><i class="fas fa-tag me-1"></i> AI & ML</span>
+                        </div>
+                        <h5 class="card-title fw-bold">Top 5 AI Trends to Watch in 2025</h5>
+                        <p class="card-text text-secondary">Explore how generative AI and automation are reshaping industries.</p>
+                        <a href="#" class="text-primary fw-bold text-decoration-none">Read More <i class="fas fa-arrow-right ms-1"></i></a>
+                    </div>
                 </div>
-                <div class="blog-carousel owl-carousel pt-5 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="blog-item bg-white rounded wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="blog-img rounded-top">
+            </div>
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                    <img src="{% static 'mainApp/img/blog-2.jpg' %}" class="card-img-top" alt="Cloud Careers">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3 text-muted small">
+                            <span><i class="fas fa-calendar-alt me-1"></i> March 10, 2025</span>
+                            <span class="ms-3"><i class="fas fa-tag me-1"></i> Cloud</span>
                         </div>
-                        <div class="bg-light rounded-bottom p-4">
-                            <div class="d-flex justify-content-between mb-4">
-                                <a href="#" class="text-muted"><i class="fa fa-calendar-alt text-primary"></i> 15 Oct
-                                    2024</a>
-                                <a href="#" class="text-muted"><span class="fa fa-comments text-primary"></span> 5
-                                    Comments</a>
-                            </div>
-                            <a href="#" class="h4 mb-3 d-block">RHCSA Exam Preparation: Top 10 Tips for Success</a>
-                            <p class="mb-3">Master Red Hat Linux administration with our proven study plan. Essential
-                                commands, troubleshooting techniques, and lab practice strategies for 92% pass rate at
-                                WebAsha.</p>
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                        </div>
+                        <h5 class="card-title fw-bold">Why Cloud Certifications Are Key in 2025</h5>
+                        <p class="card-text text-secondary">Discover the most in-demand cloud skills and how to get certified.</p>
+                        <a href="#" class="text-primary fw-bold text-decoration-none">Read More <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
-                    <div class="blog-item bg-white rounded wow fadeInUp" data-wow-delay="0.3s">
-                        <div class="blog-img rounded-top">
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
+                    <img src="{% static 'mainApp/img/blog-3.jpg' %}" class="card-img-top" alt="Remote Work">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3 text-muted small">
+                            <span><i class="fas fa-calendar-alt me-1"></i> March 5, 2025</span>
+                            <span class="ms-3"><i class="fas fa-tag me-1"></i> Career</span>
                         </div>
-                        <div class="bg-light rounded-bottom p-4">
-                            <div class="d-flex justify-content-between mb-4">
-                                <a href="#" class="text-muted"><i class="fa fa-calendar-alt text-primary"></i> 12 Oct
-                                    2024</a>
-                                <a href="#" class="text-muted"><span class="fa fa-comments text-primary"></span> 8
-                                    Comments</a>
-                            </div>
-                            <a href="#" class="h4 mb-3 d-block">OffSec OSCP: Real-World Penetration Testing Guide</a>
-                            <p class="mb-3">Hands-on pentesting labs and exploit development techniques. WebAsha's
-                                OffSec certified trainers share practical attack vectors and defense strategies.</p>
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                        </div>
-                    </div>
-                    <div class="blog-item bg-white rounded wow fadeInUp" data-wow-delay="0.5s">
-                        <div class="blog-img rounded-top">
-                        </div>
-                        <div class="bg-light rounded-bottom p-4">
-                            <div class="d-flex justify-content-between mb-4">
-                                <a href="#" class="text-muted"><i class="fa fa-calendar-alt text-primary"></i> 10 Oct
-                                    2024</a>
-                                <a href="#" class="text-muted"><span class="fa fa-comments text-primary"></span> 12
-                                    Comments</a>
-                            </div>
-                            <a href="#" class="h4 mb-3 d-block">DevOps Pipeline Mastery: Jenkins, Docker &
-                                Kubernetes</a>
-                            <p class="mb-3">Build CI/CD pipelines from scratch. WebAsha live labs cover Jenkins
-                                automation, Docker containerization, and Kubernetes orchestration for production
-                                deployments.</p>
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                        </div>
-                    </div>
-                    <div class="blog-item bg-white rounded wow fadeInUp" data-wow-delay="0.7s">
-                        <div class="blog-img rounded-top">
-                        </div>
-                        <div class="bg-light rounded-bottom p-4">
-                            <div class="d-flex justify-content-between mb-4">
-                                <a href="#" class="text-muted"><i class="fa fa-calendar-alt text-primary"></i> 08 Oct
-                                    2024</a>
-                                <a href="#" class="text-muted"><span class="fa fa-comments text-primary"></span> 6
-                                    Comments</a>
-                            </div>
-                            <a href="#" class="h4 mb-3 d-block">AWS Solutions Architect: Cloud Migration Strategies</a>
-                            <p class="mb-3">Plan hybrid cloud migrations with EC2, S3, VPC. WebAsha AWS certified
-                                instructors reveal real-world case studies and certification exam secrets.</p>
-                            <a class="btn btn-primary rounded-pill text-white py-2 px-4" href="#">Read More</a>
-                        </div>
+                        <h5 class="card-title fw-bold">How to Ace Remote Tech Interviews</h5>
+                        <p class="card-text text-secondary">Tips from hiring managers to help you land your next remote role.</p>
+                        <a href="#" class="text-primary fw-bold text-decoration-none">Read More <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Blogs End -->
+    </div>
+</div>
+<!-- Blog Section End -->
 
-        <!-- Team Start -->
-        <div class="container-fluid team pb-5">
-            <div class="container pb-5">
-                <div class="pb-5">
-                    <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Dance Teachers</h4>
-                    <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Our Professional Instructor</h1>
-                </div>
-                <div class="team-carousel owl-carousel pt-5 wow fadeInUp" data-wow-delay="0.1s">
-                    <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="team-img bg-secondary rounded-top">
-                            <img src="{% static 'mainApp/img/team-1.jpg' %}" class="img-fluid rounded-top w-100"
-                                alt="Image">
-                            <div class="team-icon">
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-instagram"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-linkedin-in"></i></a>
-                            </div>
-                        </div>
-                        <div class="team-content text-center p-4">
-                            <a href="#" class="h4">Emily Ava</a>
-                            <p class="mb-0 text-primary">Instructor</p>
-                        </div>
-                    </div>
-                    <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.3s">
-                        <div class="team-img bg-secondary rounded-top">
-                            <img src="{% static 'mainApp/img/team-2.jpg' %}" class="img-fluid rounded-top w-100"
-                                alt="Image">
-                            <div class="team-icon">
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-instagram"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-linkedin-in"></i></a>
-                            </div>
-                        </div>
-                        <div class="team-content text-center p-4">
-                            <a href="#" class="h4">Emily Ava</a>
-                            <p class="mb-0 text-primary">Instructor</p>
-                        </div>
-                    </div>
-                    <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.5s">
-                        <div class="team-img bg-secondary rounded-top">
-                            <img src="{% static 'mainApp/img/team-3.jpg' %}" class="img-fluid rounded-top w-100"
-                                alt="Image">
-                            <div class="team-icon">
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-instagram"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-linkedin-in"></i></a>
-                            </div>
-                        </div>
-                        <div class="team-content text-center p-4">
-                            <a href="#" class="h4">Emily Ava</a>
-                            <p class="mb-0 text-primary">Instructor</p>
-                        </div>
-                    </div>
-                    <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.7s">
-                        <div class="team-img bg-secondary rounded-top">
-                            <img src="{% static 'mainApp/img/team-4.jpg' %}" class="img-fluid rounded-top w-100"
-                                alt="Image">
-                            <div class="team-icon">
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-instagram"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-linkedin-in"></i></a>
-                            </div>
-                        </div>
-                        <div class="team-content text-center p-4">
-                            <a href="#" class="h4">Emily Ava</a>
-                            <p class="mb-0 text-primary">Instructor</p>
-                        </div>
-                    </div>
-                    <div class="team-item border rounded wow fadeInUp" data-wow-delay="0.9s">
-                        <div class="team-img bg-secondary rounded-top">
-                            <img src="{% static 'mainApp/img/team-4.jpg' %}" class="img-fluid rounded-top w-100"
-                                alt="Image">
-                            <div class="team-icon">
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-twitter"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-instagram"></i></a>
-                                <a class="btn btn-square btn-primary rounded-circle mx-1" href=""><i
-                                        class="fab fa-linkedin-in"></i></a>
-                            </div>
-                        </div>
-                        <div class="team-content text-center p-4">
-                            <a href="#" class="h4">Emily Ava</a>
-                            <p class="mb-0 text-primary">Instructor</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Team End -->
-
-        <!-- Video Gallery Start -->
-        <div class="container-fluid gallery pb-5">
-            <div class="container pb-5">
-                <div class="pb-5">
-                    <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Dance Gallery</h4>
-                    <h1 class="display-2 mb-0 wow fadeInUp" data-wow-delay="0.3s">Our Dance class gallery</h1>
-                </div>
-                <div class="tab-class wow fadeInUp" data-wow-delay="0.1s">
-                    <ul class="nav nav-pills d-inline-flex justify-content-center pb-4">
-                        <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                            <a class="d-flex py-2 px-5 rounded-pill active" data-bs-toggle="pill" href="#GalleryTab-1">
-                                <span class="text-dark">All</span>
-                            </a>
-                        </li>
-                        <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                            <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-2">
-                                <span class="text-dark">Dance Practice</span>
-                            </a>
-                        </li>
-                        <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                            <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-3">
-                                <span class="text-dark">Dance Training</span>
-                            </a>
-                        </li>
-                        <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                            <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-4">
-                                <span class="text-dark">Dance Growth</span>
-                            </a>
-                        </li>
-                        <li class="nav-item bg-light border border-primary rounded-pill mb-4">
-                            <a class="d-flex py-2 px-5 rounded-pill" data-bs-toggle="pill" href="#GalleryTab-5">
-                                <span class="text-dark">Dance Improvement</span>
-                            </a>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content">
-                        <div id="GalleryTab-1" class="tab-pane fade show p-0 active">
-                            <div class="row g-2">
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.1s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.5s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-4.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.9s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-5.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2 wow fadeInUp" data-wow-delay="0.1s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2 wow fadeInUp" data-wow-delay="0.5s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-4.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2 wow fadeInUp" data-wow-delay="0.9s">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-5.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="GalleryTab-2" class="tab-pane fade show p-0">
-                            <div class="row g-2">
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-4.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-4.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-5.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="GalleryTab-3" class="tab-pane fade show p-0">
-                            <div class="row g-2">
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-4.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-6.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="GalleryTab-4" class="tab-pane fade show p-0">
-                            <div class="row g-2">
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-4.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-5.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-6.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="GalleryTab-5" class="tab-pane fade show p-0">
-                            <div class="row g-2">
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-4.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-4 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-2.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-4.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-3">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-1.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 col-xl-2">
-                                    <div class="video h-100">
-                                        <img src="{% static 'mainApp/img/class-3.jpg' %}"
-                                            class="img-fluid rounded w-100 h-100" style="object-fit: cover;" alt="">
-                                        <button type="button" class="btn btn-play" data-bs-toggle="modal"
-                                            data-src="https://www.youtube.com/embed/DWRcNpR6Kdc"
-                                            data-bs-target="#videoModal">
-                                            <span></span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Video Gallery End -->
-
-        {% endblock body %}
+{% endblock %}
