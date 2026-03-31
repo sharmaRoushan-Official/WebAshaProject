@@ -1,44 +1,44 @@
 {% extends 'mainApp/base.html' %}
 {% load static %}
 
-{% block title %}IT Training Programs - WebAsha Technologies{% endblock %}
+{% block title %}Live Classes - WebAsha Technologies{% endblock %}
 
 {% block body %}
 <!-- Hero Section Start -->
-<div class="container-fluid py-5 bg-danger" style="background-color: #dc3545 !important;" text-white>
+<div class="container-fluid py-5 bg-danger" style="background-color: #dc3545 !important;">
     <div class="container py-5">
         <div class="text-center mx-auto mb-5" style="max-width: 800px; margin-top: 30px;">
-            <h4 class="text-white sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Certification Training</h4>
-            <h1 class="display-3 mb-4 wow fadeInUp" data-wow-delay="0.3s">Job-Ready IT Skills Programs</h1>
-<p class="fs-5 mb-0 text-white wow fadeInUp" data-wow-delay="0.5s">Master industry-leading certifications with hands-on labs, expert mentorship, and guaranteed interview support.</p>
+            <h4 class="text-white sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Live Batches</h4>
+            <h1 class="display-3 mb-4 wow fadeInUp" data-wow-delay="0.3s">Join Live Training Batches</h1>
+            <p class="fs-5 mb-0 text-white wow fadeInUp" data-wow-delay="0.5s">Real-time instructor-led classes with hands-on projects, live doubt clearing, and guaranteed placement support.</p>
         </div>
         <div class="row g-4">
             <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="text-center">
-                    <i class="fas fa-certificate fa-3x text-warning mb-4"></i>
-                    <h4 class="mb-2">92% Pass Rate</h4>
-<p class="mb-0 text-white">Exam Success</p>
+                    <i class="fas fa-video fa-3x text-warning mb-4"></i>
+                    <h4 class="mb-2">Live Sessions</h4>
+                    <p class="mb-0 text-white">Real-time Learning</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                 <div class="text-center">
                     <i class="fas fa-clock fa-3x text-warning mb-4"></i>
-                    <h4 class="mb-2">40-80 Hours</h4>
-<p class="mb-0 text-white">Course Duration</p>
+                    <h4 class="mb-2">{{ live_courses|length }} Batches</h4>
+                    <p class="mb-0 text-white">Running Now</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
                 <div class="text-center">
-                    <i class="fas fa-laptop fa-3x text-warning mb-4"></i>
-                    <h4 class="mb-2">Live Labs</h4>
-<p class="mb-0 text-white">Hands-on Practice</p>
+                    <i class="fas fa-chalkboard-teacher fa-3x text-warning mb-4"></i>
+                    <h4 class="mb-2">Expert Mentors</h4>
+                    <p class="mb-0 text-white">Industry Trainers</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.7s">
                 <div class="text-center">
                     <i class="fas fa-handshake fa-3x text-warning mb-4"></i>
-                    <h4 class="mb-2">300+ Partners</h4>
-<p class="mb-0 text-white">Placements</p>
+                    <h4 class="mb-2">100% Placement</h4>
+                    <p class="mb-0 text-white">Job Assistance</p>
                 </div>
             </div>
         </div>
@@ -51,16 +51,22 @@
     <div class="container">
         <ul class="nav nav-pills justify-content-center mb-0">
             <li class="nav-item">
-                <a class="nav-link active px-4 py-2" href="#all" data-bs-toggle="pill">All Courses</a>
+                <a class="nav-link active px-4 py-2" href="#all" data-bs-toggle="pill">All Batches</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-4 py-2" href="#web_dev" data-bs-toggle="pill">Web Dev</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-4 py-2" href="#dev_ops" data-bs-toggle="pill">DevOps</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-4 py-2" href="#ai_ml" data-bs-toggle="pill">AI/ML</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link px-4 py-2" href="#cybersecurity" data-bs-toggle="pill">Cybersecurity</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link px-4 py-2" href="#cloud" data-bs-toggle="pill">Cloud</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link px-4 py-2" href="#security" data-bs-toggle="pill">Security</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link px-4 py-2" href="#devops" data-bs-toggle="pill">DevOps</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link px-4 py-2" href="#linux" data-bs-toggle="pill">Linux</a>
@@ -74,178 +80,48 @@
 <div class="container-fluid py-5">
     <div class="container py-5">
         <div class="courses-grid row g-4">
-
-<div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s" data-category="linux">
-</xai:function_call]
-
-<xai:function_call name="edit_file">
-<parameter name="path">mainApp/templates/mainApp/classes.html
-                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
-                            <div class="position-relative">
-                                <img src="{% static 'mainApp/img/slider/1.ethicalHacking.png' %}" class="img-fluid w-100 course-img" alt="RHCSA" style="height: 250px; object-fit: cover;">
-                                <div class="position-absolute top-0 end-0 bg-success text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">Certification</div>
-                                <div class="position-absolute bottom-0 start-0 bg-primary text-white px-3 py-1 rounded-end fs-6 fw-bold m-3">Beginner</div>
-                            </div>
-                            <div class="p-4">
-                                <h4 class="course-title mb-2">RHCSA (EX200) - Red Hat Certified System Administrator</h4>
-                                <p class="text-muted mb-3">Master Linux administration, file systems, networking, security. 40+ hours hands-on labs. Official exam voucher included.</p>
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge bg-info fs-6">40 Hours</span>
-                                    <div class="d-flex">
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <span class="ms-1 text-muted small">(150)</span>
-                                    </div>
-                                </div>
-                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
+            {% for course in live_courses %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.{{ forloop.counter0|add:'1' }}s" data-category="{{ course.category }}">
+                <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
+                    <div class="position-relative">
+                        {% if course.image %}
+                            <img src="{{ course.image.url }}" class="img-fluid w-100 course-img" alt="{{ course.title }}" style="height: 250px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'mainApp/img/service-1.jpg' %}" class="img-fluid w-100 course-img" alt="{{ course.title }}" style="height: 250px; object-fit: cover;">
+                        {% endif %}
+                        {% if course.is_live %}
+                            <div class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">LIVE</div>
+                        {% endif %}
+                        <div class="position-absolute bottom-0 start-0 bg-primary text-white px-3 py-1 rounded-end fs-6 fw-bold m-3">{{ course.get_category_display }}</div>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="course-title mb-2">{{ course.title }}</h4>
+                        <p class="text-muted mb-3">{{ course.description }}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-info fs-6">{{ course.start_day }} {{ course.start_time }}</span>
+                            <div class="d-flex">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <span class="ms-1 text-muted small">(150+)</span>
                             </div>
                         </div>
-                    </div>
-<div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.2s" data-category="devops">
-</xai:function_call]
-
-<xai:function_call name="edit_file">
-<parameter name="path">mainApp/templates/mainApp/classes.html
-                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
-                            <div class="position-relative">
-                                <img src="{% static 'mainApp/img/slider/3.pythonSlider.avif' %}" class="img-fluid w-100 course-img" alt="Python" style="height: 250px; object-fit: cover;">
-                                <div class="position-absolute top-0 end-0 bg-success text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">Bootcamp</div>
-                                <div class="position-absolute bottom-0 start-0 bg-warning text-dark px-3 py-1 rounded-end fs-6 fw-bold m-3">Intermediate</div>
-                            </div>
-                            <div class="p-4">
-                                <h4 class="course-title mb-2">Python Programming Bootcamp</h4>
-                                <p class="text-muted mb-3">Core Python, Django, Data Science, Automation. Projects + Interview prep. Lifetime access to recordings.</p>
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge bg-info fs-6">60 Hours</span>
-                                    <div class="d-flex">
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <span class="ms-1 text-muted small">(220)</span>
-                                    </div>
-                                </div>
-                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
-                            </div>
+                        <div class="mb-3">
+                            <small class="text-danger fw-bold">₹{{ course.price }}</small>
                         </div>
+                        <a href="{{ course.button_link|default:'/join/' }}" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">{{ course.button_text|default:"Join Batch" }}</a>
                     </div>
-<div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s" data-category="security">
-</xai:function_call]
-
-<xai:function_call name="edit_file">
-<parameter name="path">mainApp/templates/mainApp/classes.html
-                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
-                            <div class="position-relative">
-                                <div class="position-absolute bottom-0 start-0 bg-warning text-dark px-3 py-1 rounded-end fs-6 fw-bold m-3">Advanced</div>
-                            </div>
-                            <div class="p-4">
-                                <h4 class="course-title mb-2">Certified Ethical Hacker (CEH v12)</h4>
-                                <p class="text-muted mb-3">Penetration testing, vulnerability assessment, network security. EC-Council accredited labs.</p>
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge bg-info fs-6">80 Hours</span>
-                                    <div class="d-flex">
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="far fa-star text-warning"></i>
-                                        <span class="ms-1 text-muted small">(180)</span>
-                                    </div>
-                                </div>
-                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
-                            </div>
-                        </div>
-                    </div>
-<div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.4s" data-category="cloud">
-</xai:function_call]
-
-<xai:function_call name="edit_file">
-<parameter name="path">mainApp/templates/mainApp/classes.html
-                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
-                            <div class="position-relative">
-                                <img src="{% static 'mainApp/img/slider/pythonSlider.jpeg' %}" class="img-fluid w-100 course-img" alt="AWS" style="height: 250px; object-fit: cover;">
-                                <div class="position-absolute top-0 end-0 bg-info text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">AWS</div>
-                                <div class="position-absolute bottom-0 start-0 bg-success text-white px-3 py-1 rounded-end fs-6 fw-bold m-3">Intermediate</div>
-                            </div>
-                            <div class="p-4">
-                                <h4 class="course-title mb-2">AWS Solutions Architect Associate</h4>
-                                <p class="text-muted mb-3">Cloud infrastructure, EC2, S3, VPC, IAM. Real-world projects + exam simulator.</p>
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge bg-info fs-6">50 Hours</span>
-                                    <div class="d-flex">
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <span class="ms-1 text-muted small">(95)</span>
-                                    </div>
-                                </div>
-                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
-                            </div>
-                        </div>
-                    </div>
-<div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s" data-category="devops">
-</xai:function_call]
-
-<xai:function_call name="edit_file">
-<parameter name="path">mainApp/templates/mainApp/classes.html
-                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
-                            <div class="position-relative">
-                                <img src="{% static 'mainApp/img/service-1.jpg' %}" class="img-fluid w-100 course-img" alt="DevOps" style="height: 250px; object-fit: cover;">
-                                <div class="position-absolute top-0 end-0 badge bg-purple text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">DevOps</div>
-                                <div class="position-absolute bottom-0 start-0 bg-warning text-dark px-3 py-1 rounded-end fs-6 fw-bold m-3">Intermediate</div>
-                            </div>
-                            <div class="p-4">
-                                <h4 class="course-title mb-2">DevOps & CI/CD Pipeline Engineering</h4>
-                                <p class="text-muted mb-3">Jenkins, Docker, Kubernetes, Terraform, Ansible. Build production pipelines.</p>
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge bg-info fs-6">70 Hours</span>
-                                    <div class="d-flex">
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star"></i>
-                                        <span class="ms-1 text-muted small">(120)</span>
-                                    </div>
-                                </div>
-                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
-                            </div>
-                        </div>
-                    </div>
-<div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.6s" data-category="cloud">
-</xai:function_call name="edit_file">
-<parameter name="path">mainApp/templates/mainApp/classes.html
-                        <div class="course-card h-100 shadow-sm hover-shadow border-0 rounded-4 overflow-hidden">
-                            <div class="position-relative">
-                                <img src="{% static 'mainApp/img/service-2.jpg' %}" class="img-fluid w-100 course-img" alt="Kubernetes" style="height: 250px; object-fit: cover;">
-                                <div class="position-absolute top-0 end-0 bg-success text-white px-3 py-1 rounded-start fs-6 fw-bold m-3">CKA</div>
-<div class="position-absolute bottom-0 start-0 bg-danger text-white" style="background-color: #dc3545 !important;" px-3 py-1 rounded-end fs-6 fw-bold m-3">Advanced\n                            </div>
-                            <div class="p-4">
-                                <h4 class="course-title mb-2">Certified Kubernetes Administrator (CKA)</h4>
-                                <p class="text-muted mb-3">CNCF certification. Deploy, manage, troubleshoot Kubernetes clusters.</p>
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="badge bg-info fs-6">60 Hours</span>
-                                    <div class="d-flex">
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <i class="fas fa-star text-warning"></i>
-                                        <span class="ms-1 text-muted small">(75)</span>
-                                    </div>
-                                </div>
-                                <a href="#" class="btn btn-primary w-100 rounded-pill py-2 fw-bold">Enroll Now</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Add more cards as needed -->
                 </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <h3>No live batches available at the moment.</h3>
+                <p class="text-muted">Check back soon for new batches!</p>
+            </div>
+            {% endfor %}
+        </div>
 
         <div class="text-center mt-5">
             <a href="#" class="btn btn-primary btn-lg rounded-pill py-3 px-5 fw-bold">View All Programs <i class="fas fa-arrow-right ms-2"></i></a>
@@ -278,29 +154,34 @@
 document.addEventListener('DOMContentLoaded', function() {
   const triggerTabList = [].slice.call(document.querySelectorAll('.nav-link[data-bs-toggle="pill"]'));
   triggerTabList.forEach(function(triggerEl) {
+    const originalListener = triggerEl._listener;
     triggerEl.addEventListener('shown.bs.tab', function(event) {
+      if (originalListener) originalListener.call(this, event);
       const targetId = event.target.getAttribute('href').substring(1);
       const filter = targetId === 'all' ? '*' : targetId;
-      const cols = document.querySelectorAll('.courses-grid .col-lg-4[data-category]');
+      const cols = document.querySelectorAll('.courses-grid [data-category]');
       cols.forEach(function(col) {
         col.style.display = 'block';
       });
       if (filter !== '*') {
         cols.forEach(function(col) {
-          if (!col.dataset.category.includes(filter)) {
+          if (col.dataset.category !== filter) {
             col.style.display = 'none';
           }
         });
       }
     });
   });
-  // Initial load
-  const activeTab = document.querySelector('.nav-link.active');
-  if (activeTab) {
-    const initialEvent = new Event('shown.bs.tab');
-    activeTab.dispatchEvent(initialEvent);
-  }
+  // Initial load - show all
+  const cols = document.querySelectorAll('.courses-grid [data-category]');
+  cols.forEach(function(col) {
+    col.style.display = 'block';
+  });
 });
 </script>
 
+<!-- Forms context -->
+{{ login_form|safe }}
+{{ register_form|safe }}
+{{ change_password_form|safe }}
 {% endblock %}

@@ -1,1 +1,182 @@
-[{"model": "mainApp.livecourse", "pk": 1, "fields": {"title": "Live DevOps Batch", "description": "Hands-on DevOps with Ansible, Docker, Kubernetes.", "image": "courses/ansible.webp", "price": "29999.00", "is_live": true, "start_day": "Monday", "start_time": "7:00 PM", "button_text": "Join Now", "button_link": "/courses/devops", "is_active": true, "created_at": "2024-01-01T00:00:00Z"}}, {"model": "mainApp.livecourse", "pk": 2, "fields": {"title": "Live Ethical Hacking (CEH)", "description": "Certified Ethical Hacker training with labs.", "image": "courses/chfi.webp", "price": "24999.00", "is_live": true, "start_day": "Wednesday", "start_time": "8:00 PM", "button_text": "Enroll", "button_link": "", "is_active": true, "created_at": "2024-01-01T00:00:00Z"}}, {"model": "mainApp.livecourse", "pk": 3, "fields": {"title": "Live AWS Cloud Practitioner", "description": "AWS fundamentals for beginners.", "image": "courses/ansible_hD7QN98.webp", "price": "19999.00", "is_live": true, "start_day": "Saturday", "start_time": "10:00 AM", "button_text": "Register", "button_link": "", "is_active": true, "created_at": "2024-01-01T00:00:00Z"}}]
+[
+  {
+    "model": "mainApp.livecourse",
+    "pk": 1,
+    "fields": {
+      "title": "Live Full Stack Web Development Batch",
+      "description": "Complete MERN Stack (MongoDB, Express, React, Node.js) with projects and deployment.",
+      "category": "web_dev",
+      "image": "courses/ansible.webp",
+      "price": "24999.00",
+      "is_live": true,
+      "start_day": "Monday, Wednesday, Friday",
+      "start_time": "7:00 PM - 9:00 PM",
+      "button_text": "Join Now",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "mainApp.livecourse",
+    "pk": 2,
+    "fields": {
+      "title": "Live DevOps Engineer Certification",
+      "description": "AWS DevOps, CI/CD pipelines, Terraform, Kubernetes, Jenkins automation.",
+      "category": "dev_ops",
+      "image": "courses/chfi.webp",
+      "price": "29999.00",
+      "is_live": true,
+      "start_day": "Tuesday, Thursday",
+      "start_time": "8:00 PM - 10:00 PM",
+      "button_text": "Enroll Now",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "mainApp.livecourse",
+    "pk": 3,
+    "fields": {
+      "title": "Live AWS Cloud Practitioner & Solutions Architect",
+      "description": "AWS fundamentals + advanced architecture, hands-on labs & certification prep.",
+      "category": "cloud",
+      "image": "courses/ansible_hD7QN98.webp",
+      "price": "27999.00",
+      "is_live": true,
+      "start_day": "Saturday, Sunday",
+      "start_time": "10:00 AM - 1:00 PM",
+      "button_text": "Register Now",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "mainApp.livecourse",
+    "pk": 4,
+    "fields": {
+      "title": "Live Certified Ethical Hacker (CEH v12)",
+      "description": "Complete ethical hacking, penetration testing, vulnerability assessment.",
+      "category": "cybersecurity",
+      "image": "courses/chfi.webp",
+      "price": "34999.00",
+      "is_live": true,
+      "start_day": "Monday, Wednesday",
+      "start_time": "6:30 PM - 8:30 PM",
+      "button_text": "Secure Spot",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-02T00:00:00Z"
+    }
+  },
+  {
+    "model": "mainApp.livecourse",
+    "pk": 5,
+    "fields": {
+      "title": "Live Machine Learning & AI with Python",
+      "description": "TensorFlow, PyTorch, NLP, Computer Vision, deployment on cloud.",
+      "category": "ai_ml",
+      "image": "courses/ansible.webp",
+      "price": "31999.00",
+      "is_live": true,
+      "start_day": "Tuesday, Thursday, Saturday",
+      "start_time": "9:00 AM - 12:00 PM",
+      "button_text": "Start Learning",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "mainApp.livecourse",
+    "pk": 6,
+    "fields": {
+      "title": "Live RHCSA & RHCE Linux Administration",
+      "description": "Red Hat Certified System Admin + Engineer, shell scripting, security.",
+      "category": "linux",
+      "image": "courses/ansible_hD7QN98.webp",
+      "price": "28999.00",
+      "is_live": true,
+      "start_day": "Wednesday, Friday",
+      "start_time": "7:30 PM - 9:30 PM",
+      "button_text": "Join Batch",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-04T00:00:00Z"
+    }
+  },
+  {
+    "model": "mainApp.livecourse",
+    "pk": 7,
+    "fields": {
+      "title": "Live Kubernetes & Docker Containers",
+      "description": "Microservices, orchestration, Helm charts, CKA/CKAD certification prep.",
+      "category": "dev_ops",
+      "image": "courses/chfi.webp",
+      "price": "26999.00",
+      "is_live": true,
+      "start_day": "Thursday, Saturday",
+      "start_time": "5:00 PM - 8:00 PM",
+      "button_text": "Enroll Today",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-05T00:00:00Z"
+    }
+  },
+  {
+    "model": "mainApp.livecourse",
+    "pk": 8,
+    "fields": {
+      "title": "Live Python Django Full Stack Development",
+      "description": "Advanced Django, REST APIs, PostgreSQL, deployment, projects.",
+      "category": "web_dev",
+      "image": "courses/ansible.webp",
+      "price": "22999.00",
+      "is_live": true,
+      "start_day": "Sunday",
+      "start_time": "11:00 AM - 2:00 PM",
+      "button_text": "Reserve Seat",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-06T00:00:00Z"
+    }
+  },
+  {
+    "model": "mainApp.livecourse",
+    "pk": 9,
+    "fields": {
+      "title": "Live CompTIA Security+ & Network+",
+      "description": "Network fundamentals + cybersecurity essentials, exam preparation.",
+      "category": "cybersecurity",
+      "image": "courses/ansible_hD7QN98.webp",
+      "price": "19999.00",
+      "is_live": true,
+      "start_day": "Friday, Sunday",
+      "start_time": "4:00 PM - 7:00 PM",
+      "button_text": "Get Certified",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-07T00:00:00Z"
+    }
+  },
+  {
+    "model": "mainApp.livecourse",
+    "pk": 10,
+    "fields": {
+      "title": "Live Azure Administrator & Developer",
+      "description": "Microsoft Azure AZ-104, VMs, storage, networking, App Services.",
+      "category": "cloud",
+      "image": "courses/chfi.webp",
+      "price": "30999.00",
+      "is_live": true,
+      "start_day": "Monday, Thursday",
+      "start_time": "6:00 PM - 9:00 PM",
+      "button_text": "Join Live",
+      "button_link": "/join/",
+      "is_active": true,
+      "created_at": "2024-10-08T00:00:00Z"
+    }
+  }
+]

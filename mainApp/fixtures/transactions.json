@@ -1,0 +1,82 @@
+[
+  {
+    "model": "mainApp.coursetransaction",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "course": 1,
+      "transaction_id": "txn_py101_001",
+      "amount": "49.99",
+      "status": "completed",
+      "purchase_date": "2024-01-20T10:00:00Z",
+      "expiry_date": "2025-01-20",
+      "payment_method": "stripe",
+      "receipt": "transactions/receipts/txn_py101_001.pdf",
+      "is_active": true
+    }
+  },
+  {
+    "model": "mainApp.coursetransaction",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "course": 2,
+      "transaction_id": "txn_aws205_001",
+      "amount": "89.99",
+      "status": "completed",
+      "purchase_date": "2024-02-05T14:30:00Z",
+      "expiry_date": "2025-02-05",
+      "payment_method": "paypal",
+      "receipt": "transactions/receipts/txn_aws205_001.pdf",
+      "is_active": true
+    }
+  },
+  {
+    "model": "mainApp.coursetransaction",
+    "pk": 3,
+    "fields": {
+      "user": 3,
+      "course": 3,
+      "transaction_id": "txn_web110_001",
+      "amount": "79.99",
+      "status": "pending",
+      "purchase_date": "2024-03-15T09:15:00Z",
+      "expiry_date": null,
+      "payment_method": "razorpay",
+      "receipt": "",
+      "is_active": true
+    }
+  },
+  {
+    "model": "mainApp.coursetransaction",
+    "pk": 4,
+    "fields": {
+      "user": 4,
+      "course": 4,
+      "transaction_id": "txn_ml307_001",
+      "amount": "69.99",
+      "status": "completed",
+      "purchase_date": "2024-04-10T16:45:00Z",
+      "expiry_date": "2025-04-10",
+      "payment_method": "card",
+      "receipt": "transactions/receipts/txn_ml307_001.pdf",
+      "is_active": true
+    }
+  },
+  {
+    "model": "mainApp.coursetransaction",
+    "pk": 5,
+    "fields": {
+      "user": 5,
+      "course": 5,
+      "transaction_id": "txn_k8s408_001",
+      "amount": "59.99",
+      "status": "refunded",
+      "purchase_date": "2024-05-25T11:20:00Z",
+      "expiry_date": null,
+      "payment_method": "stripe",
+      "receipt": "",
+      "is_active": false
+    }
+  }
+]

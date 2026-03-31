@@ -1,0 +1,105 @@
+{% extends 'mainApp/base.html' %}
+{% load static %}
+
+{% block title %}Join Live Batch - WebAsha Technologies{% endblock %}
+
+{% block body %}
+<!-- Hero Section -->
+<div class="container-fluid py-5 bg-primary">
+    <div class="container py-5 text-center text-white">
+        <h1 class="display-4 fw-bold mb-4">Join Live Training Batch</h1>
+        <p class="lead mb-0">Register now to secure your spot in our live instructor-led classes</p>
+    </div>
+</div>
+
+<!-- Registration Form -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-5">
+                    <div class="text-center mb-5">
+                        <h2 class="fw-bold text-primary">Complete Registration</h2>
+                        <p class="text-muted">Fill details to join the batch. Already registered? <a href="{% url 'login' %}">Login here</a></p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
+                                {{ register_form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
+                                {{ register_form.last_name }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Email <span class="text-danger">*</span></label>
+                                {{ register_form.email }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Phone <span class="text-danger">*</span></label>
+                                {{ register_form.phone }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Course Interest</label>
+                                <input type="text" class="form-control" name="course_interest" placeholder="e.g. DevOps Batch">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Password <span class="text-danger">*</span></label>
+                                {{ register_form.password }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Address</label>
+                                {{ register_form.address }}
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms">
+                                    <label class="form-check-label" for="terms">
+                                        I agree to terms & conditions and privacy policy
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 rounded-pill">
+                                    <i class="fas fa-paper-plane me-2"></i>Join Batch Now
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="container-fluid py-5 bg-light">
+    <div class="container py-5">
+        <div class="row g-4 text-center">
+            <div class="col-lg-3 col-md-6">
+                <i class="fas fa-video fa-3x text-primary mb-4"></i>
+                <h4 class="fw-bold">Live Classes</h4>
+                <p>Real-time interactive sessions</p>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <i class="fas fa-clock fa-3x text-primary mb-4"></i>
+                <h4 class="fw-bold">Flexible Timing</h4>
+                <p>Weekday & weekend batches</p>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-4"></i>
+                <h4 class="fw-bold">Expert Trainers</h4>
+                <p>10+ years industry experience</p>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <i class="fas fa-certificate fa-3x text-primary mb-4"></i>
+                <h4 class="fw-bold">Certification</h4>
+                <p>Industry recognized certificate</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

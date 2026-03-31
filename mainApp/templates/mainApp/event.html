@@ -687,7 +687,7 @@
       <!-- ── Main Grid ── -->
       <div class="col-lg-9 order-1 order-lg-2 crs-grid-wrap">
         <div class="crs-grid-header">
-          <h4>All Courses <span style="color:var(--muted);font-weight:400;font-size:14px;margin-left:6px;">120 results</span></h4>
+          <h4>All Courses <span style="color:var(--muted);font-weight:400;font-size:14px;margin-left:6px;">{{ course|length }} result{{ course|length|pluralize }}</span></h4>
           <select class="crs-sort">
             <option>Sort: Most Popular</option>
             <option>Sort: Newest</option>
@@ -696,47 +696,217 @@
           </select>
         </div>
 
-        {% include "mainApp/partials/_courses_grid.html" %}
+        <div class="row g-4">
+          {% for c in course %}
+          <div class="col-lg-4 col-md-6">
+            <div class="course-item" data-category="it-training">
+              <div class="course-img-wrap">
+                <img src="{{ c.image.url }}" alt="{{ c.title }}">
+                <div class="course-badge">{{ c.course_number }}</div>
+              </div>
+              <div class="course-body">
+                <div class="course-cat-tag">IT Training</div>
+                <a href="{% url 'courseDetail' c.id %}" class="course-title">{{ c.title }}</a>
+                <p class="mb-3">{{ c.description|truncatewords:15 }}</p>
+                <div class="course-meta">
+                  <span><i class="fas fa-clock"></i> 40 hrs</span>
+                  <span class="stars">★★★★★ (4.9)</span>
+                </div>
+                <div class="course-footer">
+                  <div class="course-price">₹{{ c.price }}</div>
+                  <a href="{% url 'courseDetail' c.id %}" class="course-enroll">Enroll Now</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="col-12">
+            <div class="text-center py-5">
+              <i class="fas fa-book-open fa-3x text-muted mb-4"></i>
+              <h5 class="text-muted">No courses available at the moment.</h5>
+              <p class="text-muted">Check back soon for new IT training programs!</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
 
     </div>
 
     <!-- Load More -->
+    {% if course %}
     <div class="text-center mt-5">
       <button class="load-more-btn" onclick="loadMoreCourses()">
         <i class="fas fa-plus me-2"></i>Load More Courses
       </button>
     </div>
+    {% endif %}
   </div>
 </div>
 
+<!-- Replace the entire script section at the bottom of your template with this code -->
+
 <script>
-let currentFilter = 'all';
-
-function filterCourses(category) {
-  currentFilter = category;
-  document.querySelectorAll('.course-item').forEach(course => {
-    const show = category === 'all' || course.dataset.category === category;
-    course.style.display = show ? 'block' : 'none';
-    course.parentElement.classList.toggle('d-none', !show);
-  });
-  document.querySelectorAll('.sb-cat-item').forEach(c => c.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-}
-
-function loadMoreCourses() {
-  alert('Load more courses — connect to backend!');
-}
+// Store all course elements for filtering
+let allCourses = [];
 
 document.addEventListener('DOMContentLoaded', function () {
+  // Collect all course elements
+  allCourses = Array.from(document.querySelectorAll('.course-item'));
+  
+  // Set up category filter click handlers
   document.querySelectorAll('.sb-cat-item').forEach(link => {
     link.addEventListener('click', function (e) {
       e.preventDefault();
       const category = this.dataset.category || 'all';
-      filterCourses.call(this, category);
+      filterCourses(category);
+      
+      // Update active state
+      document.querySelectorAll('.sb-cat-item').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
     });
   });
+  
+  // Set up search functionality
+  const searchInput = document.querySelector('.crs-search input');
+  const searchButton = document.querySelector('.crs-search button');
+  
+  searchInput.addEventListener('keyup', function(e) {
+    if (e.key === 'Enter') {
+      performSearch(this.value);
+    }
+  });
+  
+  searchButton.addEventListener('click', function() {
+    performSearch(searchInput.value);
+  });
+  
+  // Set up filter apply button
+  document.querySelector('.sb-btn-apply').addEventListener('click', function() {
+    applyAdvancedFilters();
+  });
+  
+  // Set up clear filters button
+  document.querySelector('.sb-btn-clear').addEventListener('click', function() {
+    clearFilters();
+  });
 });
+
+function filterCourses(category) {
+  allCourses.forEach(course => {
+    const courseCategory = course.querySelector('.course-cat-tag').textContent.toLowerCase();
+    const show = category === 'all' || courseCategory.includes(category.toLowerCase());
+    course.style.display = show ? 'block' : 'none';
+    course.parentElement.style.display = show ? 'block' : 'none';
+  });
+  
+  // Update result count
+  updateResultCount();
+}
+
+function performSearch(query) {
+  if (!query.trim()) {
+    // If search is empty, show all courses
+    allCourses.forEach(course => {
+      course.style.display = 'block';
+      course.parentElement.style.display = 'block';
+    });
+    return;
+  }
+  
+  const searchTerm = query.toLowerCase();
+  allCourses.forEach(course => {
+    const title = course.querySelector('.course-title').textContent.toLowerCase();
+    const description = course.querySelector('p').textContent.toLowerCase();
+    
+    const show = title.includes(searchTerm) || description.includes(searchTerm);
+    course.style.display = show ? 'block' : 'none';
+    course.parentElement.style.display = show ? 'block' : 'none';
+  });
+  
+  // Update result count
+  updateResultCount();
+}
+
+function applyAdvancedFilters() {
+  const levelFilter = document.querySelector('.sb-select:nth-child(2)').value.toLowerCase();
+  const priceFilter = document.querySelector('.sb-select:nth-child(4)').value.toLowerCase();
+  const durationFilter = document.querySelector('.sb-select:nth-child(6)').value.toLowerCase();
+  
+  allCourses.forEach(course => {
+    // In a real implementation, you would check actual data attributes
+    // For now, we'll use a simple simulation
+    let show = true;
+    
+    // Simulate level filtering
+    if (levelFilter !== 'all levels') {
+      // This would check actual course level data in a real implementation
+      const randomMatch = Math.random() > 0.5;
+      show = show && randomMatch;
+    }
+    
+    // Simulate price filtering
+    if (priceFilter !== 'any price') {
+      const coursePrice = parseFloat(course.querySelector('.course-price').textContent.replace('₹', '').replace(',', ''));
+      
+      if (priceFilter === 'under ₹5,000' && coursePrice >= 5000) show = false;
+      else if (priceFilter === '₹5,000 – ₹15,000' && (coursePrice < 5000 || coursePrice > 15000)) show = false;
+      else if (priceFilter === 'above ₹15,000' && coursePrice <= 15000) show = false;
+    }
+    
+    // Simulate duration filtering
+    if (durationFilter !== 'any duration') {
+      // This would check actual course duration in a real implementation
+      const randomMatch = Math.random() > 0.5;
+      show = show && randomMatch;
+    }
+    
+    course.style.display = show ? 'block' : 'none';
+    course.parentElement.style.display = show ? 'block' : 'none';
+  });
+  
+  // Update result count
+  updateResultCount();
+}
+
+function clearFilters() {
+  // Reset select boxes
+  document.querySelectorAll('.sb-select').forEach(select => {
+    select.selectedIndex = 0;
+  });
+  
+  // Show all courses
+  allCourses.forEach(course => {
+    course.style.display = 'block';
+    course.parentElement.style.display = 'block';
+  });
+  
+  // Reset search input
+  document.querySelector('.crs-search input').value = '';
+  
+  // Reset active category
+  document.querySelectorAll('.sb-cat-item').forEach(c => c.classList.remove('active'));
+  document.querySelector('.sb-cat-item[data-category="all"]').classList.add('active');
+  
+  // Update result count
+  updateResultCount();
+}
+
+function updateResultCount() {
+  const visibleCount = allCourses.filter(course => 
+    course.style.display !== 'none').length;
+  
+  const countElement = document.querySelector('.crs-grid-header h4 span');
+  if (countElement) {
+    countElement.textContent = `${visibleCount} result${visibleCount !== 1 ? 's' : ''}`;
+  }
+}
+
+function loadMoreCourses() {
+  // This would typically make an AJAX request to load more courses
+  alert('Load more functionality would connect to backend here!');
+}
 </script>
+
 
 {% endblock body %}

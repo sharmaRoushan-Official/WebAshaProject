@@ -108,8 +108,17 @@ class TeamMember(models.Model):
 # live Batches 
 
 class LiveCourse(models.Model):
+    CATEGORY_CHOICES = [
+        ('web_dev', 'Web Development'),
+        ('dev_ops', 'DevOps'),
+        ('ai_ml', 'AI/ML'),
+        ('cybersecurity', 'Cybersecurity'),
+        ('cloud', 'Cloud Computing'),
+        ('linux', 'Linux'),
+    ]
     title = models.CharField(max_length=200)
     description = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='web_dev')
     image = models.ImageField(upload_to='courses/')
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     

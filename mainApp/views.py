@@ -39,8 +39,10 @@ def aboutPage(request):
         return render(request, "mainApp/about.html", context)
 
 def eventPage(request):
+    course = Course.objects.filter(is_active=True).order_by('course_number')
     # Add forms to context
     context = {
+        "course": course,
         'login_form': LoginForm(),
         'register_form': RegisterForm(),
         'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
@@ -57,8 +59,11 @@ def certificationsPage(request):
     return render(request, "mainApp/certifications.html", context)
 
 def classPage(request):
+    from .models import LiveCourse
+    live_courses = LiveCourse.objects.filter(is_active=True)
     # Add forms to context
     context = {
+        'live_courses': live_courses,
         'login_form': LoginForm(),
         'register_form': RegisterForm(),
         'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
@@ -376,6 +381,45 @@ def purchase_cart(request):
     return redirect('my_courses')
 
 @login_required
+def join_live_batch(request):
+    from .models import LiveCourse
+    from .forms import RegisterForm
+    
+    if request.method == 'POST':
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = form.cleaned_data
+            if User.objects.filter(email=data['email']).exists():
+                messages.error(request, 'Email already registered.')
+            else:
+                user = User.objects.create_user(
+                    username=data['email'],
+                    email=data['email'],
+                    password=data['password']
+                )
+                Profile.objects.create(
+                    user=user,
+                    first_name=data['first_name'],
+                    last_name=data['last_name'],
+                    phone=data['phone'],
+                    address=data['address']
+                )
+                messages.success(request, 'Registration successful for live batch! Check your email.')
+                return redirect('login_success')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = RegisterForm()
+    
+    live_courses = LiveCourse.objects.filter(is_active=True)
+    context = {
+        'register_form': form,
+        'live_courses': live_courses,
+        'login_form': LoginForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+    }
+    return render(request, 'mainApp/join.html', context)
+
 def my_courses(request):
     profile = get_profile_or_create(request)
     transactions = profile.coursetransactions.filter(status='completed').select_related('course')
