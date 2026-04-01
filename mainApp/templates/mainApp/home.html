@@ -42,7 +42,7 @@
             </div>
             <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
                 <div class="position-relative">
-                    <img src="{% static 'mainApp/img/hero-img.png' %}" alt="Students Learning" class="img-fluid rounded-4 shadow-lg">
+                    <img src="{% static 'mainApp/img/bg-hero-1.png' %}" alt="Students Learning" class="img-fluid rounded-4 shadow-lg">
                     <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary rounded-4 opacity-10" style="z-index: -1; transform: translate(20px, 20px);"></div>
                 </div>
             </div>
@@ -88,6 +88,7 @@
 </div>
 <!-- Stats Section End -->
 
+
 <!-- Featured Courses Section -->
 <div id="courses" class="container-fluid py-5 bg-light">
     <div class="container py-5">
@@ -97,69 +98,40 @@
             <p class="text-secondary mt-3">Get trained with official curriculum and earn globally recognized credentials.</p>
         </div>
         <div class="row g-4">
-            <!-- Course 1 -->
-            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+            {% for c in courses|slice:":3" %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="{{ forloop.counter0|floatformat:1 }}s">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                    <img src="{% static 'mainApp/img/course-1.jpg' %}" class="card-img-top" alt="Data Science" style="height: 200px; object-fit: cover;">
+                    <img src="{{ c.image.url }}" class="card-img-top" alt="{{ c.title }}" style="height: 200px; object-fit: cover;">
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between mb-3">
-                            <span class="badge bg-primary rounded-pill px-3 py-2">Data Science</span>
-                            <span class="text-muted"><i class="fas fa-star text-warning"></i> 4.9 (2k+)</span>
+                            <span class="badge bg-primary rounded-pill px-3 py-2">{{ c.course_category|default:"IT Training" }}</span>
+                            <span class="text-muted"><i class="fas fa-star text-warning"></i> 4.9 ({{ c.enrollments|default:"1k+" }})</span>
                         </div>
-                        <h5 class="card-title fw-bold">Professional Data Science Bootcamp</h5>
-                        <p class="card-text text-secondary">Master Python, ML, AI, and big data tools. Build real-world projects.</p>
+                        <h5 class="card-title fw-bold">
+                            <a href="{% url 'courseDetail' c.id %}" class="text-decoration-none text-dark">{{ c.title }}</a>
+                        </h5>
+                        <p class="card-text text-secondary">{{ c.description|truncatewords:15 }}</p>
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <div>
-                                <i class="fas fa-clock me-1 text-primary"></i> 32 Weeks
-                                <i class="fas fa-users ms-3 me-1 text-primary"></i> Live Online
+                                <i class="fas fa-clock me-1 text-primary"></i> {{ c.duration|default:"40 Weeks" }}
+                                <i class="fas fa-users ms-3 me-1 text-primary"></i> Certified
                             </div>
-                            <a href="{% url 'ourCourses' %}" class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
+                            <div class="cc-price" style="font-family: sans-serif; font-size: 17px; font-weight: 700; color: #1e2a41;">₹{{ c.price }}</div>
+                        </div>
+                        <div class="mt-3 pt-3 border-top">
+                            <a href="{% url 'courseDetail' c.id %}" class="btn btn-sm btn-outline-primary rounded-pill w-100">View Details</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Course 2 -->
-            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                    <img src="{% static 'mainApp/img/course-2.jpg' %}" class="card-img-top" alt="Cloud Computing" style="height: 200px; object-fit: cover;">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="badge bg-primary rounded-pill px-3 py-2">Cloud Computing</span>
-                            <span class="text-muted"><i class="fas fa-star text-warning"></i> 4.8 (1.5k+)</span>
-                        </div>
-                        <h5 class="card-title fw-bold">AWS Solutions Architect Certification</h5>
-                        <p class="card-text text-secondary">Complete AWS training with hands-on labs. Prep for official exam.</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div>
-                                <i class="fas fa-clock me-1 text-primary"></i> 16 Weeks
-                                <i class="fas fa-users ms-3 me-1 text-primary"></i> Self-Paced
-                            </div>
-                            <a href="{% url 'ourCourses' %}" class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
-                        </div>
-                    </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">No featured courses available. <a href="{% url 'ourCourses' %}">View all courses</a>.</p>
                 </div>
             </div>
-            <!-- Course 3 -->
-            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                    <img src="{% static 'mainApp/img/course-3.jpg' %}" class="card-img-top" alt="Full Stack" style="height: 200px; object-fit: cover;">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between mb-3">
-                            <span class="badge bg-primary rounded-pill px-3 py-2">Web Development</span>
-                            <span class="text-muted"><i class="fas fa-star text-warning"></i> 4.9 (3k+)</span>
-                        </div>
-                        <h5 class="card-title fw-bold">Full Stack Web Development</h5>
-                        <p class="card-text text-secondary">MERN stack, Django, APIs, and modern frontend frameworks.</p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div>
-                                <i class="fas fa-clock me-1 text-primary"></i> 24 Weeks
-                                <i class="fas fa-users ms-3 me-1 text-primary"></i> Live Online
-                            </div>
-                            <a href="{% url 'ourCourses' %}" class="btn btn-sm btn-outline-primary rounded-pill">View Details</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
         <div class="text-center mt-5">
             <a href="{% url 'ourCourses' %}" class="btn btn-primary rounded-pill py-3 px-5">View All Courses <i class="fas fa-arrow-right ms-2"></i></a>
@@ -167,6 +139,7 @@
     </div>
 </div>
 <!-- Featured Courses End -->
+
 
 <!-- Why Choose Us Section -->
 <div class="container-fluid py-5">
@@ -352,7 +325,7 @@
         <div class="row g-4">
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                    <img src="{% static 'mainApp/img/blog-1.jpg' %}" class="card-img-top" alt="AI Trends">
+                    <img src="{% static 'mainApp/img/courses/cybersecurity-offsec.png' %}" class="card-img-top" alt="AI Trends">
                     <div class="card-body p-4">
                         <div class="d-flex mb-3 text-muted small">
                             <span><i class="fas fa-calendar-alt me-1"></i> March 15, 2025</span>
@@ -366,7 +339,7 @@
             </div>
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                    <img src="{% static 'mainApp/img/blog-2.jpg' %}" class="card-img-top" alt="Cloud Careers">
+                    <img src="{% static 'mainApp/img/courses/Networking&Infrastructure.png' %}" class="card-img-top" alt="Cloud Careers">
                     <div class="card-body p-4">
                         <div class="d-flex mb-3 text-muted small">
                             <span><i class="fas fa-calendar-alt me-1"></i> March 10, 2025</span>
@@ -380,7 +353,7 @@
             </div>
             <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.5s">
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100">
-                    <img src="{% static 'mainApp/img/blog-3.jpg' %}" class="card-img-top" alt="Remote Work">
+                    <img src="{% static 'mainApp/img/courses/Networking&Infrastructure.png' %}" class="card-img-top" alt="Remote Work">
                     <div class="card-body p-4">
                         <div class="d-flex mb-3 text-muted small">
                             <span><i class="fas fa-calendar-alt me-1"></i> March 5, 2025</span>
