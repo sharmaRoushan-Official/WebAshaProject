@@ -1,0 +1,106 @@
+{% extends 'mainApp/base.html' %}
+{% load static %}
+
+{% block title %}My Live Courses - WebAsha{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5 bg-light">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="display-5 fw-bold mb-4">My Live Courses</h1>
+                <p class="lead mb-5">Your live batch registrations and payments.</p>
+            </div>
+        </div>
+
+        <!-- Pending Registrations -->
+        {% if live_registrations %}
+        <div class="card shadow-lg border-0 mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-clipboard-list me-2"></i>Pending Registrations</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    {% for reg in live_registrations %}
+                    <div class="col-lg-6">
+                        <div class="d-flex p-4 bg-white rounded-3 shadow-sm border">
+                            <img src="{{ reg.live_course.image.url }}" class="rounded-2 me-4" style="width: 80px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1">{{ reg.live_course.title }}</h6>
+                                <div class="small text-muted mb-1">{{ reg.batch_timing|title }} Batch</div>
+                                <div class="mb-2">
+                                    <span class="badge bg-warning text-dark">Pending Payment</span>
+                                </div>
+                                <div>
+                                    <small class="text-success fw-semibold">Batch starts: {{ reg.live_course.start_day }} {{ reg.live_course.start_time }}</small>
+                                </div>
+                            </div>
+                            <div class="ms-3 text-end">
+                                <div class="fw-bold text-primary fs-5 mb-1">₹{{ reg.live_course.price }}</div>
+                                <small class="text-muted">+18% GST</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Transactions -->
+        {% if live_transactions %}
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-receipt me-2"></i>Purchased Live Batches</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Date</th>
+                                <th>Base Amount</th>
+                                <th>GST (18%)</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for txn in live_transactions %}
+                            <tr>
+                                <td>
+                                    <strong>{{ txn.live_course.title }}</strong><br>
+                                    <small class="text-muted">{{ txn.live_course.start_day }} {{ txn.live_course.start_time }}</small>
+                                </td>
+                                <td>{{ txn.purchase_date|date:"M d, Y" }}</td>
+                                <td>₹{{ txn.base_amount }}</td>
+                                <td>₹{{ txn.gst_amount }}</td>
+                                <td><strong class="text-success">₹{{ txn.total_amount }}</strong></td>
+                                <td>
+                                    {% if txn.status == 'completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% elif txn.status == 'pending' %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">{{ txn.status|title }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-chalkboard-teacher fa-4x text-muted mb-4"></i>
+            <h4>No live courses enrolled yet</h4>
+            <p class="text-muted mb-4">Join a live batch from <a href="{% url 'classes' %}">Live Classes</a>.</p>
+            <a href="{% url 'classes' %}" class="btn btn-primary btn-lg">Browse Live Batches</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

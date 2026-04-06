@@ -35,7 +35,8 @@ urlpatterns = [
     
     # Course Management URLs
     path("my-courses/", my_courses, name="my_courses"),
-    path("join/", join_live_batch, name="join"),
+    path("join/<int:live_course_id>/", join_live_batch, name="join_live"),
+    path("my-live-courses/", my_live_courses, name="my_live_courses"),
     
     # AJAX URLs for Cart Operations
     path("ajax/add-to-cart/", add_to_cart, name="add_to_cart"),

@@ -12,6 +12,7 @@ from .models import Course, Profile, TeamMember, CourseTransaction
 from .forms import LoginForm, RegisterForm, ChangePasswordForm, ContactForm
 import uuid
 from django.utils import timezone
+from decimal import Decimal
 
 # Create your views here.
 
@@ -477,44 +478,91 @@ def purchase_cart(request):
     return redirect('my_courses')
 
 @login_required
-def join_live_batch(request):
-    from .models import LiveCourse
-    from .forms import RegisterForm
+def join_live_batch(request, live_course_id):
+    from .models import LiveCourse, LiveCourseRegistration, LiveCourseTransaction, Profile
+    from .forms import LiveRegistrationForm
+    from django.contrib.auth.models import User
+    import uuid
+    from django.utils import timezone
+    
+    live_course = get_object_or_404(LiveCourse, id=live_course_id, is_active=True)
+    profile = get_profile_or_create(request)  # Use existing helper
     
     if request.method == 'POST':
-        form = RegisterForm(request.POST, request.FILES)
+        form = LiveRegistrationForm(request.POST, profile=profile)
         if form.is_valid():
+            # Update profile with new details
             data = form.cleaned_data
-            if User.objects.filter(email=data['email']).exists():
-                messages.error(request, 'Email already registered.')
-            else:
-                user = User.objects.create_user(
-                    username=data['email'],
-                    email=data['email'],
-                    password=data['password']
-                )
-                Profile.objects.create(
-                    user=user,
-                    first_name=data['first_name'],
-                    last_name=data['last_name'],
-                    phone=data['phone'],
-                    address=data['address']
-                )
-                messages.success(request, 'Registration successful for live batch! Check your email.')
-                return redirect('login_success')
+            profile.first_name = data['first_name']
+            profile.last_name = data['last_name']
+            profile.phone = data['phone']
+            profile.address = data['address']
+            profile.save()
+            
+            # Check if already registered for this course
+            if LiveCourseRegistration.objects.filter(profile=profile, live_course=live_course).exists():
+                messages.warning(request, 'You are already registered for this live course.')
+                return redirect('my_live_courses')
+            
+            # Create registration
+            registration = LiveCourseRegistration.objects.create(
+                profile=profile,
+                live_course=live_course,
+                batch_timing=data['batch_timing']
+            )
+            
+            # Create pending transaction with GST
+            base_amount = live_course.price
+            gst_amount = base_amount * Decimal('0.18')
+            total_amount = base_amount + gst_amount
+            txn_id = f"live_{uuid.uuid4().hex[:12]}_{int(timezone.now().timestamp())}"
+            
+            transaction = LiveCourseTransaction.objects.create(
+                profile=profile,
+                live_course=live_course,
+                transaction_id=txn_id,
+                base_amount=base_amount,
+                gst_amount=gst_amount,
+                total_amount=total_amount,
+                status='pending',
+                is_active=True
+            )
+            
+            messages.success(
+                request, 
+                f'Registration created for {live_course.title}! Total: ₹{total_amount:.2f} (Base: ₹{base_amount:.2f} + GST ₹{gst_amount:.2f}). Proceed to payment.'
+            )
+            return redirect('my_live_courses')  # Or payment page
         else:
-            messages.error(request, 'Please correct the errors below.')
+            messages.error(request, 'Please correct the form errors.')
     else:
-        form = RegisterForm()
+        form = LiveRegistrationForm(profile=profile)
     
-    live_courses = LiveCourse.objects.filter(is_active=True)
+    # Calculate fees for display
+    base_price = live_course.price
+    gst = base_price * Decimal('0.18')
+    total_price = base_price + gst
+    
     context = {
-        'register_form': form,
-        'live_courses': live_courses,
-        'login_form': LoginForm(),
-        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+        'form': form,
+        'live_course': live_course,
+        'base_price': base_price,
+        'gst_amount': gst,
+        'total_price': total_price,
+        'profile': profile,
     }
     return render(request, 'mainApp/join.html', context)
+
+def my_live_courses(request):
+    profile = get_profile_or_create(request)
+    registrations = profile.live_registrations.filter(status='pending').select_related('live_course')
+    transactions = profile.live_transactions.filter(is_active=True).select_related('live_course').order_by('-purchase_date')
+    context = {
+        'live_registrations': registrations,
+        'live_transactions': transactions,
+        'profile': profile,
+    }
+    return render(request, 'mainApp/my-live-courses.html', context)
 
 @login_required
 def my_courses(request):

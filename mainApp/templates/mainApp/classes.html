@@ -116,7 +116,7 @@
                                 <span class="text-muted text-decoration-line-through ms-2 small">₹{{ course.original_price }}</span>
                             {% endif %}
                         </div>
-                        <a href="{{ course.button_link|default:'/join/' }}" class="btn btn-primary rounded-pill py-2 fw-semibold w-100 transition-btn">{{ course.button_text|default:"Join Batch" }} <i class="fas fa-arrow-right ms-1"></i></a>
+                        <a href="{% url 'join_live' course.id %}" class="btn btn-success rounded-pill py-2 fw-semibold w-100 transition-btn"><i class="fas fa-bolt me-1"></i>Enroll Now <i class="fas fa-arrow-right ms-1"></i></a>
                     </div>
                 </div>
             </div>

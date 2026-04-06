@@ -149,3 +149,59 @@ class Contact(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class LiveCourseRegistration(models.Model):
+    profile = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='live_registrations')
+    live_course = models.ForeignKey('LiveCourse', on_delete=models.CASCADE, related_name='registrations')
+    batch_timing = models.CharField(
+        max_length=10, 
+        choices=[('weekdays', 'Weekdays'), ('weekends', 'Weekends')],
+        default='weekdays'
+    )
+    registered_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, default='pending', choices=[
+        ('pending', 'Pending'),
+        ('enrolled', 'Enrolled'),
+        ('cancelled', 'Cancelled'),
+    ])
+
+    def __str__(self):
+        return f"{self.profile} - {self.live_course.title}"
+
+    class Meta:
+        unique_together = ['profile', 'live_course']
+
+
+class LiveCourseTransaction(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+        ('refunded', 'Refunded'),
+    ]
+    PAYMENT_METHODS = [
+        ('stripe', 'Stripe'),
+        ('paypal', 'PayPal'),
+        ('razorpay', 'Razorpay'),
+        ('card', 'Credit/Debit Card'),
+    ]
+
+    profile = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='live_transactions')
+    live_course = models.ForeignKey('LiveCourse', on_delete=models.CASCADE)
+    transaction_id = models.CharField(max_length=100, unique=True)
+    base_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    gst_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    purchase_date = models.DateTimeField(auto_now_add=True)
+    expiry_date = models.DateField(null=True, blank=True)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, blank=True)
+    receipt = models.FileField(upload_to='live_transactions/receipts/', blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.profile.user.username} - {self.live_course.title} - ₹{self.total_amount} ({self.status})"
+
+    class Meta:
+        ordering = ['-purchase_date']

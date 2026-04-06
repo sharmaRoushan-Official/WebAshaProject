@@ -82,3 +82,35 @@ class ContactForm(forms.ModelForm):
                 'style': 'padding: 15px;'
             }),
         }
+
+
+class LiveRegistrationForm(forms.Form):
+    first_name = forms.CharField(
+        max_length=50,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name *'})
+    )
+    last_name = forms.CharField(
+        max_length=50, 
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name *'})
+    )
+    phone = forms.CharField(
+        max_length=15,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone *'})
+    )
+    address = forms.CharField(
+        widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Address', 'rows': 3})
+    )
+    batch_timing = forms.ChoiceField(
+        choices=[('weekdays', 'Weekdays (Mon-Fri)'), ('weekends', 'Weekends (Sat-Sun)')],
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        label="Preferred Batch Timing"
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.profile = kwargs.pop('profile', None)
+        super().__init__(*args, **kwargs)
+        if self.profile:
+            self.fields['first_name'].initial = self.profile.first_name
+            self.fields['last_name'].initial = self.profile.last_name
+            self.fields['phone'].initial = self.profile.phone
+            self.fields['address'].initial = self.profile.address

@@ -4,6 +4,7 @@
 {% block title %}Join Live Batch - WebAsha Technologies{% endblock %}
 
 {% block body %}
+
 <!-- Hero Section -->
 <div class="container-fluid py-5 bg-primary">
     <div class="container py-5 text-center text-white">
@@ -15,91 +16,371 @@
 <!-- Registration Form -->
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8 col-xl-6">
+        <div class="col-lg-10 col-xl-8">
             <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-body p-5">
-                    <div class="text-center mb-5">
-                        <h2 class="fw-bold text-primary">Complete Registration</h2>
-                        <p class="text-muted">Fill details to join the batch. Already registered? <a href="{% url 'login' %}">Login here</a></p>
+
+                <!-- Card Header -->
+                <div class="card-header bg-white border-0 pt-5 px-5">
+                    <div class="text-center">
+                        <h2 class="fw-bold text-success mb-3">{{ live_course.title }}</h2>
+
+                        <div class="alert alert-info border-0 rounded-3">
+                            <div class="row">
+                                <div class="col-md-6 text-md-start mb-2 mb-md-0">
+                                    <i class="fas fa-calendar-alt me-2"></i>
+                                    <strong>Schedule:</strong> {{ live_course.start_day }}
+                                </div>
+                                <div class="col-md-6 text-md-start">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <strong>Time:</strong> {{ live_course.start_time }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-success border-0 rounded-3">
+                            <div class="row align-items-center text-center">
+                                <div class="col-md-4 mb-2 mb-md-0">
+                                    <small class="text-muted d-block">Course Fee</small>
+                                    <h4 class="mb-0">₹{{ base_price|floatformat:0 }}</h4>
+                                </div>
+                                <div class="col-md-4 mb-2 mb-md-0">
+                                    <small class="text-muted d-block">GST (18%)</small>
+                                    <h4 class="mb-0 text-danger">+ ₹{{ gst_amount|floatformat:0 }}</h4>
+                                </div>
+                                <div class="col-md-4">
+                                    <small class="text-muted d-block">Total Amount</small>
+                                    <h3 class="mb-0 text-success fw-bold">₹{{ total_price|floatformat:0 }}</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-muted mt-2 mb-0">Please fill in your details below to complete registration</p>
                     </div>
-                    
-                    <form method="post">
+                </div>
+
+                <!-- Card Body / Form -->
+                <div class="card-body px-5 pb-5 pt-4">
+                    <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        <div class="row g-4">
+
+                        <div class="row g-3">
+
+                            <!-- First Name -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">First Name <span class="text-danger">*</span></label>
-                                {{ register_form.first_name }}
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                    First Name <span class="text-danger">*</span>
+                                </label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
+                                {% endif %}
                             </div>
+
+                            <!-- Last Name -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Last Name <span class="text-danger">*</span></label>
-                                {{ register_form.last_name }}
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                    Last Name <span class="text-danger">*</span>
+                                </label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
+                                {% endif %}
                             </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Email <span class="text-danger">*</span></label>
-                                {{ register_form.email }}
-                            </div>
+
+                            <!-- Phone Number -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Phone <span class="text-danger">*</span></label>
-                                {{ register_form.phone }}
+                                <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <select class="form-select flex-shrink-0 w-auto" id="phone_country" style="max-width:130px;">
+                                        <option value="+91" selected>🇮🇳 +91</option>
+                                        <option value="+1">🇺🇸 +1</option>
+                                        <option value="+44">🇬🇧 +44</option>
+                                        <option value="+971">🇦🇪 +971</option>
+                                        <option value="+61">🇦🇺 +61</option>
+                                        <option value="+65">🇸🇬 +65</option>
+                                    </select>
+                                    <input type="tel" class="form-control" id="phone_num" name="phone"
+                                           placeholder="10-digit number" maxlength="10" required>
+                                </div>
+                                <small class="text-muted">Enter 10-digit mobile number</small>
+                                {% if form.phone.errors %}
+                                    <div class="text-danger small mt-1">{{ form.phone.errors }}</div>
+                                {% endif %}
                             </div>
+
+                            <!-- Email (readonly) -->
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Course Interest</label>
-                                <input type="text" class="form-control" name="course_interest" placeholder="e.g. DevOps Batch">
+                                <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control bg-light"
+                                       value="{{ request.user.email }}" readonly disabled>
+                                <small class="text-muted">Linked to your account</small>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Password <span class="text-danger">*</span></label>
-                                {{ register_form.password }}
+
+                            <!-- City -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="city">City</label>
+                                <select class="form-select" id="city" name="city">
+                                    <option value="">— Select City —</option>
+                                    <optgroup label="Maharashtra">
+                                        <option value="Mumbai">Mumbai</option>
+                                        <option value="Pune">Pune</option>
+                                        <option value="Nagpur">Nagpur</option>
+                                        <option value="Nashik">Nashik</option>
+                                    </optgroup>
+                                    <optgroup label="Other Major Cities">
+                                        <option value="Delhi">Delhi</option>
+                                        <option value="Bangalore">Bangalore</option>
+                                        <option value="Hyderabad">Hyderabad</option>
+                                        <option value="Chennai">Chennai</option>
+                                        <option value="Kolkata">Kolkata</option>
+                                        <option value="Ahmedabad">Ahmedabad</option>
+                                        <option value="Jaipur">Jaipur</option>
+                                        <option value="Surat">Surat</option>
+                                        <option value="Lucknow">Lucknow</option>
+                                        <option value="Chandigarh">Chandigarh</option>
+                                    </optgroup>
+                                    <optgroup label="Other">
+                                        <option value="Other">Other</option>
+                                    </optgroup>
+                                </select>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Address</label>
-                                {{ register_form.address }}
+
+                            <!-- Batch Timing -->
+                            <div class="col-md-6">
+                                <label for="{{ form.batch_timing.id_for_label }}" class="form-label">
+                                    Preferred Batch Timing <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="{{ form.batch_timing.id_for_label }}" name="batch_timing" required>
+                                    <option value="">— Select Timing —</option>
+                                    <option value="weekdays">📅 Weekdays (Mon–Fri)</option>
+                                    <option value="weekends">🗓️ Weekends (Sat–Sun)</option>
+                                </select>
+                                <small class="text-muted">Choose what fits your schedule</small>
+                                {% if form.batch_timing.errors %}
+                                    <div class="text-danger small mt-1">{{ form.batch_timing.errors }}</div>
+                                {% endif %}
                             </div>
+
+                            <!-- Payment Method -->
+                            <div class="col-md-6">
+                                <label class="form-label" for="payment_method">
+                                    Payment Method <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="payment_method" name="payment_method" required>
+                                    <option value="">— Select Payment Method —</option>
+                                    <option value="razorpay">💳 Razorpay (UPI / Cards / Wallets)</option>
+                                    <option value="card">🏦 Credit / Debit Card</option>
+                                    <option value="stripe">🌐 Stripe</option>
+                                    <option value="paypal">🅿️ PayPal</option>
+                                </select>
+                                <small class="text-muted">Select how you'd like to pay</small>
+                            </div>
+
+                            <!-- Registration Status (auto-set, shown for transparency) -->
+                            <div class="col-md-6">
+                                <label class="form-label">Registration Status</label>
+                                <input type="text" class="form-control bg-light" value="Pending — will activate after payment" readonly disabled>
+                                <small class="text-muted">Status updates automatically after payment</small>
+                            </div>
+
+                            <!-- Address -->
                             <div class="col-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="terms">
+                                <label for="{{ form.address.id_for_label }}" class="form-label">
+                                    {{ form.address.label }}
+                                </label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                    <div class="text-danger small mt-1">{{ form.address.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="col-12">
+                                <hr class="my-1">
+                            </div>
+
+                            <!-- Terms Checkbox -->
+                            <div class="col-12">
+                                <div class="d-flex align-items-start gap-3 p-3 border border-success border-opacity-25 rounded-3 bg-success bg-opacity-10">
+                                    <input class="form-check-input mt-1 flex-shrink-0" type="checkbox"
+                                           id="terms" name="terms" required style="width:1.2em;height:1.2em;">
                                     <label class="form-check-label" for="terms">
-                                        I agree to terms & conditions and privacy policy
+                                        I agree to the
+                                        <a href="#" class="text-primary fw-semibold">Terms &amp; Conditions</a>
+                                        and
+                                        <a href="#" class="text-primary fw-semibold">Privacy Policy</a>.
+                                        I understand that the fee is non-refundable once the batch starts.
+                                        <span class="text-danger">*</span>
                                     </label>
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 rounded-pill">
-                                    <i class="fas fa-paper-plane me-2"></i>Join Batch Now
+
+                            <!-- Submit Button -->
+                            <div class="col-12 mt-2">
+                                <button type="submit"
+                                        class="btn btn-success btn-lg w-100 fw-bold py-3 rounded-pill shadow">
+                                    <i class="fas fa-lock me-2"></i>
+                                    Proceed to Secure Payment &nbsp;·&nbsp; ₹{{ total_price|floatformat:0 }}
                                 </button>
+                                <p class="text-center text-muted small mt-2 mb-0">
+                                    <i class="fas fa-shield-alt me-1 text-success"></i>
+                                    256-bit SSL encrypted &amp; 100% secure checkout
+                                </p>
                             </div>
-                        </div>
+
+                        </div><!-- /row -->
                     </form>
+                </div><!-- /card-body -->
+            </div><!-- /card -->
+        </div>
+    </div>
+</div>
+
+<!-- Why Choose Section -->
+<div class="container-fluid py-5 bg-light">
+    <div class="container py-4">
+        <h2 class="text-center fw-bold mb-5">Why Choose Our Live Training?</h2>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center p-4 bg-white rounded-4 shadow-sm h-100">
+                    <div class="feature-icon bg-primary bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width:70px;height:70px;">
+                        <i class="fas fa-video fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Live Classes</h5>
+                    <p class="text-muted small mb-0">Real-time interactive sessions with instructors</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center p-4 bg-white rounded-4 shadow-sm h-100">
+                    <div class="feature-icon bg-success bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width:70px;height:70px;">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Flexible Timing</h5>
+                    <p class="text-muted small mb-0">Weekday &amp; weekend batches available</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center p-4 bg-white rounded-4 shadow-sm h-100">
+                    <div class="feature-icon bg-info bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width:70px;height:70px;">
+                        <i class="fas fa-chalkboard-teacher fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Expert Trainers</h5>
+                    <p class="text-muted small mb-0">10+ years of industry experience</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card text-center p-4 bg-white rounded-4 shadow-sm h-100">
+                    <div class="feature-icon bg-warning bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width:70px;height:70px;">
+                        <i class="fas fa-certificate fa-2x"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Certification</h5>
+                    <p class="text-muted small mb-0">Industry-recognized certificate on completion</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Features -->
-<div class="container-fluid py-5 bg-light">
-    <div class="container py-5">
-        <div class="row g-4 text-center">
-            <div class="col-lg-3 col-md-6">
-                <i class="fas fa-video fa-3x text-primary mb-4"></i>
-                <h4 class="fw-bold">Live Classes</h4>
-                <p>Real-time interactive sessions</p>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <i class="fas fa-clock fa-3x text-primary mb-4"></i>
-                <h4 class="fw-bold">Flexible Timing</h4>
-                <p>Weekday & weekend batches</p>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-4"></i>
-                <h4 class="fw-bold">Expert Trainers</h4>
-                <p>10+ years industry experience</p>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <i class="fas fa-certificate fa-3x text-primary mb-4"></i>
-                <h4 class="fw-bold">Certification</h4>
-                <p>Industry recognized certificate</p>
-            </div>
-        </div>
-    </div>
-</div>
+<style>
+    /* ── Base inputs ── */
+    .form-control,
+    .form-select {
+        border-radius: 0.5rem;
+        border: 1px solid #dee2e6;
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
+        transition: border-color 0.25s, box-shadow 0.25s;
+        /* IMPORTANT: remove fixed height so textarea & input-group don't clash */
+        height: auto;
+        min-height: calc(1.5em + 1.3rem + 2px);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40,167,69,0.15);
+        outline: none;
+    }
+
+    .form-label {
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.9rem;
+    }
+
+    /* Fix input-group height alignment */
+    .input-group .form-select,
+    .input-group .form-control {
+        min-height: calc(1.5em + 1.3rem + 2px);
+        height: calc(1.5em + 1.3rem + 2px);
+    }
+
+    /* Readonly fields */
+    input[readonly],
+    input[disabled] {
+        cursor: not-allowed;
+        background-color: #f3f4f6 !important;
+        color: #6c757d;
+    }
+
+    /* Checkbox */
+    .form-check-input:checked {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    /* Submit button */
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        letter-spacing: 0.3px;
+        transition: all 0.25s ease;
+    }
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40,167,69,0.35) !important;
+    }
+
+    /* Feature cards */
+    .feature-card { transition: transform 0.3s ease; }
+    .feature-card:hover { transform: translateY(-5px); }
+
+    .card { overflow: hidden; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .card-body  { padding: 1.5rem !important; }
+        .card-header { padding: 2rem 1.5rem 1rem !important; }
+    }
+</style>
+
+<script>
+    /* Bootstrap validation */
+    (function () {
+        'use strict';
+        document.querySelectorAll('.needs-validation').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+
+    /* Phone — digits only */
+    document.addEventListener('DOMContentLoaded', function () {
+        var phoneNum = document.getElementById('phone_num');
+        if (phoneNum) {
+            phoneNum.addEventListener('input', function () {
+                this.value = this.value.replace(/\D/g, '').slice(0, 10);
+            });
+        }
+    });
+</script>
+
 {% endblock %}
