@@ -50,3 +50,35 @@ class ChangePasswordForm(PasswordChangeForm):
         self.fields['old_password'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Current Password'})
         self.fields['new_password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'New Password'})
         self.fields['new_password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm New Password'})
+
+
+from .models import Contact
+
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Contact
+        fields = ['name', 'email', 'subject', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control bg-transparent border-primary', 
+                'placeholder': 'Your Name',
+                'style': 'padding: 15px;'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control bg-transparent border-primary', 
+                'placeholder': 'Your Email', 
+                'style': 'padding: 15px;'
+            }),
+            'subject': forms.TextInput(attrs={
+                'class': 'form-control bg-transparent border-primary', 
+                'placeholder': 'Subject',
+                'style': 'padding: 15px;'
+            }),
+            'message': forms.Textarea(attrs={
+                'class': 'form-control bg-transparent border-primary',
+                'rows': 5, 
+                'placeholder': 'Your Message',
+                'style': 'padding: 15px;'
+            }),
+        }

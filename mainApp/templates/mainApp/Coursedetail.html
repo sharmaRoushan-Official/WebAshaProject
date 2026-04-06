@@ -6,7 +6,7 @@
 {% block body %}
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Epilogue:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Epilogue:wght@300;400;500;600;700&display=swap');
 
 :root {
   --red:       #e83a3a;
@@ -163,6 +163,7 @@ body { font-family: var(--font-b); background: var(--page-bg); }
   font-weight: 700; letter-spacing: 0.04em;
   cursor: pointer; transition: background 0.2s, transform 0.15s;
   margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .enroll-btn-lg:hover {
   background: var(--red-dark);
@@ -174,8 +175,9 @@ body { font-family: var(--font-b); background: var(--page-bg); }
   border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 0;
   font-family: var(--font-h); font-size: 13px;
   font-weight: 600; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.wishlist-btn:hover { border-color: var(--red); color: var(--red); }
+.wishlist-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-dim); }
 .preview-guarantee {
   text-align: center; font-size: 11.5px;
   color: var(--muted); margin-top: 12px;
@@ -313,7 +315,7 @@ body { font-family: var(--font-b); background: var(--page-bg); }
   font-family: var(--font-h); font-size: 15px;
   font-weight: 700; letter-spacing: 0.04em;
   cursor: pointer; transition: background 0.2s, transform 0.15s;
-  margin-bottom: 10px; display: block; text-align: center;
+  margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
   text-decoration: none;
 }
 .enroll-btn-sticky:hover {
@@ -326,9 +328,9 @@ body { font-family: var(--font-b); background: var(--page-bg); }
   border: 1.5px solid var(--border); border-radius: 10px; padding: 11px 0;
   font-family: var(--font-h); font-size: 13px;
   font-weight: 600; cursor: pointer; transition: all 0.2s;
-  margin-bottom: 18px;
+  margin-bottom: 18px; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.wishlist-btn-s:hover { border-color: var(--red); color: var(--red); }
+.wishlist-btn-s:hover { border-color: var(--red); color: var(--red); background: var(--red-dim); }
 .includes-list { list-style: none; padding: 0; margin: 0; }
 .includes-list li {
   display: flex; align-items: center; gap: 10px;
@@ -343,30 +345,41 @@ body { font-family: var(--font-b); background: var(--page-bg); }
 }
 .guarantee-note i { color: var(--green); }
 
-/* Mobile enroll bar */
+/* Mobile enroll bar - refined */
 .mobile-enroll-bar {
   display: none;
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: #fff; border-top: 1px solid var(--border);
-  padding: 14px 20px; z-index: 999;
-  flex-direction: column; gap: 4px;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  z-index: 999;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
 }
 .mobile-enroll-bar .mob-price {
   font-family: var(--font-h); font-size: 20px;
   font-weight: 800; color: var(--ink);
 }
+.mobile-enroll-bar .mob-original {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: line-through;
+  margin-left: 8px;
+}
 @media(max-width: 900px) {
-  .mobile-enroll-bar { display: flex; }
-  .cd-body { padding-bottom: 120px; }
+  .mobile-enroll-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .cd-body { padding-bottom: 100px; }
 }
 .mob-enroll {
   background: var(--red); color: #fff; border: none;
-  border-radius: 9px; padding: 12px 24px;
+  border-radius: 40px; padding: 12px 28px;
   font-family: var(--font-h); font-size: 14px; font-weight: 700;
-  cursor: pointer; transition: background 0.2s; white-space: nowrap;
+  cursor: pointer; transition: all 0.2s; 
+  display: inline-flex; align-items: center; gap: 8px;
+  box-shadow: 0 2px 8px rgba(232,58,58,0.3);
+  white-space: nowrap;
 }
-.mob-enroll:hover { background: var(--red-dark); }
+.mob-enroll:hover { background: var(--red-dark); transform: scale(1.02); }
 
 /* Related courses */
 .related-title {
@@ -377,10 +390,10 @@ body { font-family: var(--font-b); background: var(--page-bg); }
 .related-card {
   display: flex; gap: 12px; align-items: flex-start;
   padding: 12px 0; border-bottom: 1px solid var(--border);
-  text-decoration: none; transition: background 0.2s;
+  text-decoration: none; transition: all 0.2s;
 }
 .related-card:last-child { border-bottom: none; }
-.related-card:hover { opacity: 0.8; }
+.related-card:hover { opacity: 0.85; transform: translateX(4px); }
 .related-thumb {
   width: 70px; height: 52px; border-radius: 7px;
   object-fit: cover; flex-shrink: 0;
@@ -407,6 +420,34 @@ body { font-family: var(--font-b); background: var(--page-bg); }
 .cd-section:nth-child(3) { animation-delay: 0.18s; }
 .cd-section:nth-child(4) { animation-delay: 0.24s; }
 .cd-section:nth-child(5) { animation-delay: 0.30s; }
+
+/* Toast notification style (optional) */
+.toast-msg {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #1f2937;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 1000;
+  opacity: 0;
+  transition: all 0.25s ease;
+  pointer-events: none;
+  white-space: nowrap;
+  font-family: var(--font-h);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.toast-msg.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+@media (max-width: 600px) {
+  .toast-msg { bottom: 80px; font-size: 12px; white-space: nowrap; }
+}
 </style>
 
 <!-- Topbar / Breadcrumb -->
@@ -458,18 +499,18 @@ body { font-family: var(--font-b); background: var(--page-bg); }
         <div class="preview-img">
           <img src="{{ course.image.url }}" alt="{{ course.title }}">
           <div class="preview-play">
-            <button class="preview-play-btn"><i class="fas fa-play"></i></button>
+            <button class="preview-play-btn" aria-label="Play preview"><i class="fas fa-play"></i></button>
           </div>
         </div>
         <div class="preview-body">
           <div class="preview-price">₹{{ course.price }}</div>
           <div class="preview-orig">₹{{ course.price|add:5000 }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
           {% if user.is_authenticated %}
-            <a href="#" class="enroll-btn-lg add-to-cart" data-course="{{ course.id }}"><i class="fas fa-cart-plus me-2"></i>Add to Cart</a>
+            <button class="enroll-btn-lg add-to-cart" data-course="{{ course.id }}"><i class="fas fa-cart-plus"></i>Add to Cart</button>
             {% else %}
-            <a href="{% url 'login' %}" class="enroll-btn-lg"><i class="fas fa-sign-in-alt me-2"></i>Login to Enroll</a>
+            <a href="{% url 'login' %}" class="enroll-btn-lg"><i class="fas fa-sign-in-alt"></i>Login to Enroll</a>
             {% endif %}
-          <button class="wishlist-btn"><i class="fas fa-heart me-2"></i>Add to Wishlist</button>
+          <button class="wishlist-btn"><i class="fas fa-heart"></i>Add to Wishlist</button>
           <p class="preview-guarantee"><i class="fas fa-shield-alt"></i> 30-Day Money-Back Guarantee</p>
         </div>
       </div>
@@ -609,15 +650,15 @@ body { font-family: var(--font-b); background: var(--page-bg); }
             <div class="sticky-orig">₹{{ course.price|add:5000 }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
 
             {% if user.is_authenticated %}
-            <a href="#" class="enroll-btn-sticky add-to-cart" data-course="{{ course.id }}">
-              <i class="fas fa-cart-plus me-2"></i>Add to Cart
-            </a>
+            <button class="enroll-btn-sticky add-to-cart" data-course="{{ course.id }}">
+              <i class="fas fa-cart-plus"></i>Add to Cart
+            </button>
             {% else %}
             <a href="{% url 'login' %}" class="enroll-btn-sticky">
-              <i class="fas fa-sign-in-alt me-2"></i>Login to Enroll
+              <i class="fas fa-sign-in-alt"></i>Login to Enroll
             </a>
             {% endif %}
-            <button class="wishlist-btn-s"><i class="fas fa-heart me-2"></i>Add to Wishlist</button>
+            <button class="wishlist-btn-s"><i class="fas fa-heart"></i>Add to Wishlist</button>
 
             <p style="font-family:var(--font-h);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">This course includes:</p>
             <ul class="includes-list">
@@ -636,7 +677,7 @@ body { font-family: var(--font-b); background: var(--page-bg); }
           </div>
         </div>
 
-        <!-- Related courses would go here if passed from view -->
+        <!-- Related courses -->
         {% if related_courses %}
         <div class="cd-sticky-card" style="margin-top:20px;">
           <div class="cd-sticky-body">
@@ -659,16 +700,106 @@ body { font-family: var(--font-b); background: var(--page-bg); }
   </div>
 </div>
 
-<!-- Mobile Enroll Bar -->
+<!-- Mobile Enroll Bar (improved alignment) -->
 <div class="mobile-enroll-bar">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-    <div>
-      <div class="mob-price">₹{{ course.price }}</div>
-      <div style="font-size:11px;color:var(--muted);text-decoration:line-through;">₹{{ course.price|add:5000 }}</div>
-    </div>
-    <button class="mob-enroll"><i class="fas fa-bolt me-1"></i> Enroll Now</button>
+  <div style="display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px;">
+    <div class="mob-price">₹{{ course.price }}</div>
+    <div class="mob-original">₹{{ course.price|add:5000 }}</div>
+    <div style="font-size:11px; color:#16a34a; font-weight:600;">🔥 Save ₹5000</div>
   </div>
+  <button class="mob-enroll"><i class="fas fa-bolt"></i> Enroll Now</button>
 </div>
 
 <script src="{% static 'mainApp/js/cart.js' %}"></script>
+
+<!-- Enhanced JS for toast and wishlist feedback -->
+<script>
+  (function() {
+    // Helper to show toast message
+    function showMessage(text, isError = false) {
+      let toast = document.querySelector('.toast-msg');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = text;
+      toast.style.background = isError ? '#b91c1c' : '#1f2937';
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Add to cart functionality (for .add-to-cart buttons)
+    const cartButtons = document.querySelectorAll('.add-to-cart');
+    cartButtons.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const courseId = this.getAttribute('data-course');
+        if (!courseId) return;
+        // Simulate cart addition (you can replace with fetch if needed)
+        // If cart.js already handles this, we avoid duplication.
+        // But to ensure feedback: call your global addToCart if exists.
+        if (typeof addToCart === 'function') {
+          addToCart(courseId);
+        } else {
+          // fallback: show message and optionally redirect
+          showMessage('✓ Added to cart!', false);
+          // Optionally update cart count if you have cart counter element
+          const cartCountElem = document.querySelector('.cart-count');
+          if (cartCountElem) {
+            let curr = parseInt(cartCountElem.innerText) || 0;
+            cartCountElem.innerText = curr + 1;
+          }
+        }
+      });
+    });
+
+    // Wishlist buttons feedback
+    const wishlistBtns = document.querySelectorAll('.wishlist-btn, .wishlist-btn-s');
+    wishlistBtns.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // You can integrate actual wishlist logic here
+        showMessage('❤️ Added to wishlist', false);
+        this.innerHTML = '<i class="fas fa-check"></i> Added';
+        setTimeout(() => {
+          if(this.classList.contains('wishlist-btn')) 
+            this.innerHTML = '<i class="fas fa-heart"></i> Add to Wishlist';
+          else 
+            this.innerHTML = '<i class="fas fa-heart"></i> Add to Wishlist';
+        }, 2000);
+      });
+    });
+
+    // Mobile enroll button (same as add-to-cart for demo)
+    const mobEnroll = document.querySelector('.mob-enroll');
+    if (mobEnroll) {
+      mobEnroll.addEventListener('click', function(e) {
+        e.preventDefault();
+        const courseIdElem = document.querySelector('.add-to-cart');
+        if (courseIdElem && courseIdElem.getAttribute('data-course')) {
+          showMessage('✓ Course added to cart!', false);
+          // update cart count if exists
+          const cartCountElem = document.querySelector('.cart-count');
+          if (cartCountElem) {
+            let curr = parseInt(cartCountElem.innerText) || 0;
+            cartCountElem.innerText = curr + 1;
+          }
+        } else {
+          window.location.href = "{% url 'login' %}";
+        }
+      });
+    }
+
+    // Preview play button simple alert (demo)
+    const previewBtn = document.querySelector('.preview-play-btn');
+    if (previewBtn) {
+      previewBtn.addEventListener('click', () => {
+        showMessage('🎬 Course preview coming soon!', false);
+      });
+    }
+  })();
+</script>
 {% endblock body %}

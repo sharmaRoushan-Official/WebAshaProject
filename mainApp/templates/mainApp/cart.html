@@ -24,7 +24,9 @@
           <td>{{ item.course.title }}</td>
           <td>₹{{ item.amount }}</td>
           <td>
-            <a href="#" class="btn btn-danger btn-sm remove-cart" data-id="{{ item.id }}">Remove from cart</a>
+            <button class="btn btn-danger btn-sm remove-cart" data-id="{{ item.id }}">
+              Remove from cart
+            </button>
           </td>
         </tr>
         {% endfor %}
@@ -32,13 +34,124 @@
     </table>
     <div class="text-end">
       <h3>Total: ₹{{ total }}</h3>
-      <a href="{% url 'purchase' %}" class="btn btn-success btn-lg">Purchase Now</a>
+      <form method="POST" action="{% url 'purchase' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-lg" {% if not cart_items %}disabled{% endif %}>
+          Purchase Now
+        </button>
+      </form>
     </div>
   {% else %}
-    <p class="alert alert-info">Your cart is empty.</p>
+    <div class="text-center py-5">
+      <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+      <p class="alert alert-info">Your cart is empty.</p>
+      <a href="{% url 'ourCourses' %}" class="btn btn-primary">Browse Courses</a>
+    </div>
   {% endif %}
 </div>
+
 <script>
-  // Remove item AJAX here
+// CSRF token helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+// Handle remove from cart
+document.querySelectorAll('.remove-cart').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const itemId = this.getAttribute('data-id');
+        
+        if (confirm('Are you sure you want to remove this item from your cart?')) {
+fetch(`/ajax/remove-from-cart/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: itemId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the row from table
+                    const row = this.closest('tr');
+                    row.remove();
+                    
+                    // Update cart count in header
+                    const cartCount = document.querySelector('h1');
+                    const newCount = parseInt(cartCount.textContent.match(/\d+/)[0]) - 1;
+                    cartCount.innerHTML = `Your Cart (${newCount})`;
+                    
+                    // Update the "Cart Items" count
+                    const cartItemsHeader = document.querySelector('.d-flex h3');
+                    if (cartItemsHeader) {
+                        cartItemsHeader.innerHTML = `Cart Items (${newCount})`;
+                    }
+                    
+                    // Update total price
+                    const totalElement = document.querySelector('.text-end h3');
+                    totalElement.innerHTML = `Total: ₹${data.new_total}`;
+                    
+                    // Show success message
+                    showNotification('Item removed from cart successfully!', 'success');
+                    
+                    // If cart is empty, reload page to show empty cart message
+                    if (newCount === 0) {
+                        setTimeout(() => location.reload(), 1500);
+                    }
+                } else {
+                    showNotification(data.error || 'Failed to remove item', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('An error occurred. Please try again.', 'error');
+            });
+        }
+    });
+});
+
+// Helper function to show notifications
+function showNotification(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto dismiss after 3 seconds
+    setTimeout(() => {
+        if (alertDiv) alertDiv.remove();
+    }, 3000);
+}
+
+// Update cart count in navbar (if cart badge exists)
+function updateNavbarCartCount(count) {
+    const cartBadge = document.querySelector('.cart-badge');
+    if (cartBadge) {
+        cartBadge.textContent = count;
+        if (count === 0) cartBadge.style.display = 'none';
+        else cartBadge.style.display = 'inline-block';
+    }
+}
 </script>
 {% endblock %}

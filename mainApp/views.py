@@ -5,11 +5,11 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 from django.shortcuts import get_object_or_404
 import json
 from .models import Course, Profile, TeamMember, CourseTransaction
-from .forms import LoginForm, RegisterForm, ChangePasswordForm
+from .forms import LoginForm, RegisterForm, ChangePasswordForm, ContactForm
 import uuid
 from django.utils import timezone
 
@@ -111,8 +111,19 @@ def galleryPage(request):
     return render(request, "mainApp/gallery.html", context)
 
 def contactPage(request):
-    # Add forms to context
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Thank you! Your message has been sent successfully. We will get back to you soon.')
+            form = ContactForm()  # Reset form
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = ContactForm()
+    
     context = {
+        'form': form,
         'login_form': LoginForm(),
         'register_form': RegisterForm(),
         'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
@@ -330,9 +341,19 @@ def course_detail(request, course_id):
 
 @login_required
 def add_to_cart(request):
-    course_id = request.GET.get('course_id')
+    """Add course to cart (pending transaction)"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        course_id = data.get('course_id')
+    except:
+        course_id = request.GET.get('course_id') or request.POST.get('course_id')
+    
     if not course_id:
-        return JsonResponse({'success': False, 'error': 'No course ID'})
+        return JsonResponse({'success': False, 'error': 'No course ID provided'})
+    
     course = get_object_or_404(Course, id=course_id)
     
     try:
@@ -340,44 +361,119 @@ def add_to_cart(request):
     except Profile.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Profile not found'})
     
+    # Check if already purchased
+    if profile.coursetransactions.filter(course=course, status='completed').exists():
+        return JsonResponse({'success': False, 'error': 'Course already purchased'})
+    
+    # Check if already in cart
     transaction, created = CourseTransaction.objects.get_or_create(
         user=profile,
         course=course,
+        status='pending',
         defaults={
             'transaction_id': f"cart_{uuid.uuid4().hex[:12]}",
             'amount': course.price,
-            'status': 'pending'
+            'is_active': True
         }
     )
-    count = profile.coursetransactions.filter(status='pending', is_active=True).count()
-    return JsonResponse({'success': True, 'message': 'Added to cart' if created else 'Already in cart', 'count': count})
+    
+    if not created and transaction.is_active:
+        return JsonResponse({'success': False, 'error': 'Course already in cart'})
+    elif not created and not transaction.is_active:
+        # Reactivate if exists but inactive
+        transaction.is_active = True
+        transaction.save()
+        return JsonResponse({'success': True, 'message': 'Added to cart', 'count': get_cart_count(request)})
+    
+    count = get_cart_count(request)
+    return JsonResponse({'success': True, 'message': 'Added to cart', 'count': count})
 
 @login_required
+@require_POST
 def remove_from_cart(request, transaction_id):
-    transaction = get_object_or_404(CourseTransaction, pk=transaction_id, user__user=request.user, status='pending', is_active=True)
-    transaction.is_active = False
-    transaction.save()
-    profile = Profile.objects.get(user=request.user)
-    count = profile.coursetransactions.filter(status='pending', is_active=True).count()
-    return JsonResponse({'success': True, 'count': count})
+    """Remove item from cart (soft delete by setting is_active=False)"""
+    try:
+        transaction = get_object_or_404(
+            CourseTransaction, 
+            id=transaction_id, 
+            user__user=request.user, 
+            status='pending'
+        )
+        
+        # Soft delete by setting is_active=False
+        transaction.is_active = False
+        transaction.save()
+        
+        # Get updated cart count and total
+        profile = Profile.objects.get(user=request.user)
+        remaining_items = profile.coursetransactions.filter(status='pending', is_active=True)
+        new_total = sum(item.amount for item in remaining_items)
+        new_count = remaining_items.count()
+        
+        return JsonResponse({
+            'success': True, 
+            'message': 'Item removed from cart',
+            'count': new_count,
+            'new_total': new_total
+        })
+        
+    except CourseTransaction.DoesNotExist:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Item not found in cart'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'error': str(e)
+        }, status=500)
 
 @login_required
 def cart_view(request):
+    """Display shopping cart"""
     profile = get_profile_or_create(request)
     cart_items = profile.coursetransactions.filter(status='pending', is_active=True)
     total = sum(item.amount for item in cart_items)
-    return render(request, 'mainApp/cart.html', {'cart_items': cart_items, 'total': total})
+    
+    context = {
+        'cart_items': cart_items,
+        'total': total,
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+    }
+    return render(request, 'mainApp/cart.html', context)
 
 @login_required
 def purchase_cart(request):
+    """Convert pending cart items to completed purchases"""
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request method')
+        return redirect('cart_view')
+    
     profile = get_profile_or_create(request)
     cart_items = profile.coursetransactions.filter(status='pending', is_active=True)
-    if cart_items.exists():
-        for item in cart_items:
-            item.status = 'completed'
-            item.transaction_id = f"txn_{uuid.uuid4().hex[:12]}"
-            item.save()
-        messages.success(request, f'Purchased {cart_items.count()} courses!')
+    
+    if not cart_items.exists():
+        messages.warning(request, 'Your cart is empty')
+        return redirect('cart_view')
+    
+    # Generate a single transaction ID for the entire purchase
+    bulk_transaction_id = f"txn_{uuid.uuid4().hex[:12]}_{int(timezone.now().timestamp())}"
+    
+    purchased_courses = []
+    for item in cart_items:
+        item.status = 'completed'
+        item.transaction_id = bulk_transaction_id
+        item.purchase_date = timezone.now()
+        item.save()
+        purchased_courses.append(item.course.title)
+    
+    messages.success(
+        request, 
+        f'Successfully purchased {cart_items.count()} course(s): {", ".join(purchased_courses[:3])}{"..." if len(purchased_courses) > 3 else ""}'
+    )
+    
     return redirect('my_courses')
 
 @login_required
@@ -420,7 +516,38 @@ def join_live_batch(request):
     }
     return render(request, 'mainApp/join.html', context)
 
+@login_required
 def my_courses(request):
+    """Display purchased courses"""
     profile = get_profile_or_create(request)
-    transactions = profile.coursetransactions.filter(status='completed').select_related('course')
-    return render(request, 'mainApp/my-courses.html', {'purchased': transactions, 'profile': profile})
+    transactions = profile.coursetransactions.filter(
+        status='completed', 
+        is_active=True
+    ).select_related('course').order_by('-purchase_date')
+    
+    context = {
+        'purchased': transactions,
+        'profile': profile,
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+    }
+    return render(request, 'mainApp/my-courses.html', context)
+
+def registration_success(request):
+    """Registration success page"""
+    context = {
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+    }
+    return render(request, 'mainApp/registration_success.html', context)
+
+def login_success(request):
+    """Login success page"""
+    context = {
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+    }
+    return render(request, 'mainApp/login_success.html', context)
