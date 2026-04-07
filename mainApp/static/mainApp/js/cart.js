@@ -34,6 +34,23 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(err => console.error('Status check error:', err));
   }
 
+// CSRF token helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
   // Add to cart buttons - check status first
   const addToCartBtns = document.querySelectorAll('.add-to-cart');
   addToCartBtns.forEach(btn => {
@@ -56,9 +73,14 @@ document.addEventListener('DOMContentLoaded', function() {
       originalBtn.disabled = true;
       originalBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
       
-      fetch(`/ajax/add-to-cart/?course_id=${courseId}`, {
-        method: 'GET',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      fetch('/ajax/add-to-cart/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrftoken,
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({course_id: courseId})
       })
       .then(response => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -101,12 +123,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
       fetch(`/ajax/remove-from-cart/${transactionId}/`, {
         method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       })
       .then(response => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response.json();
       })
+
       .then(data => {
         if (data.success) {
           row.remove();

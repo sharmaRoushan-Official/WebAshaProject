@@ -26,9 +26,10 @@ urlpatterns = [
     
     # Profile URLs
     path("profile/", profile_view, name="profile"),
-    path("api/change-password/", change_password_api, name="change_password_api"),
+    path("change-password/", change_password_view, name="change_password"),  # ✅ ADDED - Regular form submission
+    path("api/change-password/", change_password_api, name="change_password_api"),  # API endpoint
     
-    # Cart URLs - Add both 'cart' and 'cart_view' names
+    # Cart URLs
     path("cart/", cart_view, name="cart_view"),
     path("cart/", cart_view, name="cart"),  # Alias for backward compatibility
     path("cart/purchase/", purchase_cart, name="purchase"),
@@ -40,6 +41,6 @@ urlpatterns = [
     
     # AJAX URLs for Cart Operations
     path("ajax/add-to-cart/", add_to_cart, name="add_to_cart"),
-    path("ajax/remove-from-cart/<int:transaction_id>/", remove_from_cart, name="remove_from_cart"),
+    path("ajax/remove-from-cart/<int:transaction_id>/", remove_from_cart, name="remove_from_cart"),  # ✅ Fixed - uses transaction_id
     path("ajax/course-status/<int:course_id>/", ajax_course_status, name="course_status"),
 ]

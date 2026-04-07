@@ -1,0 +1,39 @@
+/* Custom Base Styles for WebAsha */
+/* Prevents 404 error while allowing future customizations */
+
+body {
+  font-family: inherit;
+  line-height: inherit;
+}
+
+/* Navbar customizations */
+.navbar {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* Cart badge */
+.cart-badge {
+  font-size: 0.65em;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Auth modal enhancements */
+#authModal .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+/* Purchase button protection */
+.purchase-protected {
+  transition: all 0.2s ease;
+}
+
+.purchase-protected:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
