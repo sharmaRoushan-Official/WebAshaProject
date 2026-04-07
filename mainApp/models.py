@@ -74,6 +74,7 @@ class CourseTransaction(models.Model):
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, blank=True)
     receipt = models.FileField(upload_to='transactions/receipts/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    course_type = models.IntegerField(default=0, choices=[(0, 'Normal'), (1, 'Live')])
 
     def __str__(self):
         return f"{self.user.user.username} bought {self.course.title} - {self.status} (₹{self.amount})"
@@ -205,3 +206,4 @@ class LiveCourseTransaction(models.Model):
 
     class Meta:
         ordering = ['-purchase_date']
+
