@@ -1,9 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.utils import timezone
+import random
+import string
 
 # Create your models here.
-
 
 class Course(models.Model):
     title = models.CharField(max_length=200)
@@ -49,7 +51,58 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username} ({self.first_name} {self.last_name})"
 
-
+class PasswordResetOTP(models.Model):
+    """
+    Model to store OTP for password reset/forgot password functionality
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_reset_otps')
+    otp = models.CharField(max_length=6)  # 6 digit OTP: 2 letters + 4 numbers
+    is_used = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Password Reset OTP'
+        verbose_name_plural = 'Password Reset OTPs'
+    
+    def __str__(self):
+        return f"OTP for {self.user.email} - {self.otp} (Expires: {self.expires_at})"
+    
+    def is_valid(self):
+        """Check if OTP is not used and not expired"""
+        return not self.is_used and self.expires_at > timezone.now()
+    
+    @staticmethod
+    def generate_otp():
+        """
+        Generate 6-digit OTP: 2 random letters (uppercase) + 4 random numbers
+        Example: AB1234, XY9876
+        """
+        letters = ''.join(random.choices(string.ascii_uppercase, k=2))
+        numbers = ''.join(random.choices(string.digits, k=4))
+        return f"{letters}{numbers}"
+    
+    @staticmethod
+    def create_otp_for_user(user, expiry_minutes=10):
+        """
+        Create and save a new OTP for the user
+        Returns: (otp_object, otp_code)
+        """
+        # Invalidate any existing unused OTPs for this user
+        PasswordResetOTP.objects.filter(user=user, is_used=False).update(is_used=True)
+        
+        otp_code = PasswordResetOTP.generate_otp()
+        expires_at = timezone.now() + timezone.timedelta(minutes=expiry_minutes)
+        
+        otp_obj = PasswordResetOTP.objects.create(
+            user=user,
+            otp=otp_code,
+            expires_at=expires_at,
+            is_used=False
+        )
+        return otp_obj, otp_code
+    
 class CourseTransaction(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -82,7 +135,6 @@ class CourseTransaction(models.Model):
     class Meta:
         ordering = ['-purchase_date']
 
-
 # OurTeam 
 class TeamMember(models.Model):
     name = models.CharField(max_length=100)
@@ -105,9 +157,7 @@ class TeamMember(models.Model):
     class Meta:
         ordering = ['order']
 
-
-# live Batches 
-
+# Live Batches 
 class LiveCourse(models.Model):
     CATEGORY_CHOICES = [
         ('web_dev', 'Web Development'),
@@ -136,7 +186,6 @@ class LiveCourse(models.Model):
     def __str__(self):
         return self.title
 
-
 class Contact(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -150,7 +199,6 @@ class Contact(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-
 
 class LiveCourseRegistration(models.Model):
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='live_registrations')
@@ -172,7 +220,6 @@ class LiveCourseRegistration(models.Model):
 
     class Meta:
         unique_together = ['profile', 'live_course']
-
 
 class LiveCourseTransaction(models.Model):
     STATUS_CHOICES = [
@@ -206,4 +253,3 @@ class LiveCourseTransaction(models.Model):
 
     class Meta:
         ordering = ['-purchase_date']
-

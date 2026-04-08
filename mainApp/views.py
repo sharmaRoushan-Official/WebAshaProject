@@ -8,14 +8,370 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 from django.shortcuts import get_object_or_404
 import json
+import logging
 from .models import Course, Profile, TeamMember, CourseTransaction, LiveCourse, LiveCourseTransaction, LiveCourseRegistration
 from .forms import LoginForm, RegisterForm, ChangePasswordForm, ContactForm, LiveRegistrationForm
 import uuid
 from django.utils import timezone
 from decimal import Decimal
+from .models import PasswordResetOTP
+from .services.email_service import send_password_reset_otp_email, send_password_reset_success_email
+from .forms import (
+    ForgotPasswordRequestForm, 
+    ForgotPasswordVerifyOTPForm, 
+    ForgotPasswordResetForm,
+    ResetPasswordForm
+)
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 
+# Forgot Password Views
+def forgot_password_request(request):
+    """
+    Step 1: User enters email to request OTP for forgot password
+    """
+    if request.method == 'POST':
+        form = ForgotPasswordRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            users = User.objects.filter(email=email)
+            if not users.exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No account found with this email.'
+                }, status=404)
+            user = users.first()
+            try:
+                profile = Profile.objects.get(user=user)
+                user_name = f"{profile.first_name} {profile.last_name}".strip() or user.username
+                
+                # Create OTP
+                otp_obj, otp_code = PasswordResetOTP.create_otp_for_user(user)
+                logger.info(f"OTP created for {email}: {otp_code}")
+                
+                # Send OTP via email
+                success, message = send_password_reset_otp_email(email, otp_code, user_name)
+                
+                if success:
+                    # Store email in session for next steps
+                    request.session['reset_email'] = email
+                    request.session['reset_otp_sent_at'] = timezone.now().isoformat()
+                    
+                    return JsonResponse({
+                        'success': True,
+                        'message': f'OTP sent to {email}. Valid for 10 minutes.',
+                        'email': email
+                    })
+                else:
+                    return JsonResponse({
+                        'success': False,
+                        'error': message
+                    }, status=500)
+            except Profile.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Profile not found for this user.'
+                }, status=404)
+        else:
+            errors = {}
+            for field, error_list in form.errors.items():
+                errors[field] = error_list[0]
+            return JsonResponse({
+                'success': False,
+                'errors': errors
+            }, status=400)
+    else:
+        form = ForgotPasswordRequestForm()
+    
+    context = {
+        'form': form,
+        'cart_count': get_cart_count(request)
+    }
+    return render(request, 'mainApp/forgot_password_request.html', context)
+
+
+@csrf_exempt  # Add this temporarily for debugging
+def forgot_password_verify_otp(request):
+    """
+    Step 2: Verify OTP for forgot password
+    """
+    # Log the request for debugging
+    logger.info(f"Verify OTP request method: {request.method}")
+    logger.info(f"POST data: {request.POST}")
+    
+    email = request.session.get('reset_email')
+    if not email:
+        return JsonResponse({
+            'success': False,
+            'error': 'Session expired. Please request OTP again.'
+        }, status=400)
+    
+    if request.method == 'POST':
+        # Get OTP directly from POST data (bypass form validation for debugging)
+        otp = request.POST.get('otp', '').upper().strip()
+        
+        if not otp:
+            return JsonResponse({
+                'success': False,
+                'error': 'OTP is required'
+            }, status=400)
+        
+        try:
+            user = User.objects.get(email=email)
+            logger.info(f"Verifying OTP for user: {user.email}, OTP: {otp}")
+            
+            # Check for valid OTP
+            otp_records = PasswordResetOTP.objects.filter(
+                user=user,
+                otp=otp,
+                is_used=False,
+                expires_at__gt=timezone.now()
+            )
+            
+            logger.info(f"Found {otp_records.count()} valid OTP records")
+            
+            if not otp_records.exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Invalid or expired OTP. Please request a new one.'
+                }, status=400)
+            
+            otp_record = otp_records.latest('created_at')
+            
+            # Mark OTP as used
+            otp_record.is_used = True
+            otp_record.save()
+            
+            # Store verification in session
+            request.session['reset_verified'] = True
+            request.session['reset_user_id'] = user.id
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'OTP verified successfully. You can now reset your password.',
+                'email': email
+            })
+            
+        except User.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'User not found.'
+            }, status=404)
+        except Exception as e:
+            logger.error(f"Error in OTP verification: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': f'Verification error: {str(e)}'
+            }, status=400)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@csrf_exempt
+def forgot_password_reset(request):
+    """
+    Step 3: Reset password after OTP verification
+    """
+    if not request.session.get('reset_verified'):
+        return JsonResponse({
+            'success': False,
+            'error': 'Unauthorized. Please verify OTP first.'
+        }, status=401)
+    
+    email = request.session.get('reset_email')
+    user_id = request.session.get('reset_user_id')
+    
+    if not email or not user_id:
+        return JsonResponse({
+            'success': False,
+            'error': 'Session expired. Please request OTP again.'
+        }, status=400)
+    
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if not new_password or not confirm_password:
+            return JsonResponse({
+                'success': False,
+                'error': 'Both password fields are required'
+            }, status=400)
+        
+        if new_password != confirm_password:
+            return JsonResponse({
+                'success': False,
+                'error': 'Passwords do not match'
+            }, status=400)
+        
+        if len(new_password) < 6:
+            return JsonResponse({
+                'success': False,
+                'error': 'Password must be at least 6 characters long'
+            }, status=400)
+        
+        try:
+            user = User.objects.get(id=user_id, email=email)
+            user.set_password(new_password)
+            user.save()
+            
+            # Update session to prevent logout
+            update_session_auth_hash(request, user)
+            
+            # Send success email
+            try:
+                profile = Profile.objects.get(user=user)
+                user_name = f"{profile.first_name} {profile.last_name}".strip() or user.username
+                send_password_reset_success_email(email, user_name)
+            except Exception as e:
+                logger.error(f"Failed to send success email: {str(e)}")
+            
+            # Clear reset session data
+            request.session.pop('reset_email', None)
+            request.session.pop('reset_verified', None)
+            request.session.pop('reset_user_id', None)
+            request.session.pop('reset_otp_sent_at', None)
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Password reset successfully! Please login with your new password.'
+            })
+            
+        except User.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'User not found.'
+            }, status=404)
+        except Exception as e:
+            logger.error(f"Error resetting password: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': f'Reset error: {str(e)}'
+            }, status=400)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@login_required
+def send_reset_otp(request):
+    """
+    Send OTP for logged-in user to reset password (change password)
+    """
+    if request.method == 'POST':
+        try:
+            user = request.user
+            profile = Profile.objects.get(user=user)
+            user_name = f"{profile.first_name} {profile.last_name}".strip() or user.username
+            
+            # Create OTP
+            otp_obj, otp_code = PasswordResetOTP.create_otp_for_user(user)
+            
+            # Send OTP via email
+            success, message = send_password_reset_otp_email(user.email, otp_code, user_name)
+            
+            if success:
+                return JsonResponse({
+                    'success': True,
+                    'message': f'OTP sent to {user.email}. Valid for 10 minutes.'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': message
+                }, status=500)
+                
+        except Profile.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'Profile not found.'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@login_required
+def reset_password_with_otp(request):
+    """
+    Reset password for logged-in user using OTP verification
+    """
+    if request.method == 'POST':
+        form = ResetPasswordForm(request.user, request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data['new_password']
+            otp = form.cleaned_data['otp'].upper()
+            
+            try:
+                # Verify OTP again (double-check)
+                otp_record = PasswordResetOTP.objects.filter(
+                    user=request.user,
+                    otp=otp,
+                    is_used=False,
+                    expires_at__gt=timezone.now()
+                ).latest('created_at')
+                
+                # Mark OTP as used
+                otp_record.is_used = True
+                otp_record.save()
+                
+                # Set new password
+                request.user.set_password(new_password)
+                request.user.save()
+                
+                # Update session to keep user logged in
+                update_session_auth_hash(request, request.user)
+                
+                # Send success email
+                try:
+                    profile = Profile.objects.get(user=request.user)
+                    user_name = f"{profile.first_name} {profile.last_name}".strip() or request.user.username
+                    send_password_reset_success_email(request.user.email, user_name)
+                except:
+                    pass
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Password changed successfully!'
+                })
+                
+            except PasswordResetOTP.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Invalid or expired OTP. Please request a new OTP.'
+                }, status=400)
+        else:
+            errors = {}
+            for field, error_list in form.errors.items():
+                errors[field] = error_list[0]
+            return JsonResponse({
+                'success': False,
+                'errors': errors
+            }, status=400)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+def check_reset_session(request):
+    """
+    Check if user has valid reset session (for step tracking)
+    """
+    has_email = bool(request.session.get('reset_email'))
+    is_verified = bool(request.session.get('reset_verified'))
+    
+    return JsonResponse({
+        'has_email': has_email,
+        'is_verified': is_verified,
+        'email': request.session.get('reset_email') if has_email else None
+    })
+
+
+# Main Page Views
 def homePage(request):
     courses = Course.objects.filter(is_active=True)
     context = {
@@ -26,6 +382,7 @@ def homePage(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, "mainApp/home.html", context)
+
 
 def aboutPage(request):
     if request.method == "GET":
@@ -39,6 +396,7 @@ def aboutPage(request):
         }
         return render(request, "mainApp/about.html", context)
 
+
 def eventPage(request):
     course = Course.objects.filter(is_active=True).order_by('course_number')
     context = {
@@ -50,6 +408,7 @@ def eventPage(request):
     }
     return render(request, "mainApp/event.html", context)
 
+
 def certificationsPage(request):
     context = {
         'login_form': LoginForm(),
@@ -58,6 +417,7 @@ def certificationsPage(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, "mainApp/certifications.html", context)
+
 
 def classPage(request):
     live_courses = LiveCourse.objects.filter(is_active=True)
@@ -70,6 +430,7 @@ def classPage(request):
     }
     return render(request, "mainApp/classes.html", context)
 
+
 def ourCoursesPage(request):
     course = Course.objects.filter(is_active=True).order_by('course_number')
     context = {
@@ -81,6 +442,7 @@ def ourCoursesPage(request):
     }
     return render(request, "mainApp/ourCourses.html", context)
 
+
 def teamPage(request):
     context = {
         'login_form': LoginForm(),
@@ -89,6 +451,7 @@ def teamPage(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, "mainApp/team.html", context)
+
 
 def testimonialPage(request):
     context = {
@@ -99,6 +462,7 @@ def testimonialPage(request):
     }
     return render(request, "mainApp/testimonial.html", context)
 
+
 def galleryPage(request):
     context = {
         'login_form': LoginForm(),
@@ -107,6 +471,7 @@ def galleryPage(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, "mainApp/gallery.html", context)
+
 
 def contactPage(request):
     if request.method == 'POST':
@@ -129,6 +494,7 @@ def contactPage(request):
     }
     return render(request, "mainApp/contact.html", context)
 
+
 def error404Page(request):
     if request.method == "GET":
         context = {
@@ -139,6 +505,8 @@ def error404Page(request):
         }
         return render(request, "mainApp/404.html", context)
 
+
+# Authentication Views
 def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST, request.FILES)
@@ -176,6 +544,7 @@ def register_view(request):
     }
     return render(request, 'mainApp/register.html', context)
 
+
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -208,6 +577,7 @@ def login_view(request):
     }
     return render(request, 'mainApp/login.html', context)
 
+
 @login_required
 def get_profile_or_create(request):
     """Get profile or create minimal one if missing"""
@@ -225,6 +595,8 @@ def get_profile_or_create(request):
         messages.success(request, 'Welcome! Your profile has been created.')
         return profile
 
+
+# AJAX Status Views
 @login_required
 def ajax_course_status(request, course_id):
     """AJAX endpoint: Check if normal course purchased/incart/available"""
@@ -248,6 +620,7 @@ def ajax_course_status(request, course_id):
         'status': 'available',
         'count': get_cart_count(request)
     })
+
 
 @login_required
 def ajax_live_course_status(request, live_course_id):
@@ -273,6 +646,8 @@ def ajax_live_course_status(request, live_course_id):
         'count': get_cart_count(request)
     })
 
+
+# Profile Views
 @login_required
 def profile_view(request):
     profile = get_profile_or_create(request)
@@ -284,6 +659,7 @@ def profile_view(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, 'mainApp/profile.html', context)
+
 
 @login_required
 def change_password_view(request):
@@ -301,6 +677,7 @@ def change_password_view(request):
             return redirect('profile')
     else:
         return redirect('profile')
+
 
 @login_required
 @require_http_methods(["PUT", "POST"])
@@ -352,12 +729,14 @@ def change_password_api(request):
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+
 def logout_view(request):
     logout(request)
     messages.success(request, 'Logged out successfully!')
     return redirect('home')
 
-# Helper function to get cart count (works for both session and DB)
+
+# Cart Helper Functions
 def get_cart_count(request):
     """Get the number of items in user's cart (session for anonymous, DB for authenticated)"""
     if request.user.is_authenticated:
@@ -374,6 +753,7 @@ def get_cart_count(request):
         # Anonymous user: get cart from session
         session_cart = request.session.get('cart', [])
         return len(session_cart)
+
 
 def merge_session_cart_to_user(request, profile):
     """Merge session cart items into user's pending transactions"""
@@ -433,6 +813,8 @@ def merge_session_cart_to_user(request, profile):
     request.session['cart'] = []
     request.session.modified = True
 
+
+# Cart Views
 def add_to_cart(request):
     """Add course to cart - works for both anonymous and authenticated users"""
     if request.method != 'POST':
@@ -535,6 +917,7 @@ def add_to_cart(request):
     count = get_cart_count(request)
     return JsonResponse({'success': True, 'message': 'Course added to cart', 'count': count})
 
+
 @login_required
 @require_POST
 def remove_from_cart(request, transaction_id):
@@ -597,6 +980,7 @@ def remove_from_cart(request, transaction_id):
             'error': str(e)
         }, status=500)
 
+
 @login_required
 def cart_view(request):
     """Display shopping cart - requires login to view cart"""
@@ -645,6 +1029,7 @@ def cart_view(request):
         'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
     }
     return render(request, 'mainApp/cart.html', context)
+
 
 @login_required
 def purchase_cart(request):
@@ -704,6 +1089,8 @@ def purchase_cart(request):
     
     return redirect('my_courses')
 
+
+# Live Course Views
 @login_required
 def join_live_batch(request, live_course_id):
     live_course = get_object_or_404(LiveCourse, id=live_course_id, is_active=True)
@@ -774,6 +1161,8 @@ def join_live_batch(request, live_course_id):
         'cart_count': get_cart_count(request)
     }
     return render(request, 'mainApp/join.html', context)
+
+
 @login_required
 def my_live_courses(request):
     profile = get_profile_or_create(request)
@@ -786,6 +1175,7 @@ def my_live_courses(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, 'mainApp/my-live-courses.html', context)
+
 
 @login_required
 def my_courses(request):
@@ -815,6 +1205,8 @@ def my_courses(request):
     }
     return render(request, 'mainApp/my-courses.html', context)
 
+
+# Success Pages
 def registration_success(request):
     context = {
         'login_form': LoginForm(),
@@ -823,6 +1215,7 @@ def registration_success(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, 'mainApp/registration_success.html', context)
+
 
 def login_success(request):
     context = {
@@ -833,6 +1226,8 @@ def login_success(request):
     }
     return render(request, 'mainApp/login_success.html', context)
 
+
+# Course Detail View
 def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id, is_active=True)
     related_courses = Course.objects.filter(is_active=True).exclude(id=course_id)[:4]

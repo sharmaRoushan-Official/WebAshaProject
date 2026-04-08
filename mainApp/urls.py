@@ -24,9 +24,19 @@ urlpatterns = [
     path("registration-success/", lambda request: render(request, 'mainApp/registration_success.html'), name="registration_success"),
     path("login-success/", lambda request: render(request, 'mainApp/login_success.html'), name="login_success"),
     
+    # Forgot Password URLs (Password Reset without login)
+    path("forgot-password/request/", forgot_password_request, name="forgot_password_request"),
+    path("forgot-password/verify-otp/", forgot_password_verify_otp, name="forgot_password_verify_otp"),
+    path("forgot-password/reset/", forgot_password_reset, name="forgot_password_reset"),
+    path("check-reset-session/", check_reset_session, name="check_reset_session"),
+    
+    # Reset Password with OTP (for logged-in users)
+    path("send-reset-otp/", send_reset_otp, name="send_reset_otp"),
+    path("reset-password-with-otp/", reset_password_with_otp, name="reset_password_with_otp"),
+    
     # Profile URLs
     path("profile/", profile_view, name="profile"),
-    path("change-password/", change_password_view, name="change_password"),  # ✅ ADDED - Regular form submission
+    path("change-password/", change_password_view, name="change_password"),  # Regular form submission
     path("api/change-password/", change_password_api, name="change_password_api"),  # API endpoint
     
     # Cart URLs
@@ -41,6 +51,7 @@ urlpatterns = [
     
     # AJAX URLs for Cart Operations
     path("ajax/add-to-cart/", add_to_cart, name="add_to_cart"),
-    path("ajax/remove-from-cart/<int:transaction_id>/", remove_from_cart, name="remove_from_cart"),  # ✅ Fixed - uses transaction_id
+    path("ajax/remove-from-cart/<int:transaction_id>/", remove_from_cart, name="remove_from_cart"),
     path("ajax/course-status/<int:course_id>/", ajax_course_status, name="course_status"),
+    path("ajax/live-course-status/<int:live_course_id>/", ajax_live_course_status, name="live_course_status"),
 ]

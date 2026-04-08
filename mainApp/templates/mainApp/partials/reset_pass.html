@@ -1,0 +1,101 @@
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forgotPasswordModalLabel">
+                    <i class="fas fa-key me-2"></i>Reset Password
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Alert Container -->
+                <div id="alertContainer"></div>
+                
+                <!-- Step 1: Request OTP -->
+                <div id="requestStep">
+                    <p class="text-muted mb-3">Enter your email address and we'll send you an OTP to reset your password.</p>
+                    <form id="requestOtpForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="resetEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="resetEmail" name="email" required placeholder="Enter your registered email">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <span id="requestLoading" class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>
+                            Send OTP
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Step 2: Verify OTP -->
+                <div id="otpStep" class="d-none">
+                    <p class="text-muted mb-3">We've sent a 6-digit OTP to <strong id="resetEmailDisplay"></strong></p>
+                    <form id="verifyOtpForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="otpCode" class="form-label">Enter OTP</label>
+                            <input type="text" class="form-control" id="otpCode" name="otp" maxlength="6" required placeholder="Enter 6-digit OTP" autocomplete="off">
+                            <small class="text-muted">Format: 2 letters + 4 numbers (e.g., AB1234)</small>
+                        </div>
+                        <div class="mb-3 text-center">
+                            <small class="countdown-text">
+                                OTP expires in: <span id="countdownTimer">600</span> seconds
+                            </small>
+                            <br>
+                            <button type="button" id="resendOtpBtn" class="btn btn-link resend-otp-btn" disabled>
+                                Resend OTP
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <span id="verifyLoading" class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>
+                            Verify OTP
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Step 3: Reset Password -->
+                <div id="resetStep" class="d-none">
+                    <p class="text-muted mb-3">Create a new password for your account.</p>
+                    <form id="resetPasswordForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" name="new_password" required placeholder="Enter new password">
+                            <small class="text-muted">Minimum 6 characters with uppercase, lowercase, number, and special character</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required placeholder="Confirm new password">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <span id="resetLoading" class="spinner-border spinner-border-sm me-2 d-none" role="status"></span>
+                            Reset Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .countdown-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .resend-otp-btn {
+        font-size: 0.85rem;
+        padding: 0;
+        margin-top: 5px;
+    }
+    .resend-otp-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    #otpCode {
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+</style>
