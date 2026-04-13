@@ -4,8 +4,10 @@ charset-normalizer==3.4.7
 crispy-bootstrap5==0.7
 Django==5.2.5
 django-crispy-forms==2.3
+dotenv==0.9.9
 idna==3.11
 pillow==12.1.1
+python-dotenv==1.2.2
 requests==2.33.1
 resend==2.27.0
 sqlparse==0.5.5
