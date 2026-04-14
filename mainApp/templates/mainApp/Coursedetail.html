@@ -345,7 +345,7 @@ body { font-family: var(--font-b); background: var(--page-bg); }
 }
 .guarantee-note i { color: var(--green); }
 
-/* Mobile enroll bar - refined */
+/* Mobile enroll bar */
 .mobile-enroll-bar {
   display: none;
   position: fixed; bottom: 0; left: 0; right: 0;
@@ -421,7 +421,7 @@ body { font-family: var(--font-b); background: var(--page-bg); }
 .cd-section:nth-child(4) { animation-delay: 0.24s; }
 .cd-section:nth-child(5) { animation-delay: 0.30s; }
 
-/* Toast notification style (optional) */
+/* Toast notification */
 .toast-msg {
   position: fixed;
   bottom: 90px;
@@ -472,7 +472,7 @@ body { font-family: var(--font-b); background: var(--page-bg); }
     <div class="cd-hero-inner">
       <!-- Left -->
       <div>
-        <div class="cd-label"><i class="fas fa-certificate"></i> Certified Program</div>
+        <div class="cd-label"><i class="fas fa-certificate"></i> {{ details.get_level_display|default:"Certified Program"|upper }}</div>
         <h1>{{ course.title }}</h1>
         <p class="tagline">{{ course.description|truncatewords:28 }}</p>
 
@@ -483,30 +483,34 @@ body { font-family: var(--font-b); background: var(--page-bg); }
         </div>
 
         <div class="cd-meta-row">
-          <span><i class="fas fa-user-tie"></i> WebAsha Technologies</span>
-          <span><i class="fas fa-calendar-alt"></i> Last updated 2024</span>
+          <span><i class="fas fa-user-tie"></i> {% if details.instructor %}{{ details.instructor.name }}{% else %}WebAsha Technologies{% endif %}</span>
+          <span><i class="fas fa-calendar-alt"></i> Last updated {{ course.created_at|date:"Y" }}</span>
           <span><i class="fas fa-globe"></i> English / Hindi</span>
         </div>
         <div class="cd-meta-row">
-          <span><i class="fas fa-clock"></i> 40 total hours</span>
-          <span><i class="fas fa-book-open"></i> 120 lectures</span>
-          <span><i class="fas fa-signal"></i> All Levels</span>
+          <span><i class="fas fa-clock"></i> {{ details.duration|default:"40" }} total hours</span>
+          <span><i class="fas fa-book-open"></i> {{ details.total_lessons|default:"120" }} lectures</span>
+          <span><i class="fas fa-signal"></i> {{ details.get_level_display|default:"All Levels" }}</span>
         </div>
       </div>
 
       <!-- Right: preview card -->
       <div class="cd-hero-preview">
         <div class="preview-img">
+          {% if details.thumbnail %}
+          <img src="{{ details.thumbnail.url }}" alt="{{ course.title }}">
+          {% else %}
           <img src="{{ course.image.url }}" alt="{{ course.title }}">
+          {% endif %}
           <div class="preview-play">
             <button class="preview-play-btn" aria-label="Play preview"><i class="fas fa-play"></i></button>
           </div>
         </div>
         <div class="preview-body">
           <div class="preview-price">₹{{ course.price }}</div>
-          <div class="preview-orig">₹{{ course.price|add:5000 }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
+          <div class="preview-orig">₹{{ course.price|add:"5000" }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
           {% if user.is_authenticated %}
-            <button class="enroll-btn-lg add-to-cart" data-course="{{ course.id }}"><i class="fas fa-cart-plus"></i>Add to Cart</button>
+            <button class="enroll-btn-lg add-to-cart" data-course="{{ course.id }}" data-type="0"><i class="fas fa-cart-plus"></i>Add to Cart</button>
             {% else %}
             <a href="{% url 'login' %}" class="enroll-btn-lg"><i class="fas fa-sign-in-alt"></i>Login to Enroll</a>
             {% endif %}
@@ -526,32 +530,48 @@ body { font-family: var(--font-b); background: var(--page-bg); }
       <!-- ── Left Column ── -->
       <div>
 
-        <!-- What you'll learn -->
+        <!-- What you'll learn (Objectives) -->
+        {% if details.objectives %}
         <div class="cd-section">
           <div class="cd-sec-title"><i class="fas fa-graduation-cap"></i> What You'll Learn</div>
           <div class="learn-grid">
+            {% with objectives_list=details.objectives|linebreaksbr %}
+              {% for line in objectives_list.splitlines %}
+                {% if line|length > 5 %}
+                <div class="learn-item"><i class="fas fa-check-circle"></i> {{ line|striptags|truncatewords:15 }}</div>
+                {% endif %}
+              {% endfor %}
+            {% endwith %}
+            {% if not details.objectives %}
             <div class="learn-item"><i class="fas fa-check-circle"></i> Master core concepts and real-world application</div>
             <div class="learn-item"><i class="fas fa-check-circle"></i> Prepare for industry-recognized certification exams</div>
             <div class="learn-item"><i class="fas fa-check-circle"></i> Hands-on labs and practical exercises included</div>
             <div class="learn-item"><i class="fas fa-check-circle"></i> Build a professional portfolio of projects</div>
-            <div class="learn-item"><i class="fas fa-check-circle"></i> Learn from real-world industry scenarios</div>
-            <div class="learn-item"><i class="fas fa-check-circle"></i> Access lifetime course materials & updates</div>
-            <div class="learn-item"><i class="fas fa-check-circle"></i> Understand best practices used by professionals</div>
-            <div class="learn-item"><i class="fas fa-check-circle"></i> Career guidance and job placement support</div>
+            {% endif %}
           </div>
         </div>
+        {% endif %}
 
-        <!-- Requirements -->
+        <!-- Prerequisites / Requirements -->
+        {% if details.prerequisites %}
         <div class="cd-section">
           <div class="cd-sec-title"><i class="fas fa-list-check"></i> Requirements</div>
           <ul class="req-list">
+            {% with prereq_list=details.prerequisites|linebreaksbr %}
+              {% for req in prereq_list.splitlines %}
+                {% if req|length > 3 %}
+                <li>{{ req|striptags }}</li>
+                {% endif %}
+              {% endfor %}
+            {% endwith %}
+            {% if not details.prerequisites %}
             <li>Basic understanding of computers and operating systems</li>
             <li>Stable internet connection for online labs and resources</li>
             <li>A laptop or PC with minimum 8GB RAM recommended</li>
-            <li>Willingness to learn and dedicate 1–2 hours daily</li>
-            <li>No prior certification required — beginner-friendly</li>
+            {% endif %}
           </ul>
         </div>
+        {% endif %}
 
         <!-- Course Description -->
         <div class="cd-section">
@@ -559,45 +579,39 @@ body { font-family: var(--font-b); background: var(--page-bg); }
           <p style="font-size:14px;color:#374151;line-height:1.75;margin-bottom:14px;">
             {{ course.description }}
           </p>
+          {% if details.syllabus %}
           <p style="font-size:14px;color:#374151;line-height:1.75;margin-bottom:14px;">
-            This course is designed and delivered by industry professionals at WebAsha Technologies with years of hands-on experience. You'll gain both theoretical knowledge and practical skills that are directly applicable in the workplace.
+            {{ details.syllabus|truncatewords:100 }}
           </p>
-          <p style="font-size:14px;color:#374151;line-height:1.75;">
-            Upon successful completion, you will receive a WebAsha certificate of completion and be prepared to sit for the official vendor certification exam.
-          </p>
+          {% endif %}
           <div class="tag-list">
-            <span class="tag">IT Training</span>
-            <span class="tag">Certification</span>
-            <span class="tag">Hands-on Labs</span>
-            <span class="tag">Career Growth</span>
-            <span class="tag">Expert Instructors</span>
+            <span class="tag">{{ details.get_level_display|default:"All Levels" }}</span>
           </div>
         </div>
 
-        <!-- Curriculum -->
+        <!-- Syllabus / Curriculum -->
+        {% if details.syllabus %}
         <div class="cd-section">
           <div class="cd-sec-title"><i class="fas fa-layer-group"></i> Course Curriculum</div>
           <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">
-            <strong style="color:var(--ink);">12 sections · 120 lectures · 40 total hours</strong>
+            <strong style="color:var(--ink);">{{ details.total_lessons }} lessons · {{ details.duration }} total hours</strong>
           </p>
-
-          {% for i in "123456"|make_list %}
+          
           <div class="curriculum-item">
             <div class="curriculum-header">
               <div class="curr-title">
-                <span class="curr-num">{{ forloop.counter }}</span>
-                Module {{ forloop.counter }}: Core Concepts & Fundamentals
+                <span class="curr-num">1</span>
+                Module 1: Introduction to {{ course.title }}
               </div>
               <div class="curr-meta">
                 <span>8 lectures</span>
                 <span>3h 20m</span>
               </div>
             </div>
-            {% if forloop.first %}
             <div class="curr-lessons">
               <div class="curr-lesson-item">
                 <i class="fas fa-play-circle"></i>
-                Introduction & Course Overview
+                Course Overview & Introduction
                 <span class="curr-lesson-dur">12:30</span>
               </div>
               <div class="curr-lesson-item">
@@ -607,23 +621,53 @@ body { font-family: var(--font-b); background: var(--page-bg); }
               </div>
               <div class="curr-lesson-item">
                 <i class="fas fa-file-alt"></i>
-                Lab Exercise 1 — Hands-on Practice
+                Lab Exercise — Hands-on Practice
                 <span class="curr-lesson-dur">30:00</span>
               </div>
             </div>
-            {% endif %}
           </div>
-          {% endfor %}
+
+          <div class="curriculum-item">
+            <div class="curriculum-header">
+              <div class="curr-title">
+                <span class="curr-num">2</span>
+                Module 2: Core Concepts & Fundamentals
+              </div>
+              <div class="curr-meta">
+                <span>6 lectures</span>
+                <span>2h 45m</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="curriculum-item">
+            <div class="curriculum-header">
+              <div class="curr-title">
+                <span class="curr-num">3</span>
+                Module 3: Advanced Topics & Best Practices
+              </div>
+              <div class="curr-meta">
+                <span>10 lectures</span>
+                <span>4h 30m</span>
+              </div>
+            </div>
+          </div>
         </div>
+        {% endif %}
 
         <!-- Instructor -->
+        {% if details.instructor %}
         <div class="cd-section">
           <div class="cd-sec-title"><i class="fas fa-chalkboard-teacher"></i> Your Instructor</div>
           <div class="instructor-card">
-            <div class="inst-avatar">W</div>
+            {% if details.instructor.image %}
+            <img src="{{ details.instructor.image.url }}" alt="{{ details.instructor.name }}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid var(--border);">
+            {% else %}
+            <div class="inst-avatar">{{ details.instructor.name|first|default:"W" }}</div>
+            {% endif %}
             <div>
-              <div class="inst-name">WebAsha Expert Team</div>
-              <div class="inst-role">Senior IT Trainer & Certification Specialist</div>
+              <div class="inst-name">{{ details.instructor.name }}</div>
+              <div class="inst-role">{{ details.instructor.designation|default:"Senior IT Trainer" }}</div>
               <div class="inst-stats">
                 <span class="inst-stat"><i class="fas fa-star"></i> 4.9 Rating</span>
                 <span class="inst-stat"><i class="fas fa-users"></i> 15,000+ Students</span>
@@ -631,11 +675,12 @@ body { font-family: var(--font-b); background: var(--page-bg); }
                 <span class="inst-stat"><i class="fas fa-award"></i> 10+ Years Exp.</span>
               </div>
               <p class="inst-bio">
-                Our team of certified professionals brings real-world expertise from top enterprise environments. We specialize in turning complex IT concepts into actionable, exam-ready knowledge.
+                {{ details.instructor.bio|default:"Expert instructor with years of industry experience in delivering high-quality IT training." }}
               </p>
             </div>
           </div>
         </div>
+        {% endif %}
 
       </div>
 
@@ -643,14 +688,18 @@ body { font-family: var(--font-b); background: var(--page-bg); }
       <div>
         <div class="cd-sticky-card">
           <div class="cd-sticky-img">
+            {% if details.thumbnail %}
+            <img src="{{ details.thumbnail.url }}" alt="{{ course.title }}">
+            {% else %}
             <img src="{{ course.image.url }}" alt="{{ course.title }}">
+            {% endif %}
           </div>
           <div class="cd-sticky-body">
             <div class="sticky-price">₹{{ course.price }}</div>
-            <div class="sticky-orig">₹{{ course.price|add:5000 }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
+            <div class="sticky-orig">₹{{ course.price|add:"5000" }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
 
             {% if user.is_authenticated %}
-            <button class="enroll-btn-sticky add-to-cart" data-course="{{ course.id }}">
+            <button class="enroll-btn-sticky add-to-cart" data-course="{{ course.id }}" data-type="0">
               <i class="fas fa-cart-plus"></i>Add to Cart
             </button>
             {% else %}
@@ -662,8 +711,8 @@ body { font-family: var(--font-b); background: var(--page-bg); }
 
             <p style="font-family:var(--font-h);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">This course includes:</p>
             <ul class="includes-list">
-              <li><i class="fas fa-video"></i> 40 hours on-demand video</li>
-              <li><i class="fas fa-file-alt"></i> 25 downloadable resources</li>
+              <li><i class="fas fa-video"></i> {{ details.duration|default:"40" }} hours on-demand video</li>
+              <li><i class="fas fa-file-alt"></i> {{ details.total_lessons|default:"25" }} downloadable resources</li>
               <li><i class="fas fa-laptop"></i> Hands-on lab exercises</li>
               <li><i class="fas fa-infinity"></i> Full lifetime access</li>
               <li><i class="fas fa-mobile-alt"></i> Access on mobile & desktop</li>
@@ -700,11 +749,11 @@ body { font-family: var(--font-b); background: var(--page-bg); }
   </div>
 </div>
 
-<!-- Mobile Enroll Bar (improved alignment) -->
+<!-- Mobile Enroll Bar -->
 <div class="mobile-enroll-bar">
   <div style="display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px;">
     <div class="mob-price">₹{{ course.price }}</div>
-    <div class="mob-original">₹{{ course.price|add:5000 }}</div>
+    <div class="mob-original">₹{{ course.price|add:"5000" }}</div>
     <div style="font-size:11px; color:#16a34a; font-weight:600;">🔥 Save ₹5000</div>
   </div>
   <button class="mob-enroll"><i class="fas fa-bolt"></i> Enroll Now</button>
@@ -712,94 +761,117 @@ body { font-family: var(--font-b); background: var(--page-bg); }
 
 <script src="{% static 'mainApp/js/cart.js' %}"></script>
 
-<!-- Enhanced JS for toast and wishlist feedback -->
 <script>
-  (function() {
-    // Helper to show toast message
-    function showMessage(text, isError = false) {
-      let toast = document.querySelector('.toast-msg');
-      if (!toast) {
+// Helper to show toast message
+function showMessage(text, isError = false) {
+    let toast = document.querySelector('.toast-msg');
+    if (!toast) {
         toast = document.createElement('div');
         toast.className = 'toast-msg';
         document.body.appendChild(toast);
-      }
-      toast.textContent = text;
-      toast.style.background = isError ? '#b91c1c' : '#1f2937';
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 2500);
     }
+    toast.textContent = text;
+    toast.style.background = isError ? '#b91c1c' : '#1f2937';
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2500);
+}
 
-    // Add to cart functionality (for .add-to-cart buttons)
-    const cartButtons = document.querySelectorAll('.add-to-cart');
-    cartButtons.forEach(btn => {
-      btn.addEventListener('click', function(e) {
+// Add to cart functionality
+const cartButtons = document.querySelectorAll('.add-to-cart');
+cartButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
         e.preventDefault();
         const courseId = this.getAttribute('data-course');
-        if (!courseId) return;
-        // Simulate cart addition (you can replace with fetch if needed)
-        // If cart.js already handles this, we avoid duplication.
-        // But to ensure feedback: call your global addToCart if exists.
-        if (typeof addToCart === 'function') {
-          addToCart(courseId);
-        } else {
-          // fallback: show message and optionally redirect
-          showMessage('✓ Added to cart!', false);
-          // Optionally update cart count if you have cart counter element
-          const cartCountElem = document.querySelector('.cart-count');
-          if (cartCountElem) {
-            let curr = parseInt(cartCountElem.innerText) || 0;
-            cartCountElem.innerText = curr + 1;
-          }
-        }
-      });
+        const courseType = this.getAttribute('data-type') || '0';
+        
+        fetch("{% url 'add_to_cart' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                course_id: courseId,
+                course_type: parseInt(courseType)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('✓ Added to cart!', false);
+                // Update cart count if element exists
+                const cartCountElem = document.querySelector('.cart-count');
+                if (cartCountElem && data.count) {
+                    cartCountElem.innerText = data.count;
+                }
+                // Optionally change button text temporarily
+                this.innerHTML = '<i class="fas fa-check"></i> Added';
+                setTimeout(() => {
+                    if(this.classList.contains('enroll-btn-lg'))
+                        this.innerHTML = '<i class="fas fa-cart-plus"></i>Add to Cart';
+                    else
+                        this.innerHTML = '<i class="fas fa-cart-plus"></i>Add to Cart';
+                }, 2000);
+            } else {
+                showMessage(data.error || 'Failed to add to cart', true);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error adding to cart', true);
+        });
     });
+});
 
-    // Wishlist buttons feedback
-    const wishlistBtns = document.querySelectorAll('.wishlist-btn, .wishlist-btn-s');
-    wishlistBtns.forEach(btn => {
-      btn.addEventListener('click', function(e) {
+// Wishlist buttons feedback
+const wishlistBtns = document.querySelectorAll('.wishlist-btn, .wishlist-btn-s');
+wishlistBtns.forEach(btn => {
+    btn.addEventListener('click', function(e) {
         e.preventDefault();
-        // You can integrate actual wishlist logic here
         showMessage('❤️ Added to wishlist', false);
         this.innerHTML = '<i class="fas fa-check"></i> Added';
         setTimeout(() => {
-          if(this.classList.contains('wishlist-btn')) 
-            this.innerHTML = '<i class="fas fa-heart"></i> Add to Wishlist';
-          else 
-            this.innerHTML = '<i class="fas fa-heart"></i> Add to Wishlist';
+            if(this.classList.contains('wishlist-btn')) 
+                this.innerHTML = '<i class="fas fa-heart"></i> Add to Wishlist';
+            else 
+                this.innerHTML = '<i class="fas fa-heart"></i> Add to Wishlist';
         }, 2000);
-      });
     });
+});
 
-    // Mobile enroll button (same as add-to-cart for demo)
-    const mobEnroll = document.querySelector('.mob-enroll');
-    if (mobEnroll) {
-      mobEnroll.addEventListener('click', function(e) {
+// Mobile enroll button
+const mobEnroll = document.querySelector('.mob-enroll');
+if (mobEnroll) {
+    mobEnroll.addEventListener('click', function(e) {
         e.preventDefault();
-        const courseIdElem = document.querySelector('.add-to-cart');
-        if (courseIdElem && courseIdElem.getAttribute('data-course')) {
-          showMessage('✓ Course added to cart!', false);
-          // update cart count if exists
-          const cartCountElem = document.querySelector('.cart-count');
-          if (cartCountElem) {
-            let curr = parseInt(cartCountElem.innerText) || 0;
-            cartCountElem.innerText = curr + 1;
-          }
+        const cartBtn = document.querySelector('.add-to-cart');
+        if (cartBtn) {
+            cartBtn.click();
         } else {
-          window.location.href = "{% url 'login' %}";
+            window.location.href = "{% url 'login' %}";
         }
-      });
-    }
+    });
+}
 
-    // Preview play button simple alert (demo)
-    const previewBtn = document.querySelector('.preview-play-btn');
-    if (previewBtn) {
-      previewBtn.addEventListener('click', () => {
+// Preview play button
+const previewBtn = document.querySelector('.preview-play-btn');
+if (previewBtn) {
+    previewBtn.addEventListener('click', () => {
         showMessage('🎬 Course preview coming soon!', false);
-      });
-    }
-  })();
+    });
+}
+
+// Curriculum toggle functionality
+document.querySelectorAll('.curriculum-header').forEach(header => {
+    header.addEventListener('click', function() {
+        const lessons = this.nextElementSibling;
+        if (lessons && lessons.classList.contains('curr-lessons')) {
+            lessons.style.display = lessons.style.display === 'none' ? 'block' : 'none';
+        }
+    });
+});
 </script>
+
 {% endblock body %}
