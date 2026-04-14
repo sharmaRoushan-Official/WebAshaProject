@@ -5,8 +5,6 @@ from django.utils import timezone
 import random
 import string
 
-# Create your models here.
-
 class Course(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=300)
@@ -17,7 +15,30 @@ class Course(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title 
+        return self.title
+
+    @property
+    def details(self):
+        return self.coursedetails if hasattr(self, 'coursedetails') else None
+
+
+class CourseDetails(models.Model):
+    course = models.OneToOneField(Course, on_delete=models.CASCADE, related_name='details')
+    instructor = models.ForeignKey('TeamMember', on_delete=models.SET_NULL, null=True, blank=True, related_name='taught_courses')
+    duration = models.CharField(max_length=50, default="40 hours")
+    level = models.CharField(
+        max_length=20,
+        choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced')],
+        default='beginner'
+    )
+    prerequisites = models.TextField(blank=True, default='')
+    objectives = models.TextField(blank=True, default='')
+    syllabus = models.TextField(blank=True, default='')
+    thumbnail = models.ImageField(upload_to='course_details_thumbs/', blank=True, null=True)
+    total_lessons = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"Details for {self.course.title}"
 
 class Profile(models.Model):
     first_name = models.CharField(max_length=50, blank=True)

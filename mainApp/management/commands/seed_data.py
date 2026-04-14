@@ -28,6 +28,14 @@ class Command(BaseCommand):
             call_command('loaddata', 'courses', verbosity=0)
         else:
             self.stdout.write(self.style.WARNING('- Enough courses exist, skipping'))
+
+        # CourseDetails: seed if 0
+        from mainApp.models import CourseDetails
+        if CourseDetails.objects.count() == 0:
+            self.stdout.write(self.style.SUCCESS('- Loading course details'))
+            call_command('loaddata', 'course_details', verbosity=0)
+        else:
+            self.stdout.write(self.style.WARNING('- Course details exist, skipping'))
         
         # Profiles: seed if < 3
         if Profile.objects.count() < 3:
