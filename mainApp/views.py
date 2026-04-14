@@ -1241,3 +1241,18 @@ def course_detail(request, course_id):
         'cart_count': get_cart_count(request)
     }
     return render(request, "mainApp/Coursedetail.html", context)
+
+def certificationsPage(request):
+    # Get active live courses and regular courses
+    live_courses = LiveCourse.objects.filter(is_active=True)
+    courses = Course.objects.filter(is_active=True).order_by('course_number')
+    
+    context = {
+        'live_courses': live_courses,
+        'course': courses,  # This matches the variable name used in the template
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+        'cart_count': get_cart_count(request)
+    }
+    return render(request, "mainApp/certifications.html", context)

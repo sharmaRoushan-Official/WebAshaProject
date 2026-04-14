@@ -5,191 +5,76 @@
 
 {% block body %}
 <!-- Blog Start -->
-<div class="container-fluid blog pb-5">
+<div class="container-fluid blog pt-5 pb-5">
     <div class="container pb-5">
-        <div class="pb-5">
-<h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Top Certifications</h4>
+        <div class="pt-4 pt-md-5 pt-lg-5 pb-5">
+            <h4 class="text-secondary sub-title fw-bold wow fadeInUp" data-wow-delay="0.1s">Top Certifications</h4>
             <h1 class="display-2 mb-4 wow fadeInUp" data-wow-delay="0.3s">Industry-Leading IT Certifications</h1>
             <p class="lead text-muted mb-5 wow fadeInUp" data-wow-delay="0.5s">Earn globally recognized certifications in Cloud, Cybersecurity, DevOps, Networking, and more. Hands-on labs, expert trainers, exam success guarantee.</p>
         </div>
-        <div class="row mb-4 g-2 justify-content-center">
-            <div class="col-auto">
-                <button class="btn btn-primary rounded-pill px-4 py-2 fs-6 filter-btn active" data-filter="all" style="min-width: 140px;"><i class="fas fa-th-large me-1"></i>All</button>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="cloud" style="min-width: 140px;">Cloud</button>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="cyber" style="min-width: 140px;">Cyber</button>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="network" style="min-width: 140px;">Network</button>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="devops" style="min-width: 140px;">DevOps</button>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-outline-primary rounded-pill px-4 py-2 fs-6 filter-btn" data-filter="red-hat" style="min-width: 140px;">Red Hat</button>
-            </div>
-        </div>
+        
 
         {% load static %}
-<div class="row g-4">
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="cloud">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">AWS Solutions Architect</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★☆</span>
-                    <span class="text-muted small ms-1">(4.7)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>50 hours</small>
-                <small class="text-muted mb-3 d-block">AWS Expert</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹22,999</div>
-<a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
+        <div class="row g-4" id="certificationsGrid">
+            <!-- 4 courses from LIVE COURSES (top live batches) -->
+            {% for course in live_courses|slice:":4" %}
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm course-item" data-category="{{ course.category|default:'devops' }}">
+                    <!-- Course Image -->
+                    {% if course.image %}
+                    <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover; border-radius: 12px 12px 0 0;">
+                    {% else %}
+                    <img src="{% static 'mainApp/img/course-placeholder.jpg' %}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover; border-radius: 12px 12px 0 0;">
+                    {% endif %}
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title fw-bold text-dark mb-0">{{ course.title|truncatechars:35 }}</h6>
+                            {% if course.is_live %}
+                                <span class="badge bg-danger rounded-pill px-2 py-1 fs-10">LIVE</span>
+                            {% endif %}
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="text-warning small">★★★★★</span>
+                            <span class="text-muted small ms-1">(4.8)</span>
+                        </div>
+                        <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>{{ course.start_day|default:"Flexible" }} at {{ course.start_time|default:"Flexible" }}</small>
+                        <small class="text-muted mb-3 d-block"><i class="fas fa-chalkboard-teacher text-danger me-1"></i>Live Instructor</small>
+                        <div class="mt-auto">
+                            <div class="h6 fw-bold text-danger mb-3">₹{{ course.price|default:"19,999" }}</div>
+                            <a href="{% url 'join_live' course.id %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
+            {% endfor %}
 
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="cloud">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">Azure AZ-104 Administrator</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★★</span>
-                    <span class="text-muted small ms-1">(4.8)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>48 hours</small>
-                <small class="text-muted mb-3 d-block">Microsoft Certified Trainer</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹19,999</div>
-                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="cyber">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">OSCP Offensive Security</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★★</span>
-                    <span class="text-muted small ms-1">(4.9)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>60 hours</small>
-                <small class="text-muted mb-3 d-block">OffSec Certified</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹34,999</div>
-                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
+            <!-- 4 courses from COURSES file (regular courses) -->
+            {% for c in course|slice:":4" %}
+            <div class="col-lg-3 col-md-6">
+                <div class="card h-100 border-0 shadow-sm course-item" data-category="{{ c.category|default:'cloud' }}">
+                    <!-- Course Image -->
+                    {% if c.image %}
+                    <img src="{{ c.image.url }}" class="card-img-top" alt="{{ c.title }}" style="height: 200px; object-fit: cover; border-radius: 12px 12px 0 0;">
+                    {% else %}
+                    <img src="{% static 'mainApp/img/course-placeholder.jpg' %}" class="card-img-top" alt="{{ c.title }}" style="height: 200px; object-fit: cover; border-radius: 12px 12px 0 0;">
+                    {% endif %}
+                    <div class="card-body p-4 d-flex flex-column">
+                        <h6 class="card-title fw-bold text-dark mb-2">{{ c.title|truncatechars:35 }}</h6>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="text-warning small">★★★★★</span>
+                            <span class="text-muted small ms-1">(4.9)</span>
+                        </div>
+                        <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>Self-paced</small>
+                        <small class="text-muted mb-3 d-block"><i class="fas fa-certificate text-danger me-1"></i>Certification Ready</small>
+                        <div class="mt-auto">
+                            <div class="h6 fw-bold text-danger mb-3">₹{{ c.price|default:"14,999" }}</div>
+                            <a href="{% url 'courseDetail' c.id %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
+                        </div>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="devops">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">PMP Project Management</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★☆</span>
-                    <span class="text-muted small ms-1">(4.7)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>35 hours</small>
-                <small class="text-muted mb-3 d-block">PMI Authorized Trainer</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹16,999</div>
-                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="devops">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">Terraform DevOps Automation</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★☆</span>
-                    <span class="text-muted small ms-1">(4.8)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>28 hours</small>
-                <small class="text-muted mb-3 d-block">HashiCorp Expert</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹17,999</div>
-                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="cyber">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">CEH v12 Ethical Hacking</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★★</span>
-                    <span class="text-muted small ms-1">(4.9)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>45 hours</small>
-                <small class="text-muted mb-3 d-block">EC-Council Trainer</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹24,999</div>
-                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="network">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">CCNA Cisco Networking</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★☆</span>
-                    <span class="text-muted small ms-1">(4.7)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>35 hours</small>
-                <small class="text-muted mb-3 d-block">Cisco CCIE</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹12,999</div>
-                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="devops">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">CKA Kubernetes</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★☆</span>
-                    <span class="text-muted small ms-1">(4.7)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>30 hours</small>
-                <small class="text-muted mb-3 d-block">DevOps Expert</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹18,999</div>
-                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm course-item" data-category="red-hat">
-            <div class="card-body p-4 d-flex flex-column">
-                <h6 class="card-title fw-bold text-dark mb-2">Red Hat RHCSA</h6>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="text-warning small">★★★★☆</span>
-                    <span class="text-muted small ms-1">(4.6)</span>
-                </div>
-                <small class="text-muted mb-2 d-block"><i class="fas fa-clock text-danger me-1"></i>40 hours</small>
-                <small class="text-muted mb-3 d-block">Red Hat Expert</small>
-                <div class="mt-auto">
-                    <div class="h6 fw-bold text-danger mb-3">₹14,999</div>
-                    <a href="{% url 'contact' %}" class="btn btn-danger w-100 rounded-pill py-2">Enroll Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
         <!-- CTA Section -->
         <div class="text-center mt-5 pt-5 border-top">
@@ -200,10 +85,26 @@
     </div>
 </div>
 <!-- Blog End -->
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const courses = document.querySelectorAll('.course-item');
+    
+    // Get category from each course
+    courses.forEach(course => {
+        let category = course.getAttribute('data-category');
+        if (!category || category === '') {
+            const title = course.querySelector('.card-title')?.innerText.toLowerCase() || '';
+            if (title.includes('aws') || title.includes('azure') || title.includes('cloud')) category = 'cloud';
+            else if (title.includes('security') || title.includes('cyber') || title.includes('ethical')) category = 'cyber';
+            else if (title.includes('network') || title.includes('ccna')) category = 'network';
+            else if (title.includes('devops') || title.includes('kubernetes') || title.includes('terraform')) category = 'devops';
+            else if (title.includes('linux') || title.includes('red hat')) category = 'linux';
+            else category = 'cloud';
+            course.setAttribute('data-category', category);
+        }
+    });
     
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -216,10 +117,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             courses.forEach(course => {
                 const col = course.closest('.col-lg-3, .col-md-6');
-                if (filter === 'all' || course.dataset.category === filter) {
-                    col.classList.remove('d-none');
-                } else {
-                    col.classList.add('d-none');
+                if (col) {
+                    if (filter === 'all' || course.dataset.category === filter) {
+                        col.classList.remove('d-none');
+                    } else {
+                        col.classList.add('d-none');
+                    }
                 }
             });
         });
@@ -233,12 +136,25 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .course-item {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    border-radius: 12px;
 }
 .course-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
 }
+.fs-10 {
+    font-size: 10px;
+}
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+.card-img-top {
+    transition: transform 0.5s ease;
+}
+.course-item:hover .card-img-top {
+    transform: scale(1.05);
+}
 </style>
 
 {% endblock body %}
-
