@@ -211,6 +211,25 @@ body { font-family: var(--font-b); }
   font-size: 14px; font-weight: 700; cursor: pointer;
   letter-spacing: 0.05em; transition: all 0.2s;
 }
+
+/* Smooth search transitions */
+.course-card {
+  transition: opacity 0.2s ease, transform 0.2s ease, transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+.course-card[style*="display: none"] {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* Search focus glow */
+#crs-search:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-glow);
+}
+#courseSearch:focus-within {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-glow);
+}
 .load-more-btn:hover {
   background: var(--ink); color: #fff;
   transform: translateY(-2px);
@@ -229,9 +248,9 @@ body { font-family: var(--font-b); }
     <p class="hero-sub">Professional IT Training</p>
     <h1>Our <span>WebAsha</span> Courses</h1>
     <p class="lead-txt">Expert-led certification programs in Cybersecurity, Cloud, DevOps, AI and more. Learn, certify, get hired.</p>
-    <div class="crs-search">
-      <input type="search" placeholder="Search Python, AWS, Cyber Security…">
-      <button><i class="fas fa-search"></i></button>
+    <div class="crs-search" id="courseSearch">
+      <input type="search" id="searchInput" placeholder="Search Python, AWS, Cyber Security…">
+      <button id="searchBtn"><i class="fas fa-search"></i></button>
     </div>
     <div class="hero-stats">
       <div><div class="hs-num">120+</div><div class="hs-lbl">Courses</div></div>
@@ -250,7 +269,7 @@ body { font-family: var(--font-b); }
   <div class="container">
     <div class="grid-header">
       <h4>All Courses
-        <span style="color:var(--muted);font-weight:400;font-size:14px;margin-left:8px;">
+        <span id="resultsCount" style="color:var(--muted);font-weight:400;font-size:14px;margin-left:8px;">
           {{ course|length }} result{{ course|length|pluralize }}
         </span>
       </h4>
@@ -265,7 +284,7 @@ body { font-family: var(--font-b); }
     <div class="row g-4 grid-wrap">
       {% for c in course %}
       <div class="col-sm-6 col-lg-4">
-        <div class="course-card">
+    <div class="course-card" data-course-title="{{ c.title|lower }}">
           <div class="cc-img-wrap">
             <img src="{{ c.image.url }}" alt="{{ c.title }}">
             <div class="cc-num">{{ c.course_number }}</div>
@@ -292,9 +311,9 @@ body { font-family: var(--font-b); }
       </div>
       {% empty %}
       <div class="col-12">
-        <div class="empty-state">
-          <i class="fas fa-book-open"></i>
-          No courses available at the moment. Check back soon!
+        <div class="empty-state" id="emptySearchState" style="display: none;">
+          <i class="fas fa-search"></i>
+          <p>No courses match "<span id="searchTerm"></span>". Try different keywords.</p>
         </div>
       </div>
       {% endfor %}
@@ -309,5 +328,61 @@ body { font-family: var(--font-b); }
     {% endif %}
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const resultsCount = document.getElementById('resultsCount');
+  const courseCards = document.querySelectorAll('.course-card[data-course-title]');
+  const emptyState = document.getElementById('emptySearchState');
+  const searchTermSpan = document.getElementById('searchTerm');
+
+  function performSearch() {
+    const term = searchInput.value.trim().toLowerCase();
+    let visibleCount = 0;
+
+    courseCards.forEach(card => {
+      const title = card.dataset.courseTitle || '';
+      if (term === '' || title.includes(term)) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Update results count
+    if (term === '') {
+      resultsCount.innerHTML = '{{ course|length }} result{{ course|length|pluralize }}';
+    } else {
+      resultsCount.textContent = `${visibleCount} result${visibleCount !== 1 ? 's' : ''}`;
+    }
+
+    // Show/hide empty state
+    if (term && visibleCount === 0) {
+      if (searchTermSpan) searchTermSpan.textContent = searchInput.value;
+      if (emptyState) emptyState.style.display = 'block';
+    } else {
+      if (emptyState) emptyState.style.display = 'none';
+    }
+  }
+
+  // Search on input
+  if (searchInput) searchInput.addEventListener('input', performSearch);
+  if (searchBtn) searchBtn.addEventListener('click', performSearch);
+
+  // Clear on Escape
+  if (searchInput) {
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        searchInput.value = '';
+        performSearch();
+        searchInput.focus();
+      }
+    });
+  }
+});
+</script>
 
 {% endblock body %}
