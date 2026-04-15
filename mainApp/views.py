@@ -1229,11 +1229,12 @@ def login_success(request):
 
 # Course Detail View
 def course_detail(request, course_id):
-    course = get_object_or_404(Course, id=course_id, is_active=True)
+    course = get_object_or_404(Course.objects.prefetch_related('details'), id=course_id, is_active=True)
     related_courses = Course.objects.filter(is_active=True).exclude(id=course_id)[:4]
     
     context = {
         "course": course,
+        "details": course.details,  # CourseDetails object or None
         "related_courses": related_courses,
         'login_form': LoginForm(),
         'register_form': RegisterForm(),
