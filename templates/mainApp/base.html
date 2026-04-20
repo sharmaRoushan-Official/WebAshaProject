@@ -78,7 +78,7 @@
     <!-- Spinner End -->
 
     <!-- Topbar Start -->
-    <div class="container-fluid bg-danger px-5 d-none d-lg-block">
+class="container-fluid bg-gradient bg-primary px-5 d-none d-lg-block"
         <div class="row gx-0 align-items-center" style="height: 45px;">
             <div class="col-lg-8 text-center text-lg-start mb-lg-0">
                 <div class="d-flex flex-wrap">
@@ -107,85 +107,77 @@
     </div>
     <!-- Topbar End -->
 
-    <!-- Navbar & Hero Start -->
-    <div class="container-fluid position-relative p-0">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white px-4 px-lg-5 py-2 py-lg-1">
-            <a href="{% url 'home' %}" class="navbar-brand p-0">
-                <img src="{% static 'mainApp/img/logo.png' %}" alt="Logo" style="height: 45px; vertical-align: middle;">
+<!-- Simple Navbar Start -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top shadow-sm">
+        <div class="container px-3 px-lg-5">
+            <!-- Logo/Brand (placeholder icon since no image) -->
+            <a class="navbar-brand fw-bold fs-4" href="{% url 'home' %}">
+                <i class="fas fa-graduation-cap me-2 text-primary"></i>WebAsha
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                <span class="fa fa-bars"></span>
+            
+            <!-- Toggler -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <div class="navbar-nav ms-auto py-0">
-                    <a href="{% url 'home' %}" class="nav-item nav-link">Home</a>
-                    <a href="{% url 'about' %}" class="nav-item nav-link">About</a>
-                    <a href="{% url 'events' %}" class="nav-item nav-link">Courses</a>
-                    <a href="{% url 'certifications' %}" class="nav-item nav-link">Top Certifications</a>
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
-                        <div class="dropdown-menu m-0">
-                            <a href="{% url 'classes' %}" class="dropdown-item">Our classes</a>
-                            <a href="{% url 'ourCourses' %}" class="dropdown-item">Our Courses</a>
-                            <a href="{% url 'team' %}" class="dropdown-item">Our Team</a>
-                            <a href="{% url 'testimonial' %}" class="dropdown-item">Testimonial</a>
-                            <a href="{% url 'gallery' %}" class="dropdown-item">Gallery</a>
-                        </div>
-                    </div>
-                    <a href="{% url 'contact' %}" class="nav-item nav-link">Contact Us</a>
-                </div>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Main links (centered) -->
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'events' %}">Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'certifications' %}">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#">Contact</a>
+                    </li>
+                </ul>
                 
-                <!-- Right side icons and user menu -->
-                <div class="d-flex align-items-center ms-lg-3">
+                <!-- Right side: Cart/User/Register (preserved) -->
+                <div class="d-flex align-items-center">
                     {% if user.is_authenticated %}
-                    <!-- Cart Icon with Badge -->
-                    <a href="{% url 'cart' %}" class="nav-link position-relative me-2 p-2" style="display: inline-flex; align-items: center;">
+                    <a href="{% url 'cart' %}" class="nav-link position-relative me-3 p-2" title="Cart">
                         <i class="fas fa-shopping-cart fs-5"></i>
                         {% if cart_count > 0 %}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge" style="font-size: 0.65rem; margin-top: -3px; padding: 0.25rem 0.5rem;">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: .75rem;">
                             {{ cart_count }}
-                            <span class="visually-hidden">cart items</span>
                         </span>
                         {% endif %}
                     </a>
                     
-                    <!-- User Dropdown -->
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown" style="padding: 0.5rem 0.5rem;">
+                    <div class="dropdown">
+                        <a class="dropdown-toggle d-flex align-items-center text-decoration-none" href="#" role="button" data-bs-toggle="dropdown">
                             {% if user.profile.profile_image %}
-                                <img src="{{ user.profile.profile_image.url }}" alt="Profile" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                <img src="{{ user.profile.profile_image.url }}" class="rounded-circle" style="width: 32px; height: 32px;" alt="{{ user.profile.first_name }}">
                             {% else %}
-                                <i class="fas fa-user-circle text-primary fs-4 me-1"></i>
+                                <i class="fas fa-user-circle fs-4"></i>
                             {% endif %}
-                            <span class="d-none d-lg-inline">{{ user.profile.first_name|truncatechars:12 }}</span>
+                            <span class="d-none d-sm-inline ms-1">{{ user.profile.first_name }}</span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end m-0 shadow-sm border-0" style="border-radius: 10px; margin-top: 8px;">
-                            <a href="{% url 'profile' %}" class="dropdown-item py-2">
-                                <i class="fas fa-user me-2"></i>View Profile
-                            </a>
-                            <a href="#" class="dropdown-item py-2" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
-                                <i class="fas fa-key me-2"></i>Change Password
-                            </a>
-                            <a href="{% url 'my_courses' %}" class="dropdown-item py-2">
-                                <i class="fas fa-graduation-cap me-2"></i>My Courses
-                            </a>
-                            <a href="{% url 'my_live_courses' %}" class="dropdown-item py-2">
-                                <i class="fas fa-chalkboard-teacher me-2"></i>My Live Courses
-                            </a>
-                            <div class="dropdown-divider my-1"></div>
-                            <a href="{% url 'logout' %}" class="dropdown-item py-2 text-danger">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a>
-                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal"><i class="fas fa-key me-2"></i>Password</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
                     </div>
                     {% else %}
-                    <a href="#" class="btn btn-primary rounded-pill text-white py-2 px-4" data-bs-toggle="modal" data-bs-target="#authModal" style="white-space: nowrap;">
-                        Register Now
+                    <a class="btn btn-outline-primary btn-sm ms-2" href="#" data-bs-toggle="modal" data-bs-target="#authModal">
+                        Sign In
                     </a>
                     {% endif %}
                 </div>
             </div>
-        </nav>
+        </div>
+    </nav>
+    <!-- Simple Navbar End -->
         
         <!-- Auth Modal - With Forgot Password -->
         <div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
