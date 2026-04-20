@@ -4,6 +4,7 @@ from django.core.validators import RegexValidator
 from django.utils import timezone
 import random
 import string
+import re
 
 class Course(models.Model):
     title = models.CharField(max_length=200)
@@ -20,6 +21,18 @@ class Course(models.Model):
     @property
     def details(self):
         return self.coursedetails if hasattr(self, 'coursedetails') else None
+    
+    @property
+    def total_lectures(self):
+        """Calculate total number of lectures across all chapters"""
+        return sum(chapter.lectures.count() for chapter in self.chapters.all())
+    
+    @property
+    def total_duration(self):
+        """Calculate total duration of all lectures"""
+        total_minutes = sum(lecture.duration_minutes for chapter in self.chapters.all() 
+                           for lecture in chapter.lectures.all() if lecture.duration_minutes)
+        return total_minutes
 
 
 class CourseDetails(models.Model):
@@ -39,6 +52,7 @@ class CourseDetails(models.Model):
 
     def __str__(self):
         return f"Details for {self.course.title}"
+
 
 class Profile(models.Model):
     first_name = models.CharField(max_length=50, blank=True)
@@ -68,9 +82,294 @@ class Profile(models.Model):
     @property
     def purchased_courses(self):
         return [t.course for t in self.coursetransactions.filter(status='completed').all()]
+    
+    @property
+    def enrolled_courses(self):
+        """Get all courses the user has access to"""
+        return [access.course for access in self.course_access.filter(is_active=True) if access.has_access()]
+    
+    @property
+    def course_progress(self):
+        """Get progress for all enrolled courses"""
+        return {access.course.id: access.completion_percentage for access in self.course_access.all()}
 
     def __str__(self):
         return f"{self.user.username} ({self.first_name} {self.last_name})"
+
+
+class Chapter(models.Model):
+    """Chapter/Section model for organizing course content"""
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='chapters')
+    title = models.CharField(max_length=200, help_text="Chapter title (e.g., 'Introduction to Python')")
+    description = models.TextField(blank=True, help_text="Brief description of what this chapter covers")
+    order = models.PositiveIntegerField(default=0, help_text="Order of chapter in the course")
+    is_preview = models.BooleanField(default=False, help_text="Allow non-purchased users to preview first lecture")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        unique_together = ['course', 'order']  # Prevent duplicate order numbers for same course
+
+    def __str__(self):
+        return f"{self.course.title} - Chapter {self.order}: {self.title}"
+    
+    @property
+    def lecture_count(self):
+        return self.lectures.count()
+    
+    @property
+    def total_duration(self):
+        return sum(lecture.duration_minutes for lecture in self.lectures.all() if lecture.duration_minutes)
+
+
+class Lecture(models.Model):
+    """Individual lecture/video within a chapter"""
+    LECTURE_TYPES = [
+        ('video', 'Video'),
+        ('article', 'Article'),
+        ('quiz', 'Quiz'),
+        ('assignment', 'Assignment'),
+        ('resource', 'Resource'),
+    ]
+    
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name='lectures')
+    title = models.CharField(max_length=200, help_text="Lecture title (e.g., 'Installing Python')")
+    lecture_type = models.CharField(max_length=20, choices=LECTURE_TYPES, default='video')
+    
+    # Video/Content Links
+    video_url = models.URLField(blank=True, null=True, help_text="YouTube/Vimeo/Streaming URL")
+    video_embed_code = models.TextField(blank=True, null=True, help_text="Embed code for self-hosted videos")
+    resource_file = models.FileField(upload_to='course_resources/', blank=True, null=True, help_text="PDF, PPT, or other resources")
+    
+    # Content fields for articles/quizzes
+    content = models.TextField(blank=True, null=True, help_text="Text content for articles or lecture notes")
+    
+    # Lecture metadata
+    duration_minutes = models.PositiveIntegerField(default=0, help_text="Duration in minutes")
+    order = models.PositiveIntegerField(default=0, help_text="Order of lecture within chapter")
+    is_free_preview = models.BooleanField(default=False, help_text="Allow non-purchased users to preview this lecture")
+    is_downloadable = models.BooleanField(default=False, help_text="Allow users to download resources")
+    
+    # Quiz/Assignment specific
+    passing_score = models.PositiveIntegerField(default=0, help_text="Passing score percentage for quizzes")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        unique_together = ['chapter', 'order']
+
+    def __str__(self):
+        return f"{self.chapter.title} - {self.title}"
+    
+    def get_youtube_embed_url(self):
+        """Convert YouTube URL to embed URL - handles all YouTube URL formats"""
+        if not self.video_url:
+            return ""
+        
+        url = self.video_url.strip()
+        video_id = None
+        
+        # Pattern for youtu.be format (shortened URLs)
+        youtu_be_pattern = r'youtu\.be/([a-zA-Z0-9_-]+)'
+        match = re.search(youtu_be_pattern, url)
+        if match:
+            video_id = match.group(1)
+        
+        # Pattern for youtube.com/watch?v= format
+        if not video_id:
+            youtube_watch_pattern = r'youtube\.com/watch\?v=([a-zA-Z0-9_-]+)'
+            match = re.search(youtube_watch_pattern, url)
+            if match:
+                video_id = match.group(1)
+        
+        # Pattern for youtube.com/embed/ format
+        if not video_id:
+            youtube_embed_pattern = r'youtube\.com/embed/([a-zA-Z0-9_-]+)'
+            match = re.search(youtube_embed_pattern, url)
+            if match:
+                video_id = match.group(1)
+        
+        # Pattern for youtube.com/shorts/ format
+        if not video_id:
+            youtube_shorts_pattern = r'youtube\.com/shorts/([a-zA-Z0-9_-]+)'
+            match = re.search(youtube_shorts_pattern, url)
+            if match:
+                video_id = match.group(1)
+        
+        if video_id:
+            return f"https://www.youtube.com/embed/{video_id}?rel=0&modestbranding=1&autoplay=0&enablejsapi=1"
+        
+        # If no pattern matched, return original URL
+        return url
+    
+    def get_vimeo_embed_url(self):
+        """Convert Vimeo URL to embed URL"""
+        if not self.video_url:
+            return ""
+        match = re.search(r'https://vimeo\.com/(\d+)', self.video_url)
+        if match:
+            video_id = match.group(1)
+            return f"https://player.vimeo.com/video/{video_id}?rel=0"
+        return self.video_url
+    
+    def get_video_embed_url(self):
+        """Get embed URL for YouTube or Vimeo, fallback to original"""
+        if not self.video_url:
+            return ""
+        
+        video_url_lower = self.video_url.lower()
+        
+        # Check for YouTube URLs (all formats)
+        if 'youtube.com' in video_url_lower or 'youtu.be' in video_url_lower:
+            return self.get_youtube_embed_url()
+        # Check for Vimeo URLs
+        elif 'vimeo.com' in video_url_lower:
+            return self.get_vimeo_embed_url()
+        
+        # Return original URL for other platforms
+        return self.video_url
+    
+    @property
+    def has_content(self):
+        """Check if lecture has any content"""
+        return bool(self.video_url or self.video_embed_code or self.resource_file or self.content)
+    
+    @property
+    def duration_display(self):
+        """Return duration in HH:MM:SS format"""
+        hours = self.duration_minutes // 60
+        minutes = self.duration_minutes % 60
+        if hours > 0:
+            return f"{hours}h {minutes}m"
+        return f"{minutes}m"
+
+
+class UserCourseAccess(models.Model):
+    """Track which courses a user has purchased and their access rights"""
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='course_access')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='user_access')
+    transaction = models.ForeignKey('CourseTransaction', on_delete=models.CASCADE, related_name='access_records', null=True, blank=True)
+    
+    # Access tracking
+    is_active = models.BooleanField(default=True)
+    access_granted_at = models.DateTimeField(auto_now_add=True)
+    access_expires_at = models.DateTimeField(null=True, blank=True, help_text="For subscription-based access")
+    
+    # Progress tracking
+    last_accessed = models.DateTimeField(null=True, blank=True)
+    completed_lectures = models.ManyToManyField(Lecture, blank=True, related_name='completed_by_users')
+    completion_percentage = models.FloatField(default=0.0)
+    is_completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        unique_together = ['user', 'course']
+        ordering = ['-access_granted_at']
+    
+    def __str__(self):
+        return f"{self.user.user.username} - {self.course.title} (Access: {self.is_active})"
+    
+    def update_completion_percentage(self):
+        """Calculate and update course completion percentage"""
+        total_lectures = self.course.total_lectures
+        if total_lectures == 0:
+            return 0
+        
+        completed_count = self.completed_lectures.count()
+        percentage = (completed_count / total_lectures) * 100
+        self.completion_percentage = round(percentage, 2)
+        
+        if percentage >= 99.9 and not self.is_completed:
+            self.is_completed = True
+            self.completed_at = timezone.now()
+        
+        self.save()
+        return self.completion_percentage
+    
+    def has_access(self):
+        """Check if user currently has access to the course"""
+        if not self.is_active:
+            return False
+        if self.access_expires_at and self.access_expires_at < timezone.now():
+            return False
+        return True
+    
+    def is_lecture_completed(self, lecture):
+        """Check if a specific lecture is completed by the user"""
+        return self.completed_lectures.filter(id=lecture.id).exists()
+    
+    def mark_lecture_completed(self, lecture):
+        """Mark a lecture as completed"""
+        if not self.is_lecture_completed(lecture):
+            self.completed_lectures.add(lecture)
+            self.last_accessed = timezone.now()
+            self.save()
+            self.update_completion_percentage()
+            return True
+        return False
+
+
+class LectureProgress(models.Model):
+    """Track detailed progress for each lecture"""
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='lecture_progress')
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE, related_name='user_progress')
+    course_access = models.ForeignKey(UserCourseAccess, on_delete=models.CASCADE, related_name='lecture_progress_records')
+    
+    # Progress tracking
+    is_completed = models.BooleanField(default=False)
+    watch_time_seconds = models.PositiveIntegerField(default=0, help_text="Total watch time in seconds")
+    last_watch_position = models.PositiveIntegerField(default=0, help_text="Last watched position in seconds")
+    completed_at = models.DateTimeField(null=True, blank=True)
+    
+    # Quiz/Assignment results
+    quiz_score = models.PositiveIntegerField(null=True, blank=True)
+    quiz_attempts = models.PositiveIntegerField(default=0)
+    is_passed = models.BooleanField(default=False)
+    
+    # Notes
+    user_notes = models.TextField(blank=True, help_text="User's personal notes for this lecture")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['user', 'lecture']
+        ordering = ['-updated_at']
+    
+    def __str__(self):
+        status = "✓" if self.is_completed else "○"
+        return f"{status} {self.user.user.username} - {self.lecture.title}"
+    
+    def mark_completed(self):
+        """Mark lecture as completed"""
+        if not self.is_completed:
+            self.is_completed = True
+            self.completed_at = timezone.now()
+            self.save()
+            
+            # Update the course access's completed lectures
+            course_access = self.course_access
+            if not course_access.is_lecture_completed(self.lecture):
+                course_access.completed_lectures.add(self.lecture)
+                course_access.update_completion_percentage()
+            return True
+        return False
+    
+    def update_watch_time(self, seconds_watched, current_position):
+        """Update watch time progress"""
+        self.watch_time_seconds = min(self.watch_time_seconds + seconds_watched, self.lecture.duration_minutes * 60)
+        self.last_watch_position = current_position
+        self.save()
+        
+        # Auto-mark as completed if watched 90% or more
+        if self.lecture.duration_minutes > 0:
+            total_seconds = self.lecture.duration_minutes * 60
+            if self.watch_time_seconds >= total_seconds * 0.9 and not self.is_completed:
+                self.mark_completed()
+
 
 class PasswordResetOTP(models.Model):
     """
@@ -123,7 +422,8 @@ class PasswordResetOTP(models.Model):
             is_used=False
         )
         return otp_obj, otp_code
-    
+
+
 class CourseTransaction(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -150,11 +450,28 @@ class CourseTransaction(models.Model):
     is_active = models.BooleanField(default=True)
     course_type = models.IntegerField(default=0, choices=[(0, 'Normal'), (1, 'Live')])
 
+    def save(self, *args, **kwargs):
+        """Override save to create UserCourseAccess when transaction is completed"""
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        # If transaction status changed to 'completed', grant access
+        if self.status == 'completed':
+            access, created = UserCourseAccess.objects.get_or_create(
+                user=self.user,
+                course=self.course,
+                defaults={'transaction': self}
+            )
+            if not created and access.transaction is None:
+                access.transaction = self
+                access.save()
+
     def __str__(self):
         return f"{self.user.user.username} bought {self.course.title} - {self.status} (₹{self.amount})"
 
     class Meta:
         ordering = ['-purchase_date']
+
 
 # OurTeam 
 class TeamMember(models.Model):
@@ -177,6 +494,7 @@ class TeamMember(models.Model):
 
     class Meta:
         ordering = ['order']
+
 
 # Live Batches 
 class LiveCourse(models.Model):
@@ -207,6 +525,7 @@ class LiveCourse(models.Model):
     def __str__(self):
         return self.title
 
+
 class Contact(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -221,9 +540,10 @@ class Contact(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+
 class LiveCourseRegistration(models.Model):
-    profile = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='live_registrations')
-    live_course = models.ForeignKey('LiveCourse', on_delete=models.CASCADE, related_name='registrations')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='live_registrations')
+    live_course = models.ForeignKey(LiveCourse, on_delete=models.CASCADE, related_name='registrations')
     batch_timing = models.CharField(
         max_length=10, 
         choices=[('weekdays', 'Weekdays'), ('weekends', 'Weekends')],
@@ -242,6 +562,7 @@ class LiveCourseRegistration(models.Model):
     class Meta:
         unique_together = ['profile', 'live_course']
 
+
 class LiveCourseTransaction(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -256,8 +577,8 @@ class LiveCourseTransaction(models.Model):
         ('card', 'Credit/Debit Card'),
     ]
 
-    profile = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='live_transactions')
-    live_course = models.ForeignKey('LiveCourse', on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='live_transactions')
+    live_course = models.ForeignKey(LiveCourse, on_delete=models.CASCADE)
     transaction_id = models.CharField(max_length=100, unique=True)
     base_amount = models.DecimalField(max_digits=10, decimal_places=2)
     gst_amount = models.DecimalField(max_digits=10, decimal_places=2)

@@ -9,7 +9,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 from django.shortcuts import get_object_or_404
 import json
 import logging
-from .models import Course, Profile, TeamMember, CourseTransaction, LiveCourse, LiveCourseTransaction, LiveCourseRegistration
+from .models import Course, Profile, TeamMember, CourseTransaction, LiveCourse, LiveCourseTransaction, LiveCourseRegistration, Chapter, Lecture, UserCourseAccess
 from .forms import LoginForm, RegisterForm, ChangePasswordForm, ContactForm, LiveRegistrationForm
 import uuid
 from django.utils import timezone
@@ -27,8 +27,113 @@ from .forms import (
 logger = logging.getLogger(__name__)
 
 # Create your views here.
+# @csrf_exempt
+def forgot_password_reset(request):
+    """
+    Step 3: Reset password after OTP verification
+    """
+    if not request.session.get('reset_verified'):
+        return JsonResponse({
+            'success': False,
+            'error': 'Unauthorized. Please verify OTP first.'
+        }, status=401)
+    
+    email = request.session.get('reset_email')
+    user_id = request.session.get('reset_user_id')
+    
+    if not email or not user_id:
+        return JsonResponse({
+            'success': False,
+            'error': 'Session expired. Please request OTP again.'
+        }, status=400)
+    
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if not new_password or not confirm_password:
+            return JsonResponse({
+                'success': False,
+                'error': 'Both password fields are required'
+            }, status=400)
+        
+        if new_password != confirm_password:
+            return JsonResponse({
+                'success': False,
+                'error': 'Passwords do not match'
+            }, status=400)
+        
+        if len(new_password) < 6:
+            return JsonResponse({
+                'success': False,
+                'error': 'Password must be at least 6 characters long'
+            }, status=400)
+        
+        try:
+            user = User.objects.get(id=user_id, email=email)
+            user.set_password(new_password)
+            user.save()
+            
+            # Update session to prevent logout
+            update_session_auth_hash(request, user)
+            
+            # Send success email
+            try:
+                profile = Profile.objects.get(user=user)
+                user_name = f"{profile.first_name} {profile.last_name}".strip() or user.username
+                send_password_reset_success_email(email, user_name)
+            except Exception as e:
+                logger.error(f"Failed to send success email: {str(e)}")
+            
+            # Clear reset session data
+            request.session.pop('reset_email', None)
+            request.session.pop('reset_verified', None)
+            request.session.pop('reset_user_id', None)
+            request.session.pop('reset_otp_sent_at', None)
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Password reset successfully! Please login with your new password.'
+            })
+            
+        except User.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'error': 'User not found.'
+            }, status=404)
+        except Exception as e:
+            logger.error(f"Error resetting password: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'error': f'Reset error: {str(e)}'
+            }, status=400)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+def clean_youtube_url(self):
+    """Remove tracking parameters from YouTube URLs"""
+    if not self.video_url:
+        return ""
+    
+    url = self.video_url.strip()
+    
+    # Remove ?si= and any other query parameters
+    if '?' in url:
+        url = url.split('?')[0]
+    
+    # Remove any trailing slashes
+    url = url.rstrip('/')
+    
+    return url
+
+def save(self, *args, **kwargs):
+    """Auto-clean YouTube URLs before saving"""
+    if self.video_url and ('youtu.be' in self.video_url or 'youtube.com' in self.video_url):
+        self.video_url = self.clean_youtube_url()
+    super().save(*args, **kwargs)
 
 # Forgot Password Views
+
 def forgot_password_request(request):
     """
     Step 1: User enters email to request OTP for forgot password
@@ -93,7 +198,7 @@ def forgot_password_request(request):
     return render(request, 'mainApp/forgot_password_request.html', context)
 
 
-@csrf_exempt  # Add this temporarily for debugging
+# @csrf_exempt  # Removed - now properly protected
 def forgot_password_verify_otp(request):
     """
     Step 2: Verify OTP for forgot password
@@ -170,8 +275,7 @@ def forgot_password_verify_otp(request):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
-@csrf_exempt
-def forgot_password_reset(request):
+# @csrf_exempt
     """
     Step 3: Reset password after OTP verification
     """
@@ -1050,23 +1154,34 @@ def purchase_cart(request):
         messages.warning(request, 'Your cart is empty')
         return redirect('cart_view')
     
-    # Generate a single transaction ID for the entire purchase
-    bulk_transaction_id = f"txn_{uuid.uuid4().hex[:12]}_{int(timezone.now().timestamp())}"
-    
     purchased_items = []
     
-    # Process normal courses (CourseTransaction)
+    # Process normal courses (CourseTransaction) - generate unique ID for each
     for item in normal_cart_items:
+        # Generate unique transaction ID for each item
+        unique_transaction_id = f"txn_normal_{uuid.uuid4().hex}_{int(timezone.now().timestamp())}_{item.id}"
+        
+        # Check if transaction_id already exists
+        while CourseTransaction.objects.filter(transaction_id=unique_transaction_id).exists():
+            unique_transaction_id = f"txn_normal_{uuid.uuid4().hex}_{int(timezone.now().timestamp())}_{item.id}"
+        
         item.status = 'completed'
-        item.transaction_id = bulk_transaction_id
+        item.transaction_id = unique_transaction_id
         item.purchase_date = timezone.now()
         item.save()
         purchased_items.append(item.course.title)
     
-    # Process live courses (LiveCourseTransaction)
+    # Process live courses (LiveCourseTransaction) - generate unique ID for each
     for item in live_cart_items:
+        # Generate unique transaction ID for each item
+        unique_transaction_id = f"txn_live_{uuid.uuid4().hex}_{int(timezone.now().timestamp())}_{item.id}"
+        
+        # Check if transaction_id already exists
+        while LiveCourseTransaction.objects.filter(transaction_id=unique_transaction_id).exists():
+            unique_transaction_id = f"txn_live_{uuid.uuid4().hex}_{int(timezone.now().timestamp())}_{item.id}"
+        
         item.status = 'completed'
-        item.transaction_id = bulk_transaction_id
+        item.transaction_id = unique_transaction_id
         item.purchase_date = timezone.now()
         item.save()
         purchased_items.append(item.live_course.title)
@@ -1088,7 +1203,6 @@ def purchase_cart(request):
     )
     
     return redirect('my_courses')
-
 
 # Live Course Views
 @login_required
@@ -1228,20 +1342,90 @@ def login_success(request):
 
 
 # Course Detail View
+def get_user_course_access(user, course):
+    """Get user's course access or None"""
+    if not user.is_authenticated:
+        return None
+    try:
+        profile = Profile.objects.get(user=user)
+        access = profile.course_access.filter(course=course, is_active=True).first()
+        if access and access.has_access():
+            return access
+        return None
+    except Profile.DoesNotExist:
+        return None
+
+
 def course_detail(request, course_id):
-    course = get_object_or_404(Course.objects.prefetch_related('details'), id=course_id, is_active=True)
+    course = get_object_or_404(
+        Course.objects.prefetch_related('details', 'chapters__lectures'), 
+        id=course_id, is_active=True
+    )
     related_courses = Course.objects.filter(is_active=True).exclude(id=course_id)[:4]
+    
+    user_access = get_user_course_access(request.user, course)
+    is_enrolled = user_access is not None
+    chapters = course.chapters.all()
     
     context = {
         "course": course,
-        "details": course.details,  # CourseDetails object or None
+        "details": course.details,
         "related_courses": related_courses,
+        "chapters": chapters,
+        "user_access": user_access,
+        "is_enrolled": is_enrolled,
         'login_form': LoginForm(),
         'register_form': RegisterForm(),
         'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
         'cart_count': get_cart_count(request)
     }
     return render(request, "mainApp/Coursedetail.html", context)
+
+
+def lecture_detail(request, course_id, lecture_id):
+    course = get_object_or_404(Course.objects.prefetch_related('chapters__lectures'), id=course_id, is_active=True)
+    lecture = get_object_or_404(Lecture.objects.select_related('chapter').prefetch_related('chapter__lectures'), id=lecture_id, chapter__course=course)
+    
+    user_access = get_user_course_access(request.user, course)
+    is_enrolled = user_access is not None
+    
+    # Access check for non-preview lectures
+    if not user_access and not lecture.is_free_preview:
+        messages.warning(request, 'Please purchase the course to access this lecture.')
+        return redirect('courseDetail', course_id=course.id)
+    
+    context = {
+        'course': course,
+        'lecture': lecture,
+        'user_access': user_access,
+        'is_enrolled': is_enrolled,
+        'chapter': lecture.chapter,
+        'chapters': course.chapters.all(),
+        'cart_count': get_cart_count(request),
+    }
+    return render(request, 'mainApp/lecture.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def mark_lecture_complete(request):
+    profile = get_profile_or_create(request)
+    data = json.loads(request.body)
+    lecture_id = data.get('lecture_id')
+    
+    lecture = get_object_or_404(Lecture, id=lecture_id)
+    course = lecture.chapter.course
+    
+    try:
+        access = profile.course_access.filter(course=course, is_active=True).first()
+        if access and access.has_access():
+            success = access.mark_lecture_completed(lecture)
+            if success:
+                return JsonResponse({'success': True, 'message': 'Lecture marked complete!', 'percentage': access.completion_percentage})
+        return JsonResponse({'success': False, 'error': 'No access to this course'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+
 
 def certificationsPage(request):
     # Get active live courses and regular courses

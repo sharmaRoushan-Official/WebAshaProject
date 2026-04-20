@@ -36,22 +36,24 @@ urlpatterns = [
     
     # Profile URLs
     path("profile/", profile_view, name="profile"),
-    path("change-password/", change_password_view, name="change_password"),  # Regular form submission
-    path("api/change-password/", change_password_api, name="change_password_api"),  # API endpoint
+    path("change-password/", change_password_view, name="change_password"),
+    path("api/change-password/", change_password_api, name="change_password_api"),
     
     # Cart URLs
     path("cart/", cart_view, name="cart_view"),
-    path("cart/", cart_view, name="cart"),  # Alias for backward compatibility
+    path("cart/", cart_view, name="cart"),  # ADD THIS BACK for backward compatibility
     path("cart/purchase/", purchase_cart, name="purchase"),
     
     # Course Management URLs
     path("my-courses/", my_courses, name="my_courses"),
     path("join/<int:live_course_id>/", join_live_batch, name="join_live"),
     path("my-live-courses/", my_live_courses, name="my_live_courses"),
+    path("course/<int:course_id>/lecture/<int:lecture_id>/", lecture_detail, name="lectureDetail"),
     
     # AJAX URLs for Cart Operations
     path("ajax/add-to-cart/", add_to_cart, name="add_to_cart"),
     path("ajax/remove-from-cart/<int:transaction_id>/", remove_from_cart, name="remove_from_cart"),
     path("ajax/course-status/<int:course_id>/", ajax_course_status, name="course_status"),
     path("ajax/live-course-status/<int:live_course_id>/", ajax_live_course_status, name="live_course_status"),
+    path("ajax/mark-lecture-complete/", mark_lecture_complete, name="mark_lecture_complete"),
 ]
