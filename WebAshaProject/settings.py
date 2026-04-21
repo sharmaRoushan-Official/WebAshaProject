@@ -27,11 +27,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-h@!i^n+dyl7^2plqo*8v^oey16buc@c6yduzwl^29*)qpne1+d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "vacuum-figure-costa-sheep.trycloudflare.com",
+]
 
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://vacuum-figure-costa-sheep.trycloudflare.com",
+]
 # Application definition
 
 INSTALLED_APPS = [
