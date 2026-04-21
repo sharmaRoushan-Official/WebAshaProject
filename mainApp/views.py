@@ -275,89 +275,6 @@ def forgot_password_verify_otp(request):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
-# @csrf_exempt
-    """
-    Step 3: Reset password after OTP verification
-    """
-    if not request.session.get('reset_verified'):
-        return JsonResponse({
-            'success': False,
-            'error': 'Unauthorized. Please verify OTP first.'
-        }, status=401)
-    
-    email = request.session.get('reset_email')
-    user_id = request.session.get('reset_user_id')
-    
-    if not email or not user_id:
-        return JsonResponse({
-            'success': False,
-            'error': 'Session expired. Please request OTP again.'
-        }, status=400)
-    
-    if request.method == 'POST':
-        new_password = request.POST.get('new_password')
-        confirm_password = request.POST.get('confirm_password')
-        
-        if not new_password or not confirm_password:
-            return JsonResponse({
-                'success': False,
-                'error': 'Both password fields are required'
-            }, status=400)
-        
-        if new_password != confirm_password:
-            return JsonResponse({
-                'success': False,
-                'error': 'Passwords do not match'
-            }, status=400)
-        
-        if len(new_password) < 6:
-            return JsonResponse({
-                'success': False,
-                'error': 'Password must be at least 6 characters long'
-            }, status=400)
-        
-        try:
-            user = User.objects.get(id=user_id, email=email)
-            user.set_password(new_password)
-            user.save()
-            
-            # Update session to prevent logout
-            update_session_auth_hash(request, user)
-            
-            # Send success email
-            try:
-                profile = Profile.objects.get(user=user)
-                user_name = f"{profile.first_name} {profile.last_name}".strip() or user.username
-                send_password_reset_success_email(email, user_name)
-            except Exception as e:
-                logger.error(f"Failed to send success email: {str(e)}")
-            
-            # Clear reset session data
-            request.session.pop('reset_email', None)
-            request.session.pop('reset_verified', None)
-            request.session.pop('reset_user_id', None)
-            request.session.pop('reset_otp_sent_at', None)
-            
-            return JsonResponse({
-                'success': True,
-                'message': 'Password reset successfully! Please login with your new password.'
-            })
-            
-        except User.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'error': 'User not found.'
-            }, status=404)
-        except Exception as e:
-            logger.error(f"Error resetting password: {str(e)}")
-            return JsonResponse({
-                'success': False,
-                'error': f'Reset error: {str(e)}'
-            }, status=400)
-    
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-
 @login_required
 def send_reset_otp(request):
     """
@@ -879,7 +796,6 @@ def merge_session_cart_to_user(request, profile):
                         CourseTransaction.objects.create(
                             user=profile,
                             course=course,
-                            course_type=0,
                             status='pending',
                             transaction_id=f"cart_normal_{uuid.uuid4().hex[:12]}",
                             amount=course.price,
@@ -918,7 +834,7 @@ def merge_session_cart_to_user(request, profile):
     request.session.modified = True
 
 
-# Cart Views
+# In add_to_cart function - FIXED version (removed course_type)
 def add_to_cart(request):
     """Add course to cart - works for both anonymous and authenticated users"""
     if request.method != 'POST':
@@ -952,24 +868,25 @@ def add_to_cart(request):
             except Course.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Course not found'})
             
-            # Check if already purchased
+            # Check if already purchased (completed)
             if profile.coursetransactions.filter(course=course, status='completed').exists():
                 return JsonResponse({'success': False, 'error': 'Course already purchased'})
             
-            # Check if already in cart
-            if profile.coursetransactions.filter(course=course, status='pending', is_active=True).exists():
-                return JsonResponse({'success': False, 'error': 'Course already in cart'})
-            
-            # Add to cart
-            CourseTransaction.objects.create(
+            transaction, created = CourseTransaction.objects.get_or_create(
                 user=profile,
                 course=course,
-                course_type=0,
                 status='pending',
-                transaction_id=f"cart_normal_{uuid.uuid4().hex[:12]}",
-                amount=course.price,
-                is_active=True
+                defaults={
+                    'transaction_id': f"cart_normal_{uuid.uuid4().hex[:12]}",
+                    'amount': course.price,
+                    'is_active': True
+                }
             )
+            
+            if not created:
+                transaction.is_active = True
+                transaction.save()
+                return JsonResponse({'success': False, 'error': 'Course added in cart'})
         
         elif course_type == 1:  # Live course -> LiveCourseTransaction
             try:
@@ -977,13 +894,31 @@ def add_to_cart(request):
             except LiveCourse.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Live course not found'})
             
-            # Check if already purchased
+            # Check if already purchased (completed)
             if profile.live_transactions.filter(live_course=live_course, status='completed').exists():
                 return JsonResponse({'success': False, 'error': 'Live course already purchased'})
             
-            # Check if already in cart
-            if profile.live_transactions.filter(live_course=live_course, status='pending', is_active=True).exists():
+            transaction, created = LiveCourseTransaction.objects.get_or_create(
+                profile=profile,
+                live_course=live_course,
+                status='pending',
+                defaults={
+                    'transaction_id': f"live_cart_{uuid.uuid4().hex[:12]}",
+                    'base_amount': base_amount,
+                    'gst_amount': gst_amount,
+                    'total_amount': total_amount,
+                    'is_active': True
+                }
+            )
+            
+            if not created:
+                transaction.is_active = True
+                transaction.save()
                 return JsonResponse({'success': False, 'error': 'Live course already in cart'})
+            
+            # Check if already registered (for live courses)
+            if LiveCourseRegistration.objects.filter(profile=profile, live_course=live_course).exists():
+                return JsonResponse({'success': False, 'error': 'Already registered for this live course'})
             
             # Add to cart with GST calculation
             base_amount = live_course.price
@@ -1070,7 +1005,7 @@ def remove_from_cart(request, transaction_id):
             'success': True,
             'message': 'Item removed from cart',
             'count': new_count,
-            'new_total': new_total
+            'new_total': float(new_total)
         })
         
     except Profile.DoesNotExist:
@@ -1103,7 +1038,7 @@ def cart_view(request):
             'id': item.id,
             'type': 'normal',
             'title': item.course.title,
-            'amount': item.amount,
+            'amount': float(item.amount),
             'course_type': 0,
             'image': item.course.image.url if item.course.image else None,
         })
@@ -1113,15 +1048,15 @@ def cart_view(request):
             'id': item.id,
             'type': 'live',
             'title': item.live_course.title,
-            'amount': item.total_amount,
+            'amount': float(item.total_amount),
             'course_type': 1,
             'image': item.live_course.image.url if item.live_course.image else None,
-            'base_amount': item.base_amount,
-            'gst_amount': item.gst_amount,
+            'base_amount': float(item.base_amount),
+            'gst_amount': float(item.gst_amount),
         })
     
-    normal_total = sum(item.amount for item in normal_cart_items)
-    live_total = sum(item.total_amount for item in live_cart_items)
+    normal_total = sum(float(item.amount) for item in normal_cart_items)
+    live_total = sum(float(item.total_amount) for item in live_cart_items)
     total = normal_total + live_total
     
     context = {
@@ -1204,11 +1139,34 @@ def purchase_cart(request):
     
     return redirect('my_courses')
 
-# Live Course Views
+
+# In join_live_batch function - FIXED version
 @login_required
 def join_live_batch(request, live_course_id):
     live_course = get_object_or_404(LiveCourse, id=live_course_id, is_active=True)
     profile = get_profile_or_create(request)
+    
+    # CHECK FOR EXISTING PURCHASE OR CART ITEM FIRST
+    # Check if already purchased
+    if profile.live_transactions.filter(live_course=live_course, status='completed').exists():
+        messages.warning(request, 'You have already purchased this live course.')
+        return redirect('my_live_courses')
+    
+    # Check if already in cart
+    existing_cart = profile.live_transactions.filter(
+        live_course=live_course, 
+        status='pending', 
+        is_active=True
+    ).exists()
+    
+    if existing_cart:
+        messages.warning(request, 'This live course is already in your cart.')
+        return redirect('cart_view')
+    
+    # Check if already registered
+    if LiveCourseRegistration.objects.filter(profile=profile, live_course=live_course).exists():
+        messages.warning(request, 'You are already registered for this live course.')
+        return redirect('my_live_courses')
     
     if request.method == 'POST':
         form = LiveRegistrationForm(request.POST, profile=profile)
@@ -1219,11 +1177,6 @@ def join_live_batch(request, live_course_id):
             profile.phone = data['phone']
             profile.address = data['address']
             profile.save()
-            
-            # Check if already registered for this course
-            if LiveCourseRegistration.objects.filter(profile=profile, live_course=live_course).exists():
-                messages.warning(request, 'You are already registered for this live course.')
-                return redirect('my_live_courses')
             
             # Create registration
             registration = LiveCourseRegistration.objects.create(
@@ -1268,9 +1221,9 @@ def join_live_batch(request, live_course_id):
     context = {
         'form': form,
         'live_course': live_course,
-        'base_price': base_price,
-        'gst_amount': gst,
-        'total_price': total_price,
+        'base_price': float(base_price),
+        'gst_amount': float(gst),
+        'total_price': float(total_price),
         'profile': profile,
         'cart_count': get_cart_count(request)
     }
@@ -1425,19 +1378,3 @@ def mark_lecture_complete(request):
         return JsonResponse({'success': False, 'error': 'No access to this course'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
-
-
-def certificationsPage(request):
-    # Get active live courses and regular courses
-    live_courses = LiveCourse.objects.filter(is_active=True)
-    courses = Course.objects.filter(is_active=True).order_by('course_number')
-    
-    context = {
-        'live_courses': live_courses,
-        'course': courses,  # This matches the variable name used in the template
-        'login_form': LoginForm(),
-        'register_form': RegisterForm(),
-        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
-        'cart_count': get_cart_count(request)
-    }
-    return render(request, "mainApp/certifications.html", context)

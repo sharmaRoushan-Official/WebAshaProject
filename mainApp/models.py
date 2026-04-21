@@ -14,6 +14,7 @@ class Course(models.Model):
     course_number = models.IntegerField(unique=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
@@ -448,7 +449,18 @@ class CourseTransaction(models.Model):
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, blank=True)
     receipt = models.FileField(upload_to='transactions/receipts/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
-    course_type = models.IntegerField(default=0, choices=[(0, 'Normal'), (1, 'Live')])
+    # REMOVED course_type field - it's redundant since this is only for normal courses
+
+    class Meta:
+        ordering = ['-purchase_date']
+        # Add unique constraint to prevent duplicate pending transactions
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'course', 'status'],
+                condition=models.Q(status='pending'),
+                name='unique_pending_cart_item'
+            )
+        ]
 
     def save(self, *args, **kwargs):
         """Override save to create UserCourseAccess when transaction is completed"""
@@ -468,9 +480,6 @@ class CourseTransaction(models.Model):
 
     def __str__(self):
         return f"{self.user.user.username} bought {self.course.title} - {self.status} (₹{self.amount})"
-
-    class Meta:
-        ordering = ['-purchase_date']
 
 
 # OurTeam 
@@ -556,11 +565,19 @@ class LiveCourseRegistration(models.Model):
         ('cancelled', 'Cancelled'),
     ])
 
-    def __str__(self):
-        return f"{self.profile} - {self.live_course.title}"
-
     class Meta:
         unique_together = ['profile', 'live_course']
+        # Add constraint to prevent duplicate pending registrations
+        constraints = [
+            models.UniqueConstraint(
+                fields=['profile', 'live_course', 'status'],
+                condition=models.Q(status='pending'),
+                name='unique_pending_registration'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.profile} - {self.live_course.title}"
 
 
 class LiveCourseTransaction(models.Model):
@@ -590,8 +607,16 @@ class LiveCourseTransaction(models.Model):
     receipt = models.FileField(upload_to='live_transactions/receipts/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
-    def __str__(self):
-        return f"{self.profile.user.username} - {self.live_course.title} - ₹{self.total_amount} ({self.status})"
-
     class Meta:
         ordering = ['-purchase_date']
+        # Add unique constraint to prevent duplicate pending transactions
+        constraints = [
+            models.UniqueConstraint(
+                fields=['profile', 'live_course', 'status'],
+                condition=models.Q(status='pending'),
+                name='unique_pending_live_cart_item'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.profile.user.username} - {self.live_course.title} - ₹{self.total_amount} ({self.status})"

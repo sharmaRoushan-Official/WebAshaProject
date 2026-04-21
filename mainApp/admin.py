@@ -147,7 +147,8 @@ class PasswordResetOTPAdmin(admin.ModelAdmin):
 class CourseTransactionAdmin(admin.ModelAdmin):
     list_display = ('transaction_id', 'user', 'course', 'amount', 'status', 'purchase_date', 'payment_method')
     search_fields = ('transaction_id', 'user__user__username', 'course__title')
-    list_filter = ('status', 'payment_method', 'course_type', 'purchase_date')
+    # REMOVED 'course_type' from list_filter - line 157 fixed
+    list_filter = ('status', 'payment_method', 'purchase_date')
     readonly_fields = ('transaction_id', 'purchase_date')
     list_editable = ('status',)
     

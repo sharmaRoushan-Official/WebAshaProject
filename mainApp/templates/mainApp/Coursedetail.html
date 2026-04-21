@@ -534,7 +534,7 @@ body { font-family: var(--font-b); background: var(--page-bg); }
           <div class="preview-price">₹{{ course.price }}</div>
           <div class="preview-orig">₹{{ course.price|add:"5000" }} &nbsp;<span style="color:#16a34a;font-size:12px;font-weight:600;">Save ₹5000</span></div>
           {% if user.is_authenticated %}
-            <button class="enroll-btn-lg add-to-cart" data-course="{{ course.id }}" data-type="0"><i class="fas fa-cart-plus"></i>Add to Cart</button>
+            <button class="enroll-btn-lg add-to-cart" data-course="{{ course.id }}"><i class="fas fa-cart-plus"></i>Add to Cart</button>
             {% else %}
             <a href="{% url 'login' %}" class="enroll-btn-lg"><i class="fas fa-sign-in-alt"></i>Login to Enroll</a>
             {% endif %}
@@ -797,7 +797,7 @@ cartButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.preventDefault();
         const courseId = this.getAttribute('data-course');
-        const courseType = this.getAttribute('data-type') || '0';
+        // courseType handled by cart.js
         
         fetch("{% url 'add_to_cart' %}", {
             method: 'POST',
@@ -807,7 +807,7 @@ cartButtons.forEach(btn => {
             },
             body: JSON.stringify({
                 course_id: courseId,
-                course_type: parseInt(courseType)
+                // course_type handled by cart.js
             })
         })
         .then(response => response.json())

@@ -4,65 +4,97 @@
 
 {% block body %}
 <div class="container my-5">
-  <h1 class="mb-4">Your Cart ({{ cart_items|length }})</h1>
+  <h1 class="mb-4">Your Cart ({{ cart_count|default:0 }})</h1>
+  
   {% if cart_items %}
     <div class="d-flex justify-content-between mb-4">
-      <h3>Cart Items ({{ cart_items|length }})</h3>
+      <h3>Cart Items ({{ cart_count|default:0 }})</h3>
       <a href="{% url 'my_courses' %}" class="btn btn-outline-primary">My Courses</a>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Course</th>
-          <th>Price</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in cart_items %}
-        <tr>
-          <td>
-            {{ item.title }}
-            {% if item.course_type == 0 %}
-              <span class="badge bg-primary ms-2">Certification</span>
-            {% elif item.course_type == 1 %}
-              <span class="badge bg-danger ms-2">Live Course</span>
-              {% if item.gst_amount %}
-                <small class="text-muted d-block">(Base: ₹{{ item.base_amount }} + GST ₹{{ item.gst_amount }})</small>
-              {% endif %}
-            {% endif %}
-          </td>
-          <td>₹{{ item.amount }}</td>
-          <td>
-            <button class="btn btn-danger btn-sm remove-cart" data-id="{{ item.id }}" data-type="{{ item.type }}">
-              Remove from cart
-            </button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <div class="text-end">
-      <h3>Total: ₹{{ total }}</h3>
+    
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>Course</th>
+            <th>Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="cart-items-body">
+          {% for item in cart_items %}
+          <tr id="cart-item-{{ item.id }}">
+            <td>
+              <div class="d-flex align-items-center">
+                {% if item.image %}
+                  <img src="{{ item.image }}" alt="{{ item.title }}" style="width: 50px; height: 50px; object-fit: cover;" class="me-3 rounded">
+                {% endif %}
+                <div>
+                  <strong>{{ item.title }}</strong>
+                  {% if item.course_type == 0 %}
+                    <span class="badge bg-primary ms-2">Certification Course</span>
+                  {% elif item.course_type == 1 %}
+                    <span class="badge bg-danger ms-2">Live Course</span>
+                    {% if item.gst_amount %}
+                      <small class="text-muted d-block mt-1">
+                        (Base: ₹{{ item.base_amount|floatformat:2 }} + GST: ₹{{ item.gst_amount|floatformat:2 }})
+                      </small>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td class="align-middle">
+              <strong class="text-primary">₹{{ item.amount|floatformat:2 }}</strong>
+            </td>
+            <td class="align-middle">
+              <button class="btn btn-danger btn-sm remove-cart-item" 
+                      data-id="{{ item.id }}" 
+                      data-type="{{ item.type }}"
+                      data-url="{% url 'remove_from_cart' item.id %}">
+                <i class="fas fa-trash-alt me-1"></i>Remove
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot class="table-light">
+          <tr>
+            <td colspan="2" class="text-end"><strong>Total:</strong></td>
+            <td><strong class="text-success h5">₹{{ total|floatformat:2 }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    
+    <div class="text-end mt-4">
+      <a href="{% url 'ourCourses' %}" class="btn btn-outline-secondary btn-lg me-2">
+        <i class="fas fa-shopping-cart me-2"></i>Continue Shopping
+      </a>
+      
       {% if user.is_authenticated %}
-        <form method="POST" action="{% url 'purchase' %}" style="display: inline;">
+        <form method="POST" action="{% url 'purchase' %}" style="display: inline;" id="purchase-form">
           {% csrf_token %}
-          <button type="submit" class="btn btn-success btn-lg" {% if not cart_items %}disabled{% endif %}>
-            <i class="fas fa-credit-card me-2"></i>Purchase Now
+          <button type="submit" class="btn btn-success btn-lg" id="purchase-btn">
+            <i class="fas fa-credit-card me-2"></i>Purchase Now (₹{{ total|floatformat:2 }})
           </button>
         </form>
       {% else %}
-        <a href="#" class="btn btn-success btn-lg purchase-protected" data-bs-toggle="modal" data-bs-target="#authModal">
-          <i class="fas fa-sign-in-alt me-2"></i>Please Login to Checkout
-        </a>
-        <p class="text-muted mt-2 small">Login to proceed with payment securely.</p>
+        <button class="btn btn-success btn-lg purchase-protected" data-bs-toggle="modal" data-bs-target="#authModal">
+          <i class="fas fa-sign-in-alt me-2"></i>Login to Checkout
+        </button>
+        <p class="text-muted mt-2 small">
+          <i class="fas fa-lock me-1"></i>Login to proceed with payment securely.
+        </p>
       {% endif %}
     </div>
   {% else %}
     <div class="text-center py-5">
       <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
       <p class="alert alert-info">Your cart is empty.</p>
-      <a href="{% url 'ourCourses' %}" class="btn btn-primary">Browse Courses</a>
+      <a href="{% url 'ourCourses' %}" class="btn btn-primary btn-lg">
+        <i class="fas fa-book me-2"></i>Browse Courses
+      </a>
     </div>
   {% endif %}
 </div>
@@ -87,69 +119,190 @@ function getCookie(name) {
 const csrftoken = getCookie('csrftoken');
 
 // Handle remove from cart
-document.querySelectorAll('.remove-cart').forEach(button => {
+document.querySelectorAll('.remove-cart-item').forEach(button => {
     button.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
+        
         const itemId = this.getAttribute('data-id');
+        const itemType = this.getAttribute('data-type');
+        const url = this.getAttribute('data-url');  // Get the URL from data-url attribute
+        const row = document.getElementById(`cart-item-${itemId}`);
+        
+        if (!itemId || !url) {
+            showNotification('Invalid item or URL', 'error');
+            console.error('Missing itemId or url:', {itemId, url});
+            return;
+        }
         
         if (confirm('Are you sure you want to remove this item from your cart?')) {
-          fetch(`/ajax/remove-from-cart/${itemId}/`, {
+            // Disable button to prevent multiple clicks
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Removing...';
+            
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrftoken,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id: itemId })
+                body: JSON.stringify({ 
+                    id: itemId,
+                    type: itemType 
+                })
             })
-            .then(response => response.json())
+            .then(response => {
+                // Check if response is OK
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    const row = this.closest('tr');
-                    row.remove();
-                    
-                    const newCount = parseInt(document.querySelector('h1').textContent.match(/\d+/)[0]) - 1;
-                    document.querySelector('h1').innerHTML = `Your Cart (${newCount})`;
-                    
-                    const cartItemsHeader = document.querySelector('.d-flex h3');
-                    if (cartItemsHeader) {
-                        cartItemsHeader.innerHTML = `Cart Items (${newCount})`;
-                    }
-                    
-                    const totalElement = document.querySelector('.text-end h3');
-                    totalElement.innerHTML = `Total: ₹${data.new_total}`;
-                    
-                    showNotification('Item removed from cart successfully!', 'success');
-                    
-                    if (newCount === 0) {
-                        setTimeout(() => location.reload(), 1500);
+                    // Remove the row with animation
+                    if (row) {
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.opacity = '0';
+                        setTimeout(() => {
+                            row.remove();
+                            updateCartUI(data.count, data.new_total);
+                            showNotification('Item removed from cart successfully!', 'success');
+                        }, 300);
+                    } else {
+                        location.reload();
                     }
                 } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-trash-alt me-1"></i>Remove';
                     showNotification(data.error || 'Failed to remove item', 'error');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error details:', error);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-trash-alt me-1"></i>Remove';
                 showNotification('An error occurred. Please try again.', 'error');
             });
         }
     });
 });
 
+function updateCartUI(newCount, newTotal) {
+    // Update cart count in header
+    const headerTitle = document.querySelector('h1');
+    if (headerTitle) {
+        headerTitle.innerHTML = `Your Cart (${newCount})`;
+    }
+    
+    // Update cart items header
+    const cartItemsHeader = document.querySelector('.d-flex h3');
+    if (cartItemsHeader) {
+        cartItemsHeader.innerHTML = `Cart Items (${newCount})`;
+    }
+    
+    // Update total in table footer
+    const totalCell = document.querySelector('tfoot td:last-child strong');
+    if (totalCell) {
+        totalCell.innerHTML = `₹${parseFloat(newTotal).toFixed(2)}`;
+    }
+    
+    // Update purchase button text
+    const purchaseBtn = document.getElementById('purchase-btn');
+    if (purchaseBtn) {
+        purchaseBtn.innerHTML = `<i class="fas fa-credit-card me-2"></i>Purchase Now (₹${parseFloat(newTotal).toFixed(2)})`;
+    }
+    
+    // Update cart count in navbar (if exists)
+    const cartBadge = document.querySelector('.cart-badge, #cart-count');
+    if (cartBadge) {
+        cartBadge.textContent = newCount;
+    }
+    
+    // If cart is empty, show empty state after a delay
+    if (newCount === 0) {
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    }
+}
+
 function showNotification(message, type) {
+    // Remove existing alerts
+    const existingAlerts = document.querySelectorAll('.alert-dismissible');
+    existingAlerts.forEach(alert => alert.remove());
+    
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
     alertDiv.role = 'alert';
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.style.minWidth = '300px';
     alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     
-    const container = document.querySelector('.container');
-    container.insertBefore(alertDiv, container.firstChild);
+    document.body.appendChild(alertDiv);
     
+    // Auto dismiss after 3 seconds
     setTimeout(() => {
-        if (alertDiv) alertDiv.remove();
+        if (alertDiv) {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 300);
+        }
     }, 3000);
 }
+
+// Prevent multiple form submissions
+const purchaseForm = document.getElementById('purchase-form');
+if (purchaseForm) {
+    purchaseForm.addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        }
+    });
+}
+
+// Add keyboard shortcut (Ctrl/Cmd + K to continue shopping)
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        window.location.href = "{% url 'ourCourses' %}";
+    }
+});
+
+// Display cart summary on page load
+console.log('Cart loaded with {{ cart_count|default:0 }} items, total: ₹{{ total|default:0|floatformat:2 }}');
 </script>
+
+<style>
+  .table tbody tr {
+    transition: opacity 0.3s ease;
+  }
+  
+  .table tbody tr:hover {
+    background-color: rgba(0,0,0,0.02);
+  }
+  
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  
+  .fade-out {
+    animation: fadeOut 0.3s ease forwards;
+  }
+</style>
 {% endblock %}
