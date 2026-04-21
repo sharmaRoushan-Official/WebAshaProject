@@ -1,12 +1,8 @@
-# Navbar Update TODO
+# Task: Add My Courses link to navbar - COMPLETE
 
 ## Steps:
-# Navbar Update TODO
+- [x] Added \"My Courses\" nav item to base.html navbar (visible when logged in)
+- [x] my-courses.html confirmed with navbar via {% extends 'mainApp/base.html' %}
+- [x] Pricing text verified in navbar
 
-## Steps:
-- [x] 1. Replace navbar HTML in templates/mainApp/base.html with simple Bootstrap navbar (adapted BS5/Django urls/cart/user logic)
-- [x] 2. Add simple navbar CSS to mainApp/static/mainApp/styles/stylesBase.css
-- [ ] 3. Test: python manage.py runserver, check responsive/auth/cart/modals
-- [ ] 4. attempt_completion
-
-**Progress: Steps 1-2 complete. Navbar added with styling. Ready for testing.**
+**Result:** Direct \"My Courses\" link in main navbar. Test: `python manage.py runserver` → login → click My Courses.
