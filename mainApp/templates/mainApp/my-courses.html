@@ -4,17 +4,84 @@
 
 {% block body %}
 <div class="container my-5">
-  <h1>My Courses ({{ purchased|length }})</h1>
-  {% for item in purchased %}
-    <div class="card mb-3">
-      <div class="card-body">
-        <h5>{{ item.course.title }}</h5>
-        <p>Purchased on {{ item.purchase_date }}</p>
-        <a href="{% url 'courseDetail' item.course.id %}" class="btn btn-primary">Access Course</a>
+  <h1 class="mb-4">My Courses</h1>
+  
+  <!-- Normal Courses Section -->
+  <div class="mb-5">
+    <h2 class="mb-3">Regular Courses ({{ purchased_normal|length }})</h2>
+    {% for item in purchased_normal %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              {% if item.course.image %}
+                <img src="{{ item.course.image.url }}" alt="{{ item.course.title }}" class="img-fluid rounded">
+              {% else %}
+                <img src="{% static 'images/default-course.jpg' %}" alt="Course" class="img-fluid rounded">
+              {% endif %}
+            </div>
+            <div class="col-md-9">
+              <h5>{{ item.course.title }}</h5>
+              <p class="text-muted">Purchased on {{ item.purchase_date|date:"F d, Y" }}</p>
+              <p>{{ item.course.description|truncatewords:30 }}</p>
+              <a href="{% url 'courseDetail' item.course.id %}" class="btn btn-primary">Access Course</a>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  {% empty %}
-    <p>No purchased courses yet. <a href="{% url 'ourCourses' %}">Browse Courses</a></p>
-  {% endfor %}
+    {% empty %}
+      <div class="alert alert-info">
+        No purchased regular courses yet. <a href="{% url 'ourCourses' %}">Browse Courses</a>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Live Courses Section -->
+  <div class="mb-5">
+    <h2 class="mb-3">Live Courses ({{ purchased_live|length }})</h2>
+    {% for item in purchased_live %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              {% if item.live_course.image %}
+                <img src="{{ item.live_course.image.url }}" alt="{{ item.live_course.title }}" class="img-fluid rounded">
+              {% else %}
+                <img src="{% static 'images/default-course.jpg' %}" alt="Live Course" class="img-fluid rounded">
+              {% endif %}
+            </div>
+            <div class="col-md-9">
+              <h5>{{ item.live_course.title }}</h5>
+              <p class="text-muted">Purchased on {{ item.purchase_date|date:"F d, Y" }}</p>
+              <p>{{ item.live_course.description|truncatewords:30 }}</p>
+              <div class="mb-2">
+                <span class="badge bg-info">Live Batch</span>
+                <span class="badge bg-secondary">{{ item.live_course.start_day }} at {{ item.live_course.start_time }}</span>
+              </div>
+              <a href="{% url 'live_course_detail' item.live_course.id %}" class="btn btn-success">Join Live Session</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="alert alert-info">
+        No purchased live courses yet. <a href="{% url 'classes' %}">Browse Live Courses</a>
+      </div>
+    {% endfor %}
+  </div>
 </div>
+
+<style>
+  .card {
+    transition: transform 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  .badge {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+</style>
 {% endblock %}

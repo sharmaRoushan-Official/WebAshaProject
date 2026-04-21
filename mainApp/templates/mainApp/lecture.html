@@ -1,0 +1,217 @@
+{% extends 'mainApp/base.html' %}
+{% load static %}
+
+{% block title %}{{ lecture.title }} — {{ course.title }}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+  <div class="row">
+    <!-- Video/Content Player -->
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white py-3">
+          <h4 class="mb-0"><i class="fas fa-play-circle me-2"></i>{{ lecture.title }}</h4>
+          <small class="opacity-75">{{ lecture.chapter.title }} • {{ lecture.duration_display }}</small>
+        </div>
+        <div class="card-body p-4">
+          
+          {% if lecture.video_url %}
+            <!-- YouTube/Vimeo Video -->
+            {% if 'youtube.com' in lecture.video_url or 'youtu.be' in lecture.video_url %}
+              <div class="ratio ratio-16x9 mb-4">
+                <iframe src="{{ lecture.get_video_embed_url }}" 
+                        title="{{ lecture.title }}" 
+                        allowfullscreen 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        class="rounded shadow-sm"></iframe>
+              </div>
+            {% elif 'vimeo.com' in lecture.video_url %}
+              <div class="ratio ratio-16x9 mb-4">
+                <iframe src="{{ lecture.get_video_embed_url }}" 
+                        title="{{ lecture.title }}" 
+                        allowfullscreen 
+                        class="rounded shadow-sm"></iframe>
+              </div>
+            {% else %}
+              <!-- Generic video URL -->
+              <video class="w-100 rounded shadow-sm" controls preload="metadata">
+                <source src="{{ lecture.video_url }}" type="video/mp4">
+                Your browser does not support video playback.
+              </video>
+            {% endif %}
+          {% elif lecture.video_embed_code %}
+            <!-- Custom embed code -->
+            <div class="mb-4">{{ lecture.video_embed_code|safe }}</div>
+          {% elif lecture.resource_file %}
+            <!-- Downloadable resource -->
+            <div class="text-center py-5">
+              <i class="fas fa-file-download fa-4x text-muted mb-3"></i>
+              <h5>Download Resource</h5>
+              <p class="text-muted mb-4">{{ lecture.title }}</p>
+              <a href="{{ lecture.resource_file.url }}" class="btn btn-success btn-lg" download>
+                <i class="fas fa-download me-2"></i>Download File
+              </a>
+            </div>
+          {% elif lecture.content %}
+            <!-- Article/Text content -->
+            <div class="lecture-content">
+              {{ lecture.content|linebreaks }}
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+              <p class="text-muted">Lecture content coming soon...</p>
+            </div>
+          {% endif %}
+
+          {% if user_access %}
+          <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-success btn-sm mark-complete-btn" data-lecture="{{ lecture.id }}">
+              <i class="fas fa-check me-1"></i>Mark Complete
+            </button>
+            <button class="btn btn-outline-secondary btn-sm">
+              <i class="fas fa-bookmark me-1"></i>Add Note
+            </button>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Chapter Navigation -->
+      {% if lecture.chapter.lectures.exists %}
+      <div class="card mt-4 border-0 shadow-sm">
+        <div class="card-header bg-light py-2">
+          <h6 class="mb-0"><i class="fas fa-list me-2"></i>Lecture {{ lecture.order }} of {{ lecture.chapter.lectures.count }} in {{ lecture.chapter.title }}</h6>
+        </div>
+        <div class="card-body p-0">
+          {% for lec in lecture.chapter.lectures.all %}
+          <a href="{% url 'lectureDetail' course.id lec.id %}" 
+             class="d-flex align-items-center p-3 border-bottom {% if lec == lecture %}bg-primary text-white fw-bold{% elif lec in user_access.completed_lectures.all %}text-success{% endif %}">
+            <span class="me-3">
+              {% if lec in user_access.completed_lectures.all %}<i class="fas fa-check-circle text-success"></i>
+              {% elif lec == lecture %}<i class="fas fa-play-circle text-white"></i>
+              {% else %}<i class="fas fa-circle text-muted"></i>{% endif %}
+            </span>
+            <div class="flex-grow-1">
+              <div>{{ lec.title }}</div>
+              <small class="text-muted">{{ lec.duration_display }}</small>
+            </div>
+            {% if lec != lecture %}
+            <i class="fas fa-chevron-right opacity-50"></i>
+            {% endif %}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Course Sidebar -->
+    <div class="col-lg-4">
+      <!-- Course Progress -->
+      {% if user_access %}
+      <div class="card sticky-top" style="top: 20px;">
+        <div class="card-body">
+          <h6 class="card-title mb-3">Course Progress</h6>
+          <div class="progress mb-3" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ user_access.completion_percentage }}%" aria-valuenow="{{ user_access.completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
+              {{ user_access.completion_percentage|floatformat:0 }}%
+            </div>
+          </div>
+          <small class="text-muted">{{ user_access.completed_lectures.count }} / {{ course.total_lectures }} lectures</small>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Next Lectures -->
+      <div class="card mt-4">
+        <div class="card-header">
+          <h6 class="mb-0">Next Lectures</h6>
+        </div>
+        <div class="card-body">
+          {% if course.chapters.exists %}
+            {% for lec in course.chapters.first.lectures.all|slice:":3" %}
+              {% if lec != lecture %}
+                <a href="{% url 'lectureDetail' course.id lec.id %}" class="d-flex align-items-center p-2 border-bottom-small text-decoration-none">
+                  <i class="fas fa-play-circle text-muted me-3"></i>
+                  <div>
+                    <div class="small fw-medium">{{ lec.title|truncatechars:40 }}</div>
+                    <div class="tiny text-muted">{{ lec.duration_display }}</div>
+                  </div>
+                </a>
+              {% endif %}
+            {% empty %}
+              <p class="text-muted small mb-0">No more lectures</p>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted small mb-0">No chapters available</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Quick Course Actions -->
+      {% if user_access %}
+      <div class="card mt-4">
+        <div class="card-body text-center p-4">
+          <a href="{% url 'courseDetail' course.id %}" class="btn btn-outline-primary w-100 mb-2">
+            <i class="fas fa-list me-1"></i>Course Contents
+          </a>
+          <a href="{% url 'my_courses' %}" class="btn btn-outline-secondary w-100">
+            <i class="fas fa-th me-1"></i>My Courses
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+.lecture-content {
+  line-height: 1.7;
+  font-size: 16px;
+  color: #333;
+}
+.lecture-content h1, .lecture-content h2, .lecture-content h3 {
+  color: var(--ink);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+.lecture-content p {
+  margin-bottom: 1.2rem;
+}
+.tiny { font-size: 0.75rem !important; }
+.border-bottom-small { border-bottom: 1px solid #eee !important; }
+.border-bottom:last-child { border-bottom: none !important; }
+</style>
+
+<script>
+// Mark lecture complete
+document.addEventListener('DOMContentLoaded', function() {
+  const completeBtns = document.querySelectorAll('.mark-complete-btn');
+  completeBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const lectureId = this.dataset.lecture;
+      
+      fetch("{% url 'mark_lecture_complete' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({lecture_id: lectureId})
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          this.innerHTML = '<i class="fas fa-check-double me-1"></i>Completed ✓';
+          this.classList.add('btn-success', 'disabled');
+          location.reload(); // Refresh to update progress
+        }
+      });
+    });
+  });
+});
+</script>
+
+{% endblock %}
