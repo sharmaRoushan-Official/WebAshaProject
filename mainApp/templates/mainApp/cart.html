@@ -76,7 +76,10 @@
         <form method="POST" action="{% url 'purchase' %}" style="display: inline;" id="purchase-form">
           {% csrf_token %}
           <button type="submit" class="btn btn-success btn-lg" id="purchase-btn">
-            <i class="fas fa-credit-card me-2"></i>Purchase Now (₹{{ total|floatformat:2 }})
+            <span class="btn-text"><i class="fas fa-credit-card me-2"></i>Purchase Now (₹{{ total|floatformat:2 }})</span>
+            <span class="loading-text d-none">
+              <i class="fas fa-spinner fa-spin me-2"></i>Processing Payment...
+            </span>
           </button>
         </form>
       {% else %}
@@ -87,6 +90,56 @@
           <i class="fas fa-lock me-1"></i>Login to proceed with payment securely.
         </p>
       {% endif %}
+
+        <script>
+            const purchaseForm = document.getElementById('purchase-form');
+            const purchaseBtn = document.getElementById('purchase-btn');
+            if (purchaseForm && purchaseBtn) {
+                purchaseForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const formData = new FormData(purchaseForm);
+                    const btnText = purchaseBtn.querySelector('.btn-text');
+                    const loadingText = purchaseBtn.querySelector('.loading-text');
+                    
+                    purchaseBtn.disabled = true;
+                    btnText.classList.add('d-none');
+                    loadingText.classList.remove('d-none');
+                    
+                    fetch(purchaseForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                        },
+                    })
+                    .then(response => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else {
+                            return response.json();
+                        }
+                    })
+                    .then(data => {
+                        if (data && data.success) {
+                            window.location.href = data.redirect || '{% url "my_courses" %}';
+                        } else {
+                            alert(data.error || 'Purchase failed');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Payment error. Please try again.');
+                    })
+                    .finally(() => {
+                        purchaseBtn.disabled = false;
+                        btnText.classList.remove('d-none');
+                        loadingText.classList.add('d-none');
+                    });
+                });
+            }
+        </script>
+
     </div>
   {% else %}
     <div class="text-center py-5">
