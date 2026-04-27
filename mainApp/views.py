@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 import json
 import logging
 from .models import Course, Profile, TeamMember, CourseTransaction, LiveCourse, LiveCourseTransaction, LiveCourseRegistration, Chapter, Lecture, UserCourseAccess
-from .forms import LoginForm, RegisterForm, ChangePasswordForm, ContactForm, LiveRegistrationForm
+from .forms import LoginForm, RegisterForm, ChangePasswordForm, ContactForm, LiveRegistrationForm, ProfileUpdateForm
 import uuid
 from django.utils import timezone
 from decimal import Decimal
@@ -526,6 +526,7 @@ def register_view(request):
                     user=user,
                     first_name=data['first_name'],
                     last_name=data['last_name'],
+                    email=data['email'],  # ← ADD THIS LINE to set profile email
                     phone=data['phone'],
                     address=data['address']
                 )
@@ -545,7 +546,6 @@ def register_view(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, 'mainApp/register.html', context)
-
 
 def login_view(request):
     if request.method == 'POST':
@@ -590,14 +590,12 @@ def get_profile_or_create(request):
             user=request.user,
             first_name=request.user.first_name or '',
             last_name=request.user.last_name or '',
-            email=request.user.email or '',
+            email=request.user.email or '',  # ← Make sure email is copied from User
             phone='',
             address='',
         )
         messages.success(request, 'Welcome! Your profile has been created.')
         return profile
-
-
 # AJAX Status Views
 @login_required
 def ajax_course_status(request, course_id):
@@ -653,6 +651,16 @@ def ajax_live_course_status(request, live_course_id):
 @login_required
 def profile_view(request):
     profile = get_profile_or_create(request)
+    
+    # Sync email from User to Profile if profile email is empty
+    if not profile.email and request.user.email:
+        profile.email = request.user.email
+        profile.save()
+    # Also sync if emails don't match (prefer User email as source of truth)
+    elif profile.email != request.user.email and request.user.email:
+        profile.email = request.user.email
+        profile.save()
+    
     context = {
         'profile': profile,
         'login_form': LoginForm(),
@@ -662,7 +670,63 @@ def profile_view(request):
     }
     return render(request, 'mainApp/profile.html', context)
 
-
+@login_required
+@require_http_methods(["PUT"])
+def update_profile_api(request):
+    """API endpoint for updating profile via PUT request"""
+    try:
+        profile = get_profile_or_create(request)
+        data = json.loads(request.body)
+        
+        # Update only the fields that are provided
+        if 'phone' in data:
+            profile.phone = data['phone']
+        if 'address' in data:
+            profile.address = data['address']
+        if 'bio' in data:
+            profile.bio = data['bio']
+        
+        # Save the profile
+        profile.save()
+        
+        # Also update User model if needed
+        if 'first_name' in data and data['first_name']:
+            request.user.first_name = data['first_name']
+        if 'last_name' in data and data['last_name']:
+            request.user.last_name = data['last_name']
+        if 'email' in data and data['email']:
+            # Only update email if it's changed and not already taken
+            if request.user.email != data['email']:
+                if User.objects.filter(email=data['email']).exclude(id=request.user.id).exists():
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Email already taken by another user'
+                    }, status=400)
+                request.user.email = data['email']
+                # Also update profile email to match
+                profile.email = data['email']
+                profile.save()
+        
+        request.user.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Profile updated successfully!'
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'success': False,
+            'error': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        logger.error(f"Error updating profile: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+        
+        
 @login_required
 def change_password_view(request):
     """Regular view for changing password (used by modal form)"""

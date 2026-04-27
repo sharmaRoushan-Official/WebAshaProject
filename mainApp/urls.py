@@ -36,6 +36,7 @@ urlpatterns = [
     
     # Profile URLs
     path("profile/", profile_view, name="profile"),
+    path("api/update-profile/", update_profile_api, name="update_profile_api"),
     path("change-password/", change_password_view, name="change_password"),
     path("api/change-password/", change_password_api, name="change_password_api"),
     

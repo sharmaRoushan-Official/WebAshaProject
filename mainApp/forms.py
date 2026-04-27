@@ -83,6 +83,30 @@ class ContactForm(forms.ModelForm):
         }
 
 
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'bio']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Address', 'rows': 3}),
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Tell us about yourself', 'rows': 4}),
+        }
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            # Check if another user already has this email
+            if User.objects.filter(email=email).exclude(
+                id=self.instance.user.id if self.instance and self.instance.user else None
+            ).exists():
+                raise ValidationError("This email is already in use by another account.")
+        return email
+
+
 class LiveRegistrationForm(forms.Form):
     first_name = forms.CharField(
         max_length=50,

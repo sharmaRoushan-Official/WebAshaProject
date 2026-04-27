@@ -187,41 +187,6 @@
     justify-content: center;
   }
 
-  .avatar-badge::after {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: var(--ink);
-    border-radius: 50%;
-  }
-
-  .avatar-info h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    font-weight: 700;
-    margin: 0 0 6px;
-    color: var(--ink);
-  }
-
-  .avatar-info .email-tag {
-    font-size: 13px;
-    color: var(--muted);
-    margin: 0 0 10px;
-  }
-
-  .member-pill {
-    display: inline-block;
-    background: rgba(201,168,76,0.12);
-    color: var(--gold);
-    border: 1px solid rgba(201,168,76,0.3);
-    border-radius: 100px;
-    padding: 4px 14px;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-
   /* ─── Alert Messages ─── */
   .alert-zone {
     margin-bottom: 28px;
@@ -239,6 +204,43 @@
   .alert-info    { background: #e3f2fd; color: #1565c0; }
   .alert-warning { background: #fff8e1; color: #f57f17; }
 
+  /* ─── Edit Mode Styles ─── */
+  .edit-mode .field-value {
+    display: none;
+  }
+  
+  .edit-mode .field-edit {
+    display: block;
+  }
+  
+  .view-mode .field-edit {
+    display: none;
+  }
+  
+  .field-edit input,
+  .field-edit textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: white;
+  }
+  
+  /* Disabled input styling for non-editable fields */
+  .field-edit input:disabled {
+    background: var(--warm);
+    border-color: var(--muted);
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+  
+  .field-edit textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
   /* ─── Fields Grid ─── */
   .fields-heading {
     font-family: 'Playfair Display', serif;
@@ -354,6 +356,28 @@
     background: var(--ink);
     color: #fff;
     transform: translateY(-1px);
+  }
+
+  .btn-save {
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+  }
+  
+  .btn-save:hover {
+    background: var(--gold-light);
+    color: var(--ink);
+  }
+  
+  .btn-cancel {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--warm);
+  }
+  
+  .btn-cancel:hover {
+    background: var(--warm);
+    color: var(--ink);
   }
 
   /* ─── Sidebar Card ─── */
@@ -488,23 +512,50 @@
     color: var(--muted);
   }
 
-  /* ─── Divider Ornament ─── */
-  .ornament {
-    text-align: center;
+  /* Loading Spinner */
+  .loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0,0,0,0.1);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Modal Styles */
+  .modal-content {
+    border-radius: 20px;
+    background: var(--card-bg);
+  }
+  
+  .modal-header {
+    border-bottom-color: var(--warm);
+  }
+  
+  .modal-footer {
+    border-top-color: var(--warm);
+  }
+  
+  /* Info icon styles */
+  .info-icon {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 12px;
     color: var(--gold);
-    opacity: 0.5;
-    font-size: 20px;
-    margin: 6px 0 18px;
+    cursor: help;
   }
-
-  /* ─── Entrance Animations ─── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
+  
+  .readonly-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-style: italic;
   }
-
-  .main-card  { animation: fadeUp 0.55s cubic-bezier(.22,1,.36,1) 0.1s both; }
-  .sidebar-card { animation: fadeUp 0.55s cubic-bezier(.22,1,.36,1) 0.25s both; }
 </style>
 
 <div class="profile-wrap">
@@ -524,101 +575,130 @@
       <div class="card-inner">
 
         <!-- Alerts -->
-        {% if messages %}
-        <div class="alert-zone">
-          {% for message in messages %}
-          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-          {% endfor %}
+        <div class="alert-zone" id="alertZone">
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+          {% endif %}
         </div>
-        {% endif %}
 
         <!-- Avatar + Name -->
         <div class="avatar-section">
           <div class="avatar-wrap">
             {% if profile.profile_image %}
-              <img src="{{ profile.profile_image.url }}" alt="Profile Picture">
+              <img src="{{ profile.profile_image.url }}" alt="Profile Picture" id="profileAvatar">
             {% else %}
-              <div class="avatar-placeholder">
+              <div class="avatar-placeholder" id="profileAvatar">
                 {{ profile.first_name|first|upper }}{{ profile.last_name|first|upper }}
               </div>
             {% endif %}
             <span class="avatar-badge"></span>
           </div>
           <div class="avatar-info">
-            <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
-            <p class="email-tag">{{ profile.email }}</p>
+            <h2 id="displayName">{{ profile.first_name }} {{ profile.last_name }}</h2>
+            <p class="email-tag" id="displayEmail">{{ profile.email }}</p>
             <span class="member-pill">✦ Active Member</span>
           </div>
         </div>
 
         <!-- Info Fields -->
-        <p class="fields-heading">Personal Information</p>
-        <div class="fields-grid">
-          <div class="field-item">
-            <div class="field-label">First Name</div>
-            {% if profile.first_name %}
-              <div class="field-value">{{ profile.first_name }}</div>
-            {% else %}
-              <div class="field-value empty">Not set</div>
-            {% endif %}
-          </div>
+        <div id="profileFields" class="view-mode">
+          <p class="fields-heading">Personal Information</p>
+          <div class="fields-grid">
+            <div class="field-item">
+              <div class="field-label">
+                First Name
+                <span class="info-icon" title="First name cannot be changed. Contact support for changes.">ⓘ</span>
+              </div>
+              <div class="field-value" id="viewFirstName">
+                {% if profile.first_name %}{{ profile.first_name }}{% else %}<span class="empty">Not set</span>{% endif %}
+              </div>
+              <div class="field-edit">
+                <input type="text" id="editFirstName" value="{{ profile.first_name }}" disabled placeholder="First name cannot be edited">
+                <div class="readonly-note">First name cannot be changed. Please contact support for updates.</div>
+              </div>
+            </div>
 
-          <div class="field-item">
-            <div class="field-label">Last Name</div>
-            {% if profile.last_name %}
-              <div class="field-value">{{ profile.last_name }}</div>
-            {% else %}
-              <div class="field-value empty">Not set</div>
-            {% endif %}
-          </div>
+            <div class="field-item">
+              <div class="field-label">
+                Last Name
+                <span class="info-icon" title="Last name cannot be changed. Contact support for changes.">ⓘ</span>
+              </div>
+              <div class="field-value" id="viewLastName">
+                {% if profile.last_name %}{{ profile.last_name }}{% else %}<span class="empty">Not set</span>{% endif %}
+              </div>
+              <div class="field-edit">
+                <input type="text" id="editLastName" value="{{ profile.last_name }}" disabled placeholder="Last name cannot be edited">
+                <div class="readonly-note">Last name cannot be changed. Please contact support for updates.</div>
+              </div>
+            </div>
 
-          <div class="field-item">
-            <div class="field-label">Email Address</div>
-            {% if profile.email %}
-              <div class="field-value">{{ profile.email }}</div>
-            {% else %}
-              <div class="field-value empty">Not set</div>
-            {% endif %}
-          </div>
+            <div class="field-item">
+              <div class="field-label">
+                Email Address
+                <span class="info-icon" title="Email cannot be changed. Contact support for changes.">ⓘ</span>
+              </div>
+              <div class="field-value" id="viewEmail">
+                {% if profile.email %}{{ profile.email }}{% else %}<span class="empty">Not set</span>{% endif %}
+              </div>
+              <div class="field-edit">
+                <input type="email" id="editEmail" value="{{ profile.email }}" disabled placeholder="Email cannot be edited">
+                <div class="readonly-note">Email cannot be changed. Please contact support for updates.</div>
+              </div>
+            </div>
 
-          <div class="field-item">
-            <div class="field-label">Phone Number</div>
-            {% if profile.phone %}
-              <div class="field-value">{{ profile.phone }}</div>
-            {% else %}
-              <div class="field-value empty">Not set</div>
-            {% endif %}
-          </div>
+            <div class="field-item">
+              <div class="field-label">Phone Number</div>
+              <div class="field-value" id="viewPhone">
+                {% if profile.phone %}{{ profile.phone }}{% else %}<span class="empty">Not set</span>{% endif %}
+              </div>
+              <div class="field-edit">
+                <input type="tel" id="editPhone" value="{{ profile.phone }}" placeholder="Enter phone number">
+              </div>
+            </div>
 
-          <div class="field-item full">
-            <div class="field-label">Address</div>
-            {% if profile.address %}
-              <div class="field-value">{{ profile.address }}</div>
-            {% else %}
-              <div class="field-value empty">Not set</div>
-            {% endif %}
-          </div>
+            <div class="field-item full">
+              <div class="field-label">Address</div>
+              <div class="field-value" id="viewAddress">
+                {% if profile.address %}{{ profile.address }}{% else %}<span class="empty">Not set</span>{% endif %}
+              </div>
+              <div class="field-edit">
+                <textarea id="editAddress" placeholder="Enter address">{{ profile.address }}</textarea>
+              </div>
+            </div>
 
-          <div class="field-item full">
-            <div class="field-label">Bio</div>
-            {% if profile.bio %}
-              <div class="field-value">{{ profile.bio }}</div>
-            {% else %}
-              <div class="field-value empty">Not set</div>
-            {% endif %}
-          </div>
+            <div class="field-item full">
+              <div class="field-label">Bio</div>
+              <div class="field-value" id="viewBio">
+                {% if profile.bio %}{{ profile.bio }}{% else %}<span class="empty">Not set</span>{% endif %}
+              </div>
+              <div class="field-edit">
+                <textarea id="editBio" placeholder="Tell us about yourself">{{ profile.bio }}</textarea>
+              </div>
+            </div>
 
-          <div class="field-item full">
-            <div class="field-label">Member Since</div>
-            <div class="field-value">{{ profile.date_joined_institute }}</div>
+            <div class="field-item full">
+              <div class="field-label">Member Since</div>
+              <div class="field-value">{{ profile.date_joined_institute }}</div>
+            </div>
           </div>
         </div>
 
         <!-- Actions -->
-        <div class="action-row">
+        <div class="action-row" id="actionButtons">
+          <button type="button" class="btn-gold" id="editProfileBtn">
+            <i class="fas fa-edit"></i> Edit Profile
+          </button>
+          <button type="button" class="btn-gold btn-save" id="saveProfileBtn" style="display: none;">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+          <button type="button" class="btn-outline-dark btn-cancel" id="cancelEditBtn" style="display: none;">
+            <i class="fas fa-times"></i> Cancel
+          </button>
           <button type="button" class="btn-gold" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
             <i class="fas fa-key"></i> Change Password
           </button>
@@ -641,7 +721,7 @@
             <span class="ql-icon"><i class="fas fa-book"></i></span>
             Browse Courses
           </a>
-          <a href="{% url 'cart' %}" class="quick-link">
+          <a href="{% url 'cart_view' %}" class="quick-link">
             <span class="ql-icon"><i class="fas fa-shopping-cart"></i></span>
             Cart ({{ cart_count }})
           </a>
@@ -665,11 +745,11 @@
 
         <div class="stat-strip">
           <div class="stat-box">
-            <div class="stat-num">0</div>
+            <div class="stat-num">{{ purchased_count|default:"0" }}</div>
             <div class="stat-label">Courses</div>
           </div>
           <div class="stat-box">
-            <div class="stat-num">0</div>
+            <div class="stat-num">{{ live_count|default:"0" }}</div>
             <div class="stat-label">Classes</div>
           </div>
         </div>
@@ -679,5 +759,244 @@
 
   </div>
 </div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Change Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="changePasswordForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Current Password</label>
+            <input type="password" class="form-control" id="currentPassword" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">New Password</label>
+            <input type="password" class="form-control" id="newPassword" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirm New Password</label>
+            <input type="password" class="form-control" id="confirmPassword" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="submitPasswordChange">Update Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+// Toggle edit mode
+function toggleEditMode(isEditing) {
+    const profileFields = document.getElementById('profileFields');
+    const editBtn = document.getElementById('editProfileBtn');
+    const saveBtn = document.getElementById('saveProfileBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    
+    if (isEditing) {
+        profileFields.classList.remove('view-mode');
+        profileFields.classList.add('edit-mode');
+        editBtn.style.display = 'none';
+        saveBtn.style.display = 'inline-flex';
+        cancelBtn.style.display = 'inline-flex';
+    } else {
+        profileFields.classList.remove('edit-mode');
+        profileFields.classList.add('view-mode');
+        editBtn.style.display = 'inline-flex';
+        saveBtn.style.display = 'none';
+        cancelBtn.style.display = 'none';
+    }
+}
+
+// Show alert message
+function showAlert(message, type) {
+    const alertZone = document.getElementById('alertZone');
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    alertZone.insertAdjacentHTML('beforeend', alertHtml);
+    
+    // Auto dismiss after 5 seconds
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        if (alerts.length > 0) {
+            alerts[alerts.length - 1].remove();
+        }
+    }, 5000);
+}
+
+// Save profile changes with PUT request (only editable fields)
+// Save profile changes with PUT request (only editable fields)
+async function saveProfileChanges() {
+    const saveBtn = document.getElementById('saveProfileBtn');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+    saveBtn.disabled = true;
+    
+    // Only include editable fields (phone, address, bio)
+    const profileData = {
+        phone: document.getElementById('editPhone').value,
+        address: document.getElementById('editAddress').value,
+        bio: document.getElementById('editBio').value
+    };
+    
+    console.log('Sending data:', profileData); // Debug log
+    
+    try {
+        const response = await fetch("{% url 'update_profile_api' %}", {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(profileData)
+        });
+        
+        const result = await response.json();
+        console.log('Response:', result); // Debug log
+        
+        if (result.success) {
+            // Update view mode values for editable fields only
+            const phoneValue = profileData.phone || '';
+            const addressValue = profileData.address || '';
+            const bioValue = profileData.bio || '';
+            
+            document.getElementById('viewPhone').innerHTML = phoneValue || '<span class="empty">Not set</span>';
+            document.getElementById('viewAddress').innerHTML = addressValue || '<span class="empty">Not set</span>';
+            document.getElementById('viewBio').innerHTML = bioValue || '<span class="empty">Not set</span>';
+            
+            showAlert(result.message, 'success');
+            toggleEditMode(false);
+            
+            // Reload page after 1 second to show updated data
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            // Display validation errors
+            if (result.errors) {
+                for (const [field, error] of Object.entries(result.errors)) {
+                    showAlert(`${field}: ${error}`, 'danger');
+                }
+            } else {
+                showAlert(result.error || 'Failed to update profile', 'danger');
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('Network error. Please try again.', 'danger');
+    } finally {
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
+    }
+}
+
+// Change password function
+async function changePassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showAlert('Please fill in all password fields', 'danger');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        showAlert('New passwords do not match', 'danger');
+        return;
+    }
+    
+    if (newPassword.length < 6) {
+        showAlert('Password must be at least 6 characters', 'danger');
+        return;
+    }
+    
+    const submitBtn = document.getElementById('submitPasswordChange');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="loading-spinner"></span> Updating...';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch("{% url 'change_password_api' %}", {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                old_password: currentPassword,
+                new_password1: newPassword,
+                new_password2: confirmPassword
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showAlert(result.message, 'success');
+            // Close modal and clear form
+            const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+            modal.hide();
+            document.getElementById('changePasswordForm').reset();
+        } else {
+            if (result.errors) {
+                for (const [field, error] of Object.entries(result.errors)) {
+                    showAlert(error, 'danger');
+                }
+            } else {
+                showAlert(result.error || 'Failed to change password', 'danger');
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('Network error. Please try again.', 'danger');
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+// Event listeners
+document.getElementById('editProfileBtn').addEventListener('click', () => toggleEditMode(true));
+document.getElementById('cancelEditBtn').addEventListener('click', () => {
+    // Reset only editable fields to original values
+    document.getElementById('editPhone').value = document.getElementById('viewPhone').innerText.replace('Not set', '');
+    document.getElementById('editAddress').value = document.getElementById('viewAddress').innerText.replace('Not set', '');
+    document.getElementById('editBio').value = document.getElementById('viewBio').innerText.replace('Not set', '');
+    toggleEditMode(false);
+});
+document.getElementById('saveProfileBtn').addEventListener('click', saveProfileChanges);
+document.getElementById('submitPasswordChange').addEventListener('click', changePassword);
+</script>
 
 {% endblock %}
