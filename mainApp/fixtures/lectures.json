@@ -1,0 +1,50 @@
+[
+  {
+    "model": "mainApp.chapter",
+    "pk": 1,
+    "fields": {
+      "course": 2,
+      "title": "Introduction to Django",
+      "description": "Get started with Django web framework basics",
+      "order": 1,
+      "is_preview": true
+    }
+  },
+  {
+    "model": "mainApp.lecture",
+    "pk": 1,
+    "fields": {
+      "chapter": 1,
+      "title": "Django Installation and First Project",
+      "lecture_type": "video",
+      "video_url": "https://www.youtube.com/watch?v=fCDmd1kF0xc",
+      "duration_minutes": 15,
+      "order": 1,
+      "is_free_preview": true
+    }
+  },
+  {
+    "model": "mainApp.chapter",
+    "pk": 2,
+    "fields": {
+      "course": 2,
+      "title": "Django Models and Admin",
+      "description": "Learn Django ORM and admin interface",
+      "order": 2,
+      "is_preview": false
+    }
+  },
+  {
+    "model": "mainApp.lecture",
+    "pk": 2,
+    "fields": {
+      "chapter": 2,
+      "title": "Creating Models and Migrations",
+      "lecture_type": "video",
+      "video_url": "https://youtu.be/rScL_He1P94",
+      "duration_minutes": 20,
+      "order": 1,
+      "is_free_preview": false
+    }
+  }
+]

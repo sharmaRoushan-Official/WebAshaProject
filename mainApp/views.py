@@ -27,7 +27,11 @@ from .forms import (
 logger = logging.getLogger(__name__)
 
 # Create your views here.
-# @csrf_exempt
+
+# REMOVED THE INCORRECTLY PLACED METHODS FROM HERE
+# The clean_youtube_url and save methods should NOT be in views.py
+# They belong in models.py (already there)
+
 def forgot_password_reset(request):
     """
     Step 3: Reset password after OTP verification
@@ -110,28 +114,6 @@ def forgot_password_reset(request):
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-def clean_youtube_url(self):
-    """Remove tracking parameters from YouTube URLs"""
-    if not self.video_url:
-        return ""
-    
-    url = self.video_url.strip()
-    
-    # Remove ?si= and any other query parameters
-    if '?' in url:
-        url = url.split('?')[0]
-    
-    # Remove any trailing slashes
-    url = url.rstrip('/')
-    
-    return url
-
-def save(self, *args, **kwargs):
-    """Auto-clean YouTube URLs before saving"""
-    if self.video_url and ('youtu.be' in self.video_url or 'youtube.com' in self.video_url):
-        self.video_url = self.clean_youtube_url()
-    super().save(*args, **kwargs)
-
 # Forgot Password Views
 
 def forgot_password_request(request):
@@ -198,7 +180,6 @@ def forgot_password_request(request):
     return render(request, 'mainApp/forgot_password_request.html', context)
 
 
-# @csrf_exempt  # Removed - now properly protected
 def forgot_password_verify_otp(request):
     """
     Step 2: Verify OTP for forgot password
@@ -886,7 +867,7 @@ def add_to_cart(request):
             if not created:
                 transaction.is_active = True
                 transaction.save()
-                return JsonResponse({'success': False, 'error': 'Course added in cart'})
+                return JsonResponse({'success': False, 'error': 'Course already in cart'})
         
         elif course_type == 1:  # Live course -> LiveCourseTransaction
             try:
@@ -898,27 +879,9 @@ def add_to_cart(request):
             if profile.live_transactions.filter(live_course=live_course, status='completed').exists():
                 return JsonResponse({'success': False, 'error': 'Live course already purchased'})
             
-            transaction, created = LiveCourseTransaction.objects.get_or_create(
-                profile=profile,
-                live_course=live_course,
-                status='pending',
-                defaults={
-                    'transaction_id': f"live_cart_{uuid.uuid4().hex[:12]}",
-                    'base_amount': base_amount,
-                    'gst_amount': gst_amount,
-                    'total_amount': total_amount,
-                    'is_active': True
-                }
-            )
-            
-            if not created:
-                transaction.is_active = True
-                transaction.save()
+            # Check if already in cart
+            if profile.live_transactions.filter(live_course=live_course, status='pending', is_active=True).exists():
                 return JsonResponse({'success': False, 'error': 'Live course already in cart'})
-            
-            # Check if already registered (for live courses)
-            if LiveCourseRegistration.objects.filter(profile=profile, live_course=live_course).exists():
-                return JsonResponse({'success': False, 'error': 'Already registered for this live course'})
             
             # Add to cart with GST calculation
             base_amount = live_course.price
@@ -1347,6 +1310,11 @@ def lecture_detail(request, course_id, lecture_id):
         messages.warning(request, 'Please purchase the course to access this lecture.')
         return redirect('courseDetail', course_id=course.id)
     
+    # Debug print to verify embed URL
+    print(f"Lecture: {lecture.title}")
+    print(f"Video URL: {lecture.video_url}")
+    print(f"Embed URL: {lecture.get_video_embed_url()}")
+    
     context = {
         'course': course,
         'lecture': lecture,
@@ -1355,6 +1323,9 @@ def lecture_detail(request, course_id, lecture_id):
         'chapter': lecture.chapter,
         'chapters': course.chapters.all(),
         'cart_count': get_cart_count(request),
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
     }
     return render(request, 'mainApp/lecture.html', context)
 

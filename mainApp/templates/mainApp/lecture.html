@@ -18,25 +18,58 @@
           {% if lecture.video_url %}
             <!-- YouTube/Vimeo Video -->
             {% if 'youtube.com' in lecture.video_url or 'youtu.be' in lecture.video_url %}
-              <div class="ratio ratio-16x9 mb-4">
-                <iframe src="{{ lecture.get_video_embed_url }}" 
+              <div class="ratio ratio-16x9 mb-4" id="youtube-video-container">
+                <iframe id="youtube-iframe"
+                        src="{{ lecture.get_video_embed_url }}" 
                         title="{{ lecture.title }}" 
                         allowfullscreen 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        class="rounded shadow-sm"></iframe>
+                        class="rounded shadow-sm"
+                        onerror="handleVideoError()"></iframe>
               </div>
+              
+              <!-- Fallback for blocked content (Brave, etc.) -->
+              <div id="video-fallback" style="display: none;" class="alert alert-warning text-center p-4">
+                <i class="fas fa-shield-alt fa-3x mb-3 text-warning"></i>
+                <h5>Video player is blocked</h5>
+                <p>This could be due to browser privacy settings (Brave Shields), ad blocker, or network restrictions.</p>
+                <div class="mt-3">
+                  <button onclick="openInNewTab()" class="btn btn-primary me-2">
+                    <i class="fab fa-youtube me-2"></i>Open in YouTube
+                  </button>
+                  <button onclick="retryVideo()" class="btn btn-outline-secondary">
+                    <i class="fas fa-sync-alt me-2"></i>Retry
+                  </button>
+                </div>
+                <div class="mt-3 small text-muted">
+                  <strong>Brave Users:</strong> Click the lion icon 🦁 in address bar → Disable Shields for this site
+                </div>
+              </div>
+              
+              <!-- Direct link for all users -->
+              <div class="text-center mt-2">
+                <a href="{{ lecture.video_url }}" target="_blank" class="text-muted small" id="direct-link">
+                  <i class="fab fa-youtube me-1"></i>Watch on YouTube (opens in new tab)
+                </a>
+              </div>
+              
             {% elif 'vimeo.com' in lecture.video_url %}
               <div class="ratio ratio-16x9 mb-4">
                 <iframe src="{{ lecture.get_video_embed_url }}" 
                         title="{{ lecture.title }}" 
                         allowfullscreen 
-                        class="rounded shadow-sm"></iframe>
+                        class="rounded shadow-sm"
+                        onerror="handleVimeoError(this)"></iframe>
+              </div>
+              <div id="vimeo-fallback" style="display: none;" class="alert alert-warning text-center">
+                <p>Vimeo video cannot be loaded. <a href="{{ lecture.video_url }}" target="_blank">Click here to watch on Vimeo</a></p>
               </div>
             {% else %}
               <!-- Generic video URL -->
-              <video class="w-100 rounded shadow-sm" controls preload="metadata">
+              <video class="w-100 rounded shadow-sm" controls preload="metadata" id="html5-video">
                 <source src="{{ lecture.video_url }}" type="video/mp4">
                 Your browser does not support video playback.
+                <a href="{{ lecture.video_url }}" target="_blank">Download video</a>
               </video>
             {% endif %}
           {% elif lecture.video_embed_code %}
@@ -69,7 +102,7 @@
             <button class="btn btn-success btn-sm mark-complete-btn" data-lecture="{{ lecture.id }}">
               <i class="fas fa-check me-1"></i>Mark Complete
             </button>
-            <button class="btn btn-outline-secondary btn-sm">
+            <button class="btn btn-outline-secondary btn-sm" onclick="addNote()">
               <i class="fas fa-bookmark me-1"></i>Add Note
             </button>
           </div>
@@ -86,9 +119,9 @@
         <div class="card-body p-0">
           {% for lec in lecture.chapter.lectures.all %}
           <a href="{% url 'lectureDetail' course.id lec.id %}" 
-             class="d-flex align-items-center p-3 border-bottom {% if lec == lecture %}bg-primary text-white fw-bold{% elif lec in user_access.completed_lectures.all %}text-success{% endif %}">
+             class="d-flex align-items-center p-3 border-bottom {% if lec == lecture %}bg-primary text-white fw-bold{% elif user_access and lec in user_access.completed_lectures.all %}text-success{% endif %}">
             <span class="me-3">
-              {% if lec in user_access.completed_lectures.all %}<i class="fas fa-check-circle text-success"></i>
+              {% if user_access and lec in user_access.completed_lectures.all %}<i class="fas fa-check-circle text-success"></i>
               {% elif lec == lecture %}<i class="fas fa-play-circle text-white"></i>
               {% else %}<i class="fas fa-circle text-muted"></i>{% endif %}
             </span>
@@ -183,34 +216,227 @@
 .tiny { font-size: 0.75rem !important; }
 .border-bottom-small { border-bottom: 1px solid #eee !important; }
 .border-bottom:last-child { border-bottom: none !important; }
+.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffecb5;
+  color: #856404;
+}
 </style>
 
 <script>
+// Get CSRF token from cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
 // Mark lecture complete
 document.addEventListener('DOMContentLoaded', function() {
   const completeBtns = document.querySelectorAll('.mark-complete-btn');
   completeBtns.forEach(btn => {
     btn.addEventListener('click', function() {
       const lectureId = this.dataset.lecture;
+      const btnElement = this;
       
       fetch("{% url 'mark_lecture_complete' %}", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+          'X-CSRFToken': csrftoken
         },
         body: JSON.stringify({lecture_id: lectureId})
       })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          this.innerHTML = '<i class="fas fa-check-double me-1"></i>Completed ✓';
-          this.classList.add('btn-success', 'disabled');
-          location.reload(); // Refresh to update progress
+          btnElement.innerHTML = '<i class="fas fa-check-double me-1"></i>Completed ✓';
+          btnElement.classList.add('btn-success', 'disabled');
+          btnElement.disabled = true;
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          alert('Error: ' + (data.error || 'Could not mark lecture as complete'));
         }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to mark lecture as complete. Please try again.');
       });
     });
   });
+});
+
+// YouTube video error handling for all browsers
+function handleVideoError() {
+  console.log('Video failed to load');
+  const container = document.getElementById('youtube-video-container');
+  const fallback = document.getElementById('video-fallback');
+  if (container && fallback) {
+    container.style.display = 'none';
+    fallback.style.display = 'block';
+  }
+}
+
+function openInNewTab() {
+  const videoUrl = "{{ lecture.video_url|escapejs }}";
+  if (videoUrl) {
+    window.open(videoUrl, '_blank');
+  }
+}
+
+function retryVideo() {
+  const container = document.getElementById('youtube-video-container');
+  const fallback = document.getElementById('video-fallback');
+  const iframe = document.getElementById('youtube-iframe');
+  
+  if (container && fallback && iframe) {
+    // Reset iframe src to retry loading
+    const currentSrc = iframe.src;
+    iframe.src = '';
+    setTimeout(() => {
+      iframe.src = currentSrc;
+    }, 100);
+    
+    container.style.display = 'block';
+    fallback.style.display = 'none';
+  }
+}
+
+// Detect Brave browser and other blockers
+async function detectBrave() {
+  // Check for Brave
+  if (navigator.brave && await navigator.brave.isBrave()) {
+    return 'brave';
+  }
+  // Check user agent for Brave
+  if (navigator.userAgent.includes('Brave')) {
+    return 'brave';
+  }
+  return 'other';
+}
+
+// Check if iframe is blocked
+function checkIframeBlocked() {
+  const iframe = document.getElementById('youtube-iframe');
+  if (iframe) {
+    // Try to access iframe content - will throw error if blocked
+    try {
+      const iframeDoc = iframe.contentWindow || iframe.contentDocument;
+      if (iframeDoc === null) {
+        handleVideoError();
+      }
+    } catch (e) {
+      console.log('Iframe access blocked:', e);
+      handleVideoError();
+    }
+  }
+}
+
+// Run detection after page load
+document.addEventListener('DOMContentLoaded', async function() {
+  const browser = await detectBrave();
+  if (browser === 'brave') {
+    console.log('Brave browser detected - checking video player');
+    setTimeout(checkIframeBlocked, 2000);
+  }
+  
+  // Also check after 3 seconds for any loading issues
+  setTimeout(checkIframeBlocked, 3000);
+});
+
+// Vimeo error handling
+function handleVimeoError(iframe) {
+  const fallback = document.getElementById('vimeo-fallback');
+  if (fallback) {
+    iframe.style.display = 'none';
+    fallback.style.display = 'block';
+  }
+}
+
+// Add note functionality
+function addNote() {
+  const note = prompt('Enter your notes for this lecture:');
+  if (note && note.trim()) {
+    // You can implement AJAX call to save notes here
+    fetch("{% url 'save_lecture_note' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({
+        lecture_id: {{ lecture.id }},
+        note: note
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Note saved successfully!');
+      } else {
+        alert('Failed to save note');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to save note');
+    });
+  }
+}
+
+// Track video watch time for progress
+let watchStartTime = null;
+let watchInterval = null;
+
+function startWatchTracking() {
+  if (document.getElementById('youtube-iframe')) {
+    watchStartTime = Date.now();
+    watchInterval = setInterval(() => {
+      if (watchStartTime) {
+        const watchTime = Math.floor((Date.now() - watchStartTime) / 1000);
+        if (watchTime >= 30) { // Send update every 30 seconds
+          updateWatchTime(watchTime);
+          watchStartTime = Date.now();
+        }
+      }
+    }, 30000);
+  }
+}
+
+function updateWatchTime(seconds) {
+  fetch("{% url 'update_watch_time' %}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrftoken
+    },
+    body: JSON.stringify({
+      lecture_id: {{ lecture.id }},
+      seconds: seconds
+    })
+  })
+  .catch(error => console.error('Error updating watch time:', error));
+}
+
+// Start tracking when page loads
+document.addEventListener('DOMContentLoaded', startWatchTracking);
+
+// Stop tracking when leaving page
+window.addEventListener('beforeunload', function() {
+  if (watchInterval) {
+    clearInterval(watchInterval);
+  }
 });
 </script>
 
