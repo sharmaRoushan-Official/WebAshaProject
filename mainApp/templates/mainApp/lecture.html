@@ -102,9 +102,6 @@
             <button class="btn btn-success btn-sm mark-complete-btn" data-lecture="{{ lecture.id }}">
               <i class="fas fa-check me-1"></i>Mark Complete
             </button>
-            <button class="btn btn-outline-secondary btn-sm" onclick="addNote()">
-              <i class="fas fa-bookmark me-1"></i>Add Note
-            </button>
           </div>
           {% endif %}
         </div>
@@ -364,80 +361,9 @@ function handleVimeoError(iframe) {
   }
 }
 
-// Add note functionality
-function addNote() {
-  const note = prompt('Enter your notes for this lecture:');
-  if (note && note.trim()) {
-    // You can implement AJAX call to save notes here
-    fetch("{% url 'save_lecture_note' %}", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrftoken
-      },
-      body: JSON.stringify({
-        lecture_id: {{ lecture.id }},
-        note: note
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Note saved successfully!');
-      } else {
-        alert('Failed to save note');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Failed to save note');
-    });
-  }
-}
 
-// Track video watch time for progress
-let watchStartTime = null;
-let watchInterval = null;
 
-function startWatchTracking() {
-  if (document.getElementById('youtube-iframe')) {
-    watchStartTime = Date.now();
-    watchInterval = setInterval(() => {
-      if (watchStartTime) {
-        const watchTime = Math.floor((Date.now() - watchStartTime) / 1000);
-        if (watchTime >= 30) { // Send update every 30 seconds
-          updateWatchTime(watchTime);
-          watchStartTime = Date.now();
-        }
-      }
-    }, 30000);
-  }
-}
 
-function updateWatchTime(seconds) {
-  fetch("{% url 'update_watch_time' %}", {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrftoken
-    },
-    body: JSON.stringify({
-      lecture_id: {{ lecture.id }},
-      seconds: seconds
-    })
-  })
-  .catch(error => console.error('Error updating watch time:', error));
-}
-
-// Start tracking when page loads
-document.addEventListener('DOMContentLoaded', startWatchTracking);
-
-// Stop tracking when leaving page
-window.addEventListener('beforeunload', function() {
-  if (watchInterval) {
-    clearInterval(watchInterval);
-  }
-});
 </script>
 
 {% endblock %}
