@@ -772,6 +772,19 @@ def create_invoice_for_course_transaction(sender, instance, created, **kwargs):
             except Exception as e:
                 logger.error(f"Failed to auto-generate PDF for invoice {invoice.invoice_number}: {str(e)}")
 
+@receiver(post_save, sender=Invoice)
+def send_email_on_invoice_creation(sender, instance, created, **kwargs):
+    """
+    Automatically send invoice email after invoice is created with paid status
+    """
+    if created and instance.payment_status == 'paid':
+        try:
+            from .services.emailjs_service import send_invoice_email
+            send_invoice_email(instance, request=None)
+            logger.info(f"Invoice email sent for {instance.invoice_number}")
+        except Exception as e:
+            logger.error(f"Failed to send invoice email: {str(e)}")
+
 
 @receiver(post_save, sender=LiveCourseTransaction)
 def create_invoice_for_live_course_transaction(sender, instance, created, **kwargs):

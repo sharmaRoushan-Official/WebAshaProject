@@ -146,3 +146,9 @@ LOGOUT_REDIRECT_URL = '/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# EmailJS Configuration
+EMAILJS_SERVICE_ID = 'service_70zmrya'
+EMAILJS_TEMPLATE_ID = 'template_uwofnd9'
+EMAILJS_USER_ID = 'KJSpCzreT81Hc1sgO'  # Get from EmailJS: Account → API Keys → Public Key
+EMAILJS_ACCESS_TOKEN = '6RR0QNFitrc_IG92zoM4M'  # Get from EmailJS: Account → API Keys → Private Key
