@@ -5,6 +5,13 @@ from django.utils import timezone
 import random
 import string
 import re
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from decimal import Decimal
+
+import logging
+logger = logging.getLogger(__name__)
+
 
 class Course(models.Model):
     title = models.CharField(max_length=200)
@@ -620,3 +627,197 @@ class LiveCourseTransaction(models.Model):
 
     def __str__(self):
         return f"{self.profile.user.username} - {self.live_course.title} - ₹{self.total_amount} ({self.status})"
+    
+# Add this model to your existing models.py file
+
+class Invoice(models.Model):
+    """
+    Invoice model for tracking purchases and generating PDF invoices
+    """
+    INVOICE_STATUS_CHOICES = [
+        ('paid', 'Paid'),
+        ('pending', 'Pending'),
+        ('cancelled', 'Cancelled'),
+        ('refunded', 'Refunded'),
+    ]
+    
+    # Unique invoice number (e.g., INV-20241201-0001)
+    invoice_number = models.CharField(max_length=50, unique=True, editable=False)
+    
+    # Relationships
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='invoices')
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
+    live_course = models.ForeignKey(LiveCourse, on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
+    
+    # Transaction references
+    course_transaction = models.ForeignKey(CourseTransaction, on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
+    live_transaction = models.ForeignKey(LiveCourseTransaction, on_delete=models.SET_NULL, null=True, blank=True, related_name='invoices')
+    
+    # Invoice details
+    invoice_date = models.DateTimeField(auto_now_add=True)
+    base_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # GST etc.
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=18.00)  # 18% GST
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    
+    # Payment details
+    payment_status = models.CharField(max_length=20, choices=INVOICE_STATUS_CHOICES, default='paid')
+    payment_method = models.CharField(max_length=50, blank=True, help_text="e.g., Stripe, PayPal, Razorpay")
+    payment_transaction_id = models.CharField(max_length=100, blank=True, help_text="Gateway transaction ID")
+    
+    # Customer details captured at time of purchase (for historical record)
+    customer_name = models.CharField(max_length=100)
+    customer_email = models.EmailField()
+    customer_phone = models.CharField(max_length=15)
+    customer_address = models.TextField(blank=True)
+    
+    # Invoice metadata
+    notes = models.TextField(blank=True, help_text="Any additional notes on invoice")
+    pdf_file = models.FileField(upload_to='invoices/', blank=True, null=True, help_text="Generated PDF file")
+    is_downloaded = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-invoice_date']
+        verbose_name = 'Invoice'
+        verbose_name_plural = 'Invoices'
+    
+    def __str__(self):
+        course_title = self.course.title if self.course else (self.live_course.title if self.live_course else 'N/A')
+        return f"{self.invoice_number} - {self.customer_name} - {course_title}"
+    
+    @property
+    def get_course_title(self):
+        """Get the course title (either normal or live)"""
+        if self.course:
+            return self.course.title
+        elif self.live_course:
+            return self.live_course.title
+        return "Unknown Course"
+    
+    @staticmethod
+    def generate_invoice_number():
+        """
+        Generate unique invoice number
+        Format: INV-YYYYMMDD-XXXX (where XXXX is sequential)
+        """
+        from datetime import datetime
+        date_prefix = datetime.now().strftime('%Y%m%d')
+        
+        # Get the last invoice number for today
+        last_invoice = Invoice.objects.filter(
+            invoice_number__startswith=f"INV-{date_prefix}"
+        ).order_by('-invoice_number').first()
+        
+        if last_invoice:
+            # Extract the sequence number and increment
+            last_seq = int(last_invoice.invoice_number.split('-')[-1])
+            new_seq = last_seq + 1
+        else:
+            new_seq = 1
+        
+        return f"INV-{date_prefix}-{new_seq:04d}"
+    
+# ==================== SIGNALS FOR AUTO-INVOICE CREATION ====================
+
+
+
+@receiver(post_save, sender=CourseTransaction)
+def create_invoice_for_course_transaction(sender, instance, created, **kwargs):
+    """
+    Automatically create an invoice when a CourseTransaction is marked as 'completed'
+    """
+    if instance.status == 'completed' and instance.is_active:
+        # Check if invoice already exists for this transaction
+        if not Invoice.objects.filter(course_transaction=instance).exists():
+            profile = instance.user
+            course = instance.course
+            
+            # Calculate amounts
+            base_amount = instance.amount
+            tax_rate = Decimal('18.00')
+            tax_amount = (base_amount * tax_rate) / Decimal('100')
+            total_amount = base_amount + tax_amount
+            
+            # Generate invoice number
+            invoice_number = Invoice.generate_invoice_number()
+            
+            # Create the invoice
+            invoice = Invoice.objects.create(
+                invoice_number=invoice_number,
+                profile=profile,
+                course=course,
+                live_course=None,
+                course_transaction=instance,
+                live_transaction=None,
+                base_amount=base_amount,
+                tax_amount=tax_amount,
+                tax_rate=tax_rate,
+                total_amount=total_amount,
+                payment_status='paid',
+                payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
+                payment_transaction_id=instance.transaction_id,
+                customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
+                customer_email=profile.email or profile.user.email,
+                customer_phone=profile.phone or '',
+                customer_address=profile.address or '',
+            )
+            
+            # Auto-generate and save PDF for the invoice
+            try:
+                from .services.invoice_pdf import save_pdf_to_model
+                save_pdf_to_model(invoice)
+                logger.info(f"PDF auto-generated for invoice {invoice.invoice_number}")
+            except Exception as e:
+                logger.error(f"Failed to auto-generate PDF for invoice {invoice.invoice_number}: {str(e)}")
+
+
+@receiver(post_save, sender=LiveCourseTransaction)
+def create_invoice_for_live_course_transaction(sender, instance, created, **kwargs):
+    """
+    Automatically create an invoice when a LiveCourseTransaction is marked as 'completed'
+    """
+    if instance.status == 'completed' and instance.is_active:
+        # Check if invoice already exists for this transaction
+        if not Invoice.objects.filter(live_transaction=instance).exists():
+            profile = instance.profile
+            live_course = instance.live_course
+            
+            # Use the stored amounts from the transaction
+            base_amount = instance.base_amount
+            tax_amount = instance.gst_amount
+            total_amount = instance.total_amount
+            tax_rate = Decimal('18.00')
+            
+            # Generate invoice number
+            invoice_number = Invoice.generate_invoice_number()
+            
+            # Create the invoice
+            invoice = Invoice.objects.create(
+                invoice_number=invoice_number,
+                profile=profile,
+                course=None,
+                live_course=live_course,
+                course_transaction=None,
+                live_transaction=instance,
+                base_amount=base_amount,
+                tax_amount=tax_amount,
+                tax_rate=tax_rate,
+                total_amount=total_amount,
+                payment_status='paid',
+                payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
+                payment_transaction_id=instance.transaction_id,
+                customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
+                customer_email=profile.email or profile.user.email,
+                customer_phone=profile.phone or '',
+                customer_address=profile.address or '',
+            )
+            
+            # Auto-generate and save PDF for the invoice
+            try:
+                from .services.invoice_pdf import save_pdf_to_model
+                save_pdf_to_model(invoice)
+                logger.info(f"PDF auto-generated for invoice {invoice.invoice_number}")
+            except Exception as e:
+                logger.error(f"Failed to auto-generate PDF for invoice {invoice.invoice_number}: {str(e)}")

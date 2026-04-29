@@ -22,7 +22,10 @@ from .forms import (
     ForgotPasswordResetForm,
     ResetPasswordForm
 )
-
+from django.http import HttpResponse, Http404
+from django.core.exceptions import PermissionDenied
+from .models import Invoice
+from .services.invoice_pdf import generate_invoice_pdf, save_pdf_to_model
 # Set up logging
 logger = logging.getLogger(__name__)
 
@@ -1413,3 +1416,113 @@ def mark_lecture_complete(request):
         return JsonResponse({'success': False, 'error': 'No access to this course'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+    
+# ==================== INVOICE VIEWS ====================
+
+@login_required
+def my_invoices(request):
+    """Display list of all invoices for the logged-in user"""
+    profile = get_profile_or_create(request)
+    invoices = Invoice.objects.filter(profile=profile).order_by('-invoice_date')
+    
+    context = {
+        'invoices': invoices,
+        'profile': profile,
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+        'cart_count': get_cart_count(request)
+    }
+    return render(request, 'mainApp/my_invoices.html', context)
+
+
+@login_required
+def download_invoice_pdf(request, invoice_id):
+    """
+    Download invoice as PDF
+    """
+    profile = get_profile_or_create(request)
+    
+    # Get the invoice and verify ownership
+    try:
+        invoice = Invoice.objects.get(id=invoice_id, profile=profile)
+    except Invoice.DoesNotExist:
+        raise Http404("Invoice not found")
+    
+    # Check if user owns this invoice
+    if invoice.profile != profile:
+        raise PermissionDenied("You don't have permission to download this invoice")
+    
+    # Check if PDF file exists in model, if not generate and save
+    if not invoice.pdf_file or not invoice.pdf_file.name:
+        save_pdf_to_model(invoice)
+        # Refresh invoice to get the saved PDF
+        invoice.refresh_from_db()
+    
+    # If PDF file exists, serve it
+    if invoice.pdf_file and invoice.pdf_file.name:
+        try:
+            response = HttpResponse(invoice.pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="invoice_{invoice.invoice_number}.pdf"'
+            return response
+        except Exception as e:
+            logger.error(f"Error serving PDF for invoice {invoice.invoice_number}: {str(e)}")
+            # Fallback: generate on the fly
+            pdf_buffer = generate_invoice_pdf(invoice)
+            response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="invoice_{invoice.invoice_number}.pdf"'
+            return response
+    else:
+        # Generate PDF on the fly if not saved
+        pdf_buffer = generate_invoice_pdf(invoice)
+        response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="invoice_{invoice.invoice_number}.pdf"'
+        return response
+
+
+@login_required
+def view_invoice_pdf(request, invoice_id):
+    """
+    View invoice as PDF in browser (inline instead of download)
+    """
+    profile = get_profile_or_create(request)
+    
+    # Get the invoice and verify ownership
+    try:
+        invoice = Invoice.objects.get(id=invoice_id, profile=profile)
+    except Invoice.DoesNotExist:
+        raise Http404("Invoice not found")
+    
+    # Check if user owns this invoice
+    if invoice.profile != profile:
+        raise PermissionDenied("You don't have permission to view this invoice")
+    
+    # Generate PDF
+    pdf_buffer = generate_invoice_pdf(invoice)
+    response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="invoice_{invoice.invoice_number}.pdf"'
+    return response
+
+
+@login_required
+def invoice_detail(request, invoice_id):
+    """Display invoice details page (HTML view)"""
+    profile = get_profile_or_create(request)
+    
+    try:
+        invoice = Invoice.objects.get(id=invoice_id, profile=profile)
+    except Invoice.DoesNotExist:
+        raise Http404("Invoice not found")
+    
+    if invoice.profile != profile:
+        raise PermissionDenied("You don't have permission to view this invoice")
+    
+    context = {
+        'invoice': invoice,
+        'profile': profile,
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+        'cart_count': get_cart_count(request)
+    }
+    return render(request, 'mainApp/invoice_detail.html', context)

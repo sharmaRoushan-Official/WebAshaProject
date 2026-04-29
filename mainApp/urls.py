@@ -57,4 +57,12 @@ urlpatterns = [
     path("ajax/course-status/<int:course_id>/", ajax_course_status, name="course_status"),
     path("ajax/live-course-status/<int:live_course_id>/", ajax_live_course_status, name="live_course_status"),
     path("ajax/mark-lecture-complete/", mark_lecture_complete, name="mark_lecture_complete"),
+    
+    # Add these with your other URL patterns
+
+    # Invoice URLs
+    path("my-invoices/", my_invoices, name="my_invoices"),
+    path("invoice/<int:invoice_id>/", invoice_detail, name="invoice_detail"),
+    path("invoice/<int:invoice_id>/download/", download_invoice_pdf, name="download_invoice_pdf"),
+    path("invoice/<int:invoice_id>/view/", view_invoice_pdf, name="view_invoice_pdf"),
 ]
