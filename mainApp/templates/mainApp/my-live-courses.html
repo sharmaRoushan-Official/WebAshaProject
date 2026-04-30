@@ -60,6 +60,7 @@
                         <thead>
                             <tr>
                                 <th>Course</th>
+                                <th>Email</th>
                                 <th>Purchase Date</th>
                                 <th>Base Amount</th>
                                 <th>GST (18%)</th>
@@ -74,6 +75,7 @@
                                     <strong>{{ txn.live_course.title }}</strong><br>
                                     <small class="text-muted">{{ txn.live_course.start_day }} {{ txn.live_course.start_time }}</small>
                                 </td>
+                                <td><strong>{{ txn.profile.user.email }}</strong></td>
                                 <td>{{ txn.purchase_date|date:"M d, Y" }}</td>
                                 <td>₹{{ txn.base_amount }}</td>
                                 <td>₹{{ txn.gst_amount }}</td>

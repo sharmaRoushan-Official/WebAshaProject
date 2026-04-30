@@ -26,14 +26,11 @@ from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from .models import Invoice
 from .services.invoice_pdf import generate_invoice_pdf, save_pdf_to_model
+
 # Set up logging
 logger = logging.getLogger(__name__)
 
 # Create your views here.
-
-# REMOVED THE INCORRECTLY PLACED METHODS FROM HERE
-# The clean_youtube_url and save methods should NOT be in views.py
-# They belong in models.py (already there)
 
 def forgot_password_reset(request):
     """
@@ -529,7 +526,7 @@ def register_view(request):
                     user=user,
                     first_name=data['first_name'],
                     last_name=data['last_name'],
-                    email=data['email'],  # ← ADD THIS LINE to set profile email
+                    email=data['email'],
                     phone=data['phone'],
                     address=data['address']
                 )
@@ -549,6 +546,7 @@ def register_view(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, 'mainApp/register.html', context)
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -593,12 +591,14 @@ def get_profile_or_create(request):
             user=request.user,
             first_name=request.user.first_name or '',
             last_name=request.user.last_name or '',
-            email=request.user.email or '',  # ← Make sure email is copied from User
+            email=request.user.email or '',
             phone='',
             address='',
         )
         messages.success(request, 'Welcome! Your profile has been created.')
         return profile
+
+
 # AJAX Status Views
 @login_required
 def ajax_course_status(request, course_id):
@@ -655,14 +655,7 @@ def ajax_live_course_status(request, live_course_id):
 def profile_view(request):
     profile = get_profile_or_create(request)
     
-    # Sync email from User to Profile if profile email is empty
-    if not profile.email and request.user.email:
-        profile.email = request.user.email
-        profile.save()
-    # Also sync if emails don't match (prefer User email as source of truth)
-    elif profile.email != request.user.email and request.user.email:
-        profile.email = request.user.email
-        profile.save()
+    # Email sync handled by models.py signal - no manual sync needed
     
     context = {
         'profile': profile,
@@ -672,6 +665,7 @@ def profile_view(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, 'mainApp/profile.html', context)
+
 
 @login_required
 @require_http_methods(["PUT"])
@@ -841,12 +835,19 @@ def merge_session_cart_to_user(request, profile):
                 if not profile.coursetransactions.filter(course=course, status='completed').exists():
                     # Check if already in cart
                     if not profile.coursetransactions.filter(course=course, status='pending', is_active=True).exists():
+                        # Calculate GST for the course (18%)
+                        base_amount = course.price
+                        gst_amount = base_amount * Decimal('0.18')
+                        total_amount = base_amount + gst_amount
+                        
                         CourseTransaction.objects.create(
                             user=profile,
                             course=course,
                             status='pending',
                             transaction_id=f"cart_normal_{uuid.uuid4().hex[:12]}",
-                            amount=course.price,
+                            base_amount=base_amount,
+                            gst_amount=gst_amount,
+                            amount=total_amount,
                             is_active=True
                         )
             except Course.DoesNotExist:
@@ -882,7 +883,7 @@ def merge_session_cart_to_user(request, profile):
     request.session.modified = True
 
 
-# In add_to_cart function - FIXED version (removed course_type)
+# In add_to_cart function - FIXED version
 def add_to_cart(request):
     """Add course to cart - works for both anonymous and authenticated users"""
     if request.method != 'POST':
@@ -920,19 +921,29 @@ def add_to_cart(request):
             if profile.coursetransactions.filter(course=course, status='completed').exists():
                 return JsonResponse({'success': False, 'error': 'Course already purchased'})
             
+            # Calculate GST amounts for the course
+            base_amount = course.price
+            gst_amount = base_amount * Decimal('0.18')
+            total_amount = base_amount + gst_amount
+            
             transaction, created = CourseTransaction.objects.get_or_create(
                 user=profile,
                 course=course,
                 status='pending',
                 defaults={
                     'transaction_id': f"cart_normal_{uuid.uuid4().hex[:12]}",
-                    'amount': course.price,
+                    'base_amount': base_amount,
+                    'gst_amount': gst_amount,
+                    'amount': total_amount,
                     'is_active': True
                 }
             )
             
             if not created:
                 transaction.is_active = True
+                transaction.base_amount = base_amount
+                transaction.gst_amount = gst_amount
+                transaction.amount = total_amount
                 transaction.save()
                 return JsonResponse({'success': False, 'error': 'Course already in cart'})
         
@@ -1071,6 +1082,8 @@ def cart_view(request):
             'amount': float(item.amount),
             'course_type': 0,
             'image': item.course.image.url if item.course.image else None,
+            'base_amount': float(item.base_amount),
+            'gst_amount': float(item.gst_amount),
         })
     
     for item in live_cart_items:
@@ -1170,7 +1183,6 @@ def purchase_cart(request):
     return redirect('my_courses')
 
 
-# In join_live_batch function - FIXED version
 @login_required
 def join_live_batch(request, live_course_id):
     live_course = get_object_or_404(LiveCourse, id=live_course_id, is_active=True)

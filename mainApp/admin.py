@@ -90,10 +90,10 @@ class ProfileAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'date_joined_institute')
     fieldsets = (
         ('User Information', {
-            'fields': ('user', 'first_name', 'last_name', 'email')
+            'fields': ('user', 'first_name', 'last_name')
         }),
         ('Contact Details', {
-            'fields': ('phone', 'address', 'profile_image')
+            'fields': ('phone', 'address', 'profile_image', 'email')
         }),
         ('Personal Info', {
             'fields': ('bio', 'date_joined_institute')
@@ -102,6 +102,12 @@ class ProfileAdmin(admin.ModelAdmin):
             'fields': ('is_student', 'is_active', 'password')
         }),
     )
+    
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if obj:
+            readonly_fields.append('email')
+        return readonly_fields
 
 
 @admin.register(UserCourseAccess)

@@ -65,7 +65,7 @@ class CourseDetails(models.Model):
 class Profile(models.Model):
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
-    email = models.EmailField(blank=True)
+    email = models.EmailField(blank=True)  # DISPLAY-ONLY: Auto-synced from User.email via signal
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True)
     address = models.TextField(blank=True)
@@ -449,7 +449,9 @@ class CourseTransaction(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='coursetransactions')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     transaction_id = models.CharField(max_length=100, unique=True)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    base_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Price before GST
+    gst_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)   # GST amount (18%)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)       # Total (base + GST)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     purchase_date = models.DateTimeField(auto_now_add=True)
     expiry_date = models.DateField(null=True, blank=True)
@@ -721,6 +723,24 @@ class Invoice(models.Model):
     
 # ==================== SIGNALS FOR AUTO-INVOICE CREATION ====================
 
+# FIXED: Auto-sync Profile.email when User.email changes (admin updates)
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=User)
+def sync_profile_email(sender, instance, created, **kwargs):
+    """
+    Automatically sync Profile.email when User.email changes (admin update)
+    Makes User.email the single source of truth for email across system
+    """
+    try:
+        profile, _ = Profile.objects.get_or_create(user=instance)
+        if profile.email != instance.email:
+            profile.email = instance.email
+            profile.save(update_fields=['email'])
+    except Profile.DoesNotExist:
+        pass
+
 
 
 @receiver(post_save, sender=CourseTransaction)
@@ -734,11 +754,11 @@ def create_invoice_for_course_transaction(sender, instance, created, **kwargs):
             profile = instance.user
             course = instance.course
             
-            # Calculate amounts
-            base_amount = instance.amount
+            # Use stored amounts from the transaction (base_amount, gst_amount already calculated)
+            base_amount = instance.base_amount
+            tax_amount = instance.gst_amount
+            total_amount = instance.amount
             tax_rate = Decimal('18.00')
-            tax_amount = (base_amount * tax_rate) / Decimal('100')
-            total_amount = base_amount + tax_amount
             
             # Generate invoice number
             invoice_number = Invoice.generate_invoice_number()
@@ -759,7 +779,7 @@ def create_invoice_for_course_transaction(sender, instance, created, **kwargs):
                 payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
                 payment_transaction_id=instance.transaction_id,
                 customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
-                customer_email=profile.email or profile.user.email,
+                customer_email=profile.user.email,  # FIXED: Always use User.email as source of truth
                 customer_phone=profile.phone or '',
                 customer_address=profile.address or '',
             )
@@ -822,7 +842,7 @@ def create_invoice_for_live_course_transaction(sender, instance, created, **kwar
                 payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
                 payment_transaction_id=instance.transaction_id,
                 customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
-                customer_email=profile.email or profile.user.email,
+                customer_email=profile.user.email,  # FIXED: Always use User.email as source of truth
                 customer_phone=profile.phone or '',
                 customer_address=profile.address or '',
             )
