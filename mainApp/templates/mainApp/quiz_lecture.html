@@ -1,0 +1,155 @@
+{% extends 'mainApp/base.html' %}
+{% load static %}
+
+{% block title %}Quiz: {{ lecture.title }} — {{ course.title }}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <!-- Quiz Information Card -->
+      <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-primary text-white py-3">
+          <h4 class="mb-0"><i class="fas fa-question-circle me-2"></i>{{ lecture.title }}</h4>
+          <small class="opacity-75">{{ lecture.chapter.title }} • Quiz Assessment</small>
+        </div>
+        <div class="card-body p-4">
+          
+          {% if quiz_data %}
+            {% with quiz=quiz_data.quiz %}
+            
+            <!-- Quiz Info -->
+            <div class="alert alert-info mb-4">
+              <div class="row">
+                <div class="col-md-6">
+                  <small><i class="fas fa-question-circle me-1"></i> Total Questions: <strong>{{ quiz_data.total_questions }}</strong></small>
+                </div>
+                <div class="col-md-6">
+                  <small><i class="fas fa-star me-1"></i> Total Points: <strong>{{ quiz_data.total_points }}</strong></small>
+                </div>
+                <div class="col-md-6 mt-2">
+                  <small><i class="fas fa-clock me-1"></i> Time Limit: 
+                    <strong>{% if quiz.time_limit_minutes > 0 %}{{ quiz.time_limit_minutes }} minutes{% else %}No limit{% endif %}</strong>
+                  </small>
+                </div>
+                <div class="col-md-6 mt-2">
+                  <small><i class="fas fa-trophy me-1"></i> Passing Score: <strong>{{ quiz.passing_score }}%</strong></small>
+                </div>
+                <div class="col-md-12 mt-2">
+                  <small><i class="fas fa-redo me-1"></i> Attempts: <strong>{{ quiz_data.attempts_made }} / {{ quiz_data.max_attempts }}</strong></small>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Quiz Description -->
+            {% if quiz.description %}
+            <div class="mb-4">
+              <h6><i class="fas fa-info-circle me-2"></i>Instructions:</h6>
+              <p class="text-muted">{{ quiz.description|linebreaks }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Previous Attempt Results -->
+            {% if quiz_data.latest_attempt and quiz_data.latest_attempt.status == 'completed' %}
+            <div class="alert {% if quiz_data.latest_attempt.is_passed %}alert-success{% else %}alert-warning{% endif %} mb-4">
+              <h6 class="mb-2">
+                <i class="fas fa-chart-line me-2"></i>Your Previous Attempt:
+              </h6>
+              <div class="row">
+                <div class="col-md-4">
+                  <small>Score: <strong>{{ quiz_data.latest_attempt.score }} / {{ quiz_data.latest_attempt.total_points }}</strong></small>
+                </div>
+                <div class="col-md-4">
+                  <small>Percentage: <strong>{{ quiz_data.latest_attempt.percentage_score|floatformat:1 }}%</strong></small>
+                </div>
+                <div class="col-md-4">
+                  <small>Status: 
+                    <strong class="{% if quiz_data.latest_attempt.is_passed %}text-success{% else %}text-danger{% endif %}">
+                      {% if quiz_data.latest_attempt.is_passed %}Passed{% else %}Failed{% endif %}
+                    </strong>
+                  </small>
+                </div>
+              </div>
+              <div class="mt-2">
+                <a href="{% url 'quiz_results_attempt' course.id lecture.id quiz_data.latest_attempt.id %}" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-eye me-1"></i>View Detailed Results
+                </a>
+              </div>
+            </div>
+            {% endif %}
+            
+            <!-- Quiz Actions -->
+            {% if quiz_data.can_attempt %}
+              <div class="text-center">
+                <a href="{% url 'take_quiz' course.id lecture.id %}" class="btn btn-primary btn-lg">
+                  <i class="fas fa-play-circle me-2"></i>
+                  {% if quiz_data.attempts_made > 0 %}Retake Quiz{% else %}Start Quiz{% endif %}
+                </a>
+                <p class="text-muted mt-3 small">
+                  <i class="fas fa-info-circle me-1"></i>
+                  You have {{ quiz_data.max_attempts|add:"-1"|default:quiz_data.max_attempts }} attempt(s) remaining
+                </p>
+              </div>
+            {% elif quiz_data.has_passed %}
+              <div class="alert alert-success text-center">
+                <i class="fas fa-check-circle fa-2x mb-2"></i>
+                <h5>Congratulations! You've passed this quiz!</h5>
+                <p>You've successfully completed this assessment.</p>
+              </div>
+            {% else %}
+              <div class="alert alert-danger text-center">
+                <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
+                <h5>Maximum Attempts Reached</h5>
+                <p>You've used all {{ quiz_data.max_attempts }} attempt(s) for this quiz.</p>
+                <p class="mb-0">Please contact your instructor if you need assistance.</p>
+              </div>
+            {% endif %}
+            
+            {% endwith %}
+          {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+              <h5>Quiz Not Available</h5>
+              <p>This quiz is currently not available. Please check back later.</p>
+            </div>
+          {% endif %}
+          
+        </div>
+      </div>
+      
+      <!-- Chapter Navigation -->
+      {% if lecture.chapter.lectures.exists %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light py-2">
+          <h6 class="mb-0"><i class="fas fa-list me-2"></i>Lecture {{ lecture.order }} of {{ lecture.chapter.lectures.count }} in {{ lecture.chapter.title }}</h6>
+        </div>
+        <div class="card-body p-0">
+          {% for lec in lecture.chapter.lectures.all %}
+          <a href="{% url 'lectureDetail' course.id lec.id %}" 
+             class="d-flex align-items-center p-3 border-bottom {% if lec == lecture %}bg-primary text-white fw-bold{% elif user_access and lec in user_access.completed_lectures.all %}text-success{% endif %}">
+            <span class="me-3">
+              {% if user_access and lec in user_access.completed_lectures.all %}
+                <i class="fas fa-check-circle text-success"></i>
+              {% elif lec == lecture %}
+                <i class="fas fa-play-circle text-white"></i>
+              {% else %}
+                <i class="fas fa-circle text-muted"></i>
+              {% endif %}
+            </span>
+            <div class="flex-grow-1">
+              <div>{{ lec.title }}</div>
+              <small class="text-muted">{{ lec.duration_display }}</small>
+            </div>
+            {% if lec != lecture %}
+            <i class="fas fa-chevron-right opacity-50"></i>
+            {% endif %}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+      
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -58,11 +58,20 @@ urlpatterns = [
     path("ajax/live-course-status/<int:live_course_id>/", ajax_live_course_status, name="live_course_status"),
     path("ajax/mark-lecture-complete/", mark_lecture_complete, name="mark_lecture_complete"),
     
-    # Add these with your other URL patterns
-
     # Invoice URLs
     path("my-invoices/", my_invoices, name="my_invoices"),
     path("invoice/<int:invoice_id>/", invoice_detail, name="invoice_detail"),
     path("invoice/<int:invoice_id>/download/", download_invoice_pdf, name="download_invoice_pdf"),
     path("invoice/<int:invoice_id>/view/", view_invoice_pdf, name="view_invoice_pdf"),
+    
+    # ==================== QUIZ URLs ====================
+    # Quiz taking and management
+    path("course/<int:course_id>/lecture/<int:lecture_id>/take-quiz/", take_quiz, name="take_quiz"),
+    path("submit-quiz-answer/", submit_quiz_answer, name="submit_quiz_answer"),
+    path("complete-quiz/", complete_quiz, name="complete_quiz"),
+    path("course/<int:course_id>/lecture/<int:lecture_id>/results/", quiz_results, name="quiz_results"),
+    path("course/<int:course_id>/lecture/<int:lecture_id>/results/<int:attempt_id>/", quiz_results, name="quiz_results_attempt"),
+    # Add this line with other quiz URLs
+path("api/quiz-questions/", get_quiz_questions_api, name="get_quiz_questions_api"),
+    path("ajax/course-progress/<int:course_id>/", get_course_progress, name="course_progress"),
 ]

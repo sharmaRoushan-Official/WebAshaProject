@@ -9,7 +9,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 from django.shortcuts import get_object_or_404
 import json
 import logging
-from .models import Course, Profile, TeamMember, CourseTransaction, LiveCourse, LiveCourseTransaction, LiveCourseRegistration, Chapter, Lecture, UserCourseAccess
+from .models import Course, Profile, TeamMember, CourseTransaction, LiveCourse, LiveCourseTransaction, LiveCourseRegistration, Chapter, Lecture, UserCourseAccess, Quiz, QuizQuestion, QuizAttempt, QuizAnswer, LectureProgress
 from .forms import LoginForm, RegisterForm, ChangePasswordForm, ContactForm, LiveRegistrationForm, ProfileUpdateForm
 import uuid
 from django.utils import timezone
@@ -26,6 +26,7 @@ from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from .models import Invoice
 from .services.invoice_pdf import generate_invoice_pdf, save_pdf_to_model
+from django.db.models import Q
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -1389,10 +1390,38 @@ def lecture_detail(request, course_id, lecture_id):
         messages.warning(request, 'Please purchase the course to access this lecture.')
         return redirect('courseDetail', course_id=course.id)
     
-    # Debug print to verify embed URL
-    print(f"Lecture: {lecture.title}")
-    print(f"Video URL: {lecture.video_url}")
-    print(f"Embed URL: {lecture.get_video_embed_url()}")
+    # Get or create lecture progress
+    lecture_progress = None
+    if user_access:
+        lecture_progress, created = LectureProgress.objects.get_or_create(
+            user=user_access.user,
+            lecture=lecture,
+            course_access=user_access
+        )
+    
+    # Check if lecture has quiz
+    has_quiz = lecture.has_quiz
+    quiz_data = None
+    quiz_attempt = None
+    can_take_quiz = False
+    
+    if has_quiz and user_access:
+        quiz = lecture.quiz
+        # Check if user can take quiz
+        can_take_quiz = quiz.can_attempt(user_access.user)
+        # Get latest attempt
+        quiz_attempt = quiz.attempts.filter(profile=user_access.user).order_by('-started_at').first()
+        
+        quiz_data = {
+            'quiz': quiz,
+            'total_questions': quiz.total_questions,
+            'total_points': quiz.total_points,
+            'attempts_made': quiz.attempts.filter(profile=user_access.user).count(),
+            'max_attempts': quiz.max_attempts,
+            'can_attempt': can_take_quiz,
+            'latest_attempt': quiz_attempt,
+            'has_passed': quiz_attempt.is_passed if quiz_attempt else False
+        }
     
     context = {
         'course': course,
@@ -1402,12 +1431,311 @@ def lecture_detail(request, course_id, lecture_id):
         'chapter': lecture.chapter,
         'chapters': course.chapters.all(),
         'cart_count': get_cart_count(request),
+        'lecture_progress': lecture_progress,
+        'has_quiz': has_quiz,
+        'quiz_data': quiz_data,
         'login_form': LoginForm(),
         'register_form': RegisterForm(),
         'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
     }
+    
+    # Redirect to quiz template if lecture type is quiz
+    if lecture.lecture_type == 'quiz':
+        return render(request, 'mainApp/quiz_lecture.html', context)
+    
     return render(request, 'mainApp/lecture.html', context)
 
+
+@login_required
+def take_quiz(request, course_id, lecture_id):
+    """Start or resume a quiz"""
+    course = get_object_or_404(Course, id=course_id, is_active=True)
+    lecture = get_object_or_404(Lecture, id=lecture_id, chapter__course=course)
+    
+    # Check access
+    user_access = get_user_course_access(request.user, course)
+    if not user_access:
+        messages.error(request, 'You need to purchase this course to take quizzes.')
+        return redirect('courseDetail', course_id=course.id)
+    
+    # Check if lecture has quiz
+    if not lecture.has_quiz:
+        messages.error(request, 'This lecture does not have a quiz.')
+        return redirect('lectureDetail', course_id=course.id, lecture_id=lecture.id)
+    
+    quiz = lecture.quiz
+    
+    # Check if user can attempt
+    if not quiz.can_attempt(user_access.user):
+        messages.warning(request, f'You have reached the maximum number of attempts ({quiz.max_attempts}) for this quiz.')
+        return redirect('lectureDetail', course_id=course.id, lecture_id=lecture.id)
+    
+    # Get or create lecture progress
+    lecture_progress, _ = LectureProgress.objects.get_or_create(
+        user=user_access.user,
+        lecture=lecture,
+        course_access=user_access
+    )
+    
+    # Check for in-progress attempt
+    current_attempt = quiz.attempts.filter(
+        profile=user_access.user,
+        status='in_progress'
+    ).first()
+    
+    if not current_attempt:
+        # Create new attempt
+        attempt_number = quiz.attempts.filter(profile=user_access.user).count() + 1
+        current_attempt = QuizAttempt.objects.create(
+            quiz=quiz,
+            profile=user_access.user,
+            lecture_progress=lecture_progress,
+            attempt_number=attempt_number,
+            status='in_progress'
+        )
+    
+    # Get questions (shuffle if enabled)
+    questions = quiz.questions.all().order_by('order')
+    if quiz.shuffle_questions:
+        questions = questions.order_by('?')
+    
+    # Prepare questions data as JSON for JavaScript
+    questions_list = []
+    for q in questions:
+        q_data = {
+            'id': q.id,
+            'question_text': q.question_text,
+            'question_type': q.question_type,
+            'points': q.points,
+            'order': q.order,
+            'option_a': q.option_a or '',
+            'option_b': q.option_b or '',
+            'option_c': q.option_c or '',
+            'option_d': q.option_d or '',
+            'correct_option': q.correct_option or '',
+            'expected_answer': q.expected_answer or '',
+            'image_url': q.image.url if q.image and hasattr(q.image, 'url') else '',
+        }
+        questions_list.append(q_data)
+    
+    # Get answered question IDs for this attempt
+    answered_question_ids = list(current_attempt.answers.values_list('question_id', flat=True))
+    
+    context = {
+        'course': course,
+        'lecture': lecture,
+        'quiz': quiz,
+        'attempt': current_attempt,
+        'questions': questions,
+        'questions_json': json.dumps(questions_list),  # Pass as JSON string
+        'answered_question_ids': answered_question_ids,
+        'total_questions': questions.count(),
+        'answered_count': len(answered_question_ids),
+        'remaining_count': questions.count() - len(answered_question_ids),
+        'time_limit_minutes': quiz.time_limit_minutes,
+        'cart_count': get_cart_count(request),
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+    }
+    
+    return render(request, 'mainApp/take_quiz.html', context)
+
+@login_required
+@require_http_methods(["POST"])
+def submit_quiz_answer(request):
+    """Submit an answer for a quiz question via AJAX"""
+    try:
+        data = json.loads(request.body)
+        attempt_id = data.get('attempt_id')
+        question_id = data.get('question_id')
+        answer = data.get('answer', '').strip()
+        
+        # Get objects
+        attempt = get_object_or_404(QuizAttempt, id=attempt_id, profile__user=request.user)
+        question = get_object_or_404(QuizQuestion, id=question_id)
+        
+        # Check if already answered
+        existing_answer = QuizAnswer.objects.filter(attempt=attempt, question=question).first()
+        if existing_answer:
+            return JsonResponse({
+                'success': False,
+                'error': 'This question has already been answered.'
+            }, status=400)
+        
+        # Create answer
+        quiz_answer = QuizAnswer.objects.create(
+            attempt=attempt,
+            question=question,
+            user_answer=answer,
+            selected_option=answer if question.question_type == 'mcq' else '',
+            text_answer=answer if question.question_type == 'one_line' else ''
+        )
+        
+        # Return response
+        return JsonResponse({
+            'success': True,
+            'message': 'Answer submitted successfully!',
+            'is_correct': quiz_answer.is_correct,
+            'points_earned': quiz_answer.points_earned,
+            'explanation': question.explanation or 'No explanation provided.',
+            'correct_answer': question.correct_option if question.question_type == 'mcq' else question.expected_answer,
+            'question_type': question.question_type
+        })
+        
+    except Exception as e:
+        logger.error(f"Error submitting quiz answer: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def complete_quiz(request):
+    """Complete the quiz and calculate final score"""
+    try:
+        data = json.loads(request.body)
+        attempt_id = data.get('attempt_id')
+        
+        attempt = get_object_or_404(QuizAttempt, id=attempt_id, profile__user=request.user)
+        
+        if attempt.status == 'completed':
+            return JsonResponse({
+                'success': False,
+                'error': 'Quiz already completed.'
+            }, status=400)
+        
+        # Calculate final score
+        attempt.calculate_score()
+        attempt.mark_completed()
+        
+        # Refresh to get updated data
+        attempt.refresh_from_db()
+        
+        # Get the course and lecture for redirect
+        lecture = attempt.quiz.lecture
+        course = lecture.chapter.course
+        
+        # Get all attempts for this user to find the best one
+        all_attempts = attempt.quiz.attempts.filter(
+            profile=attempt.profile, 
+            status='completed'
+        ).order_by('-percentage_score')
+        
+        best_attempt = all_attempts.first()
+        
+        # Prepare response data
+        response_data = {
+            'success': True,
+            'message': 'Quiz completed!',
+            'score': attempt.score,
+            'total_points': attempt.total_points,
+            'percentage': attempt.percentage_score,
+            'is_passed': attempt.is_passed,
+            'passed_message': 'Congratulations! You passed the quiz!' if attempt.is_passed else 'Sorry, you did not pass. You can try again.',
+            'redirect_url': f'/course/{course.id}/lecture/{lecture.id}/results/'
+        }
+        
+        # Add info if this is the best attempt
+        if best_attempt and best_attempt.id == attempt.id:
+            response_data['is_best_attempt'] = True
+            response_data['message'] = f'Quiz completed! This is your best attempt ({attempt.percentage_score:.1f}%)!'
+        
+        logger.info(f"Quiz completed - Attempt {attempt.attempt_number}, Score: {attempt.percentage_score}%, Best: {best_attempt.percentage_score if best_attempt else 0}%")
+        
+        return JsonResponse(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error completing quiz: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+@login_required
+def quiz_results(request, course_id, lecture_id, attempt_id=None):
+    """View quiz results - shows specific attempt or best attempt"""
+    course = get_object_or_404(Course, id=course_id, is_active=True)
+    lecture = get_object_or_404(Lecture, id=lecture_id, chapter__course=course)
+    
+    # Check access
+    user_access = get_user_course_access(request.user, course)
+    if not user_access:
+        messages.error(request, 'Access denied.')
+        return redirect('courseDetail', course_id=course.id)
+    
+    # Check if lecture has quiz
+    if not lecture.has_quiz:
+        messages.error(request, 'This lecture does not have a quiz.')
+        return redirect('lectureDetail', course_id=course.id, lecture_id=lecture.id)
+    
+    quiz = lecture.quiz
+    
+    # Get all attempts for this user
+    all_attempts = quiz.attempts.filter(profile=user_access.user, status='completed').order_by('-percentage_score', '-completed_at')
+    
+    # If specific attempt_id provided, show that attempt
+    current_attempt = None
+    if attempt_id:
+        current_attempt = all_attempts.filter(id=attempt_id).first()
+    
+    # If no specific attempt or attempt not found, show best attempt
+    if not current_attempt:
+        current_attempt = all_attempts.first()  # Best attempt (highest score)
+    
+    if not current_attempt:
+        messages.warning(request, 'No completed attempts found for this quiz.')
+        return redirect('lectureDetail', course_id=course.id, lecture_id=lecture.id)
+    
+    # Get all answers with questions for current attempt
+    answers = current_attempt.answers.select_related('question').all()
+    
+    # Calculate counts for current attempt
+    correct_answers_count = answers.filter(is_correct=True).count()
+    incorrect_answers_count = answers.filter(is_correct=False).count()
+    
+    # Calculate time in minutes and seconds
+    time_minutes = current_attempt.time_taken_seconds // 60
+    time_seconds = current_attempt.time_taken_seconds % 60
+    
+    # Prepare attempts data for dropdown/display
+    attempts_data = []
+    for attempt in all_attempts:
+        attempts_data.append({
+            'id': attempt.id,
+            'attempt_number': attempt.attempt_number,
+            'percentage_score': attempt.percentage_score,
+            'is_passed': attempt.is_passed,
+            'score': attempt.score,
+            'total_points': attempt.total_points,
+            'completed_at': attempt.completed_at,
+            'is_current': attempt.id == current_attempt.id
+        })
+    
+    context = {
+        'course': course,
+        'lecture': lecture,
+        'quiz': quiz,
+        'current_attempt': current_attempt,
+        'answers': answers,
+        'percentage': current_attempt.percentage_score,
+        'is_passed': current_attempt.is_passed,
+        'correct_answers_count': correct_answers_count,
+        'incorrect_answers_count': incorrect_answers_count,
+        'time_minutes': time_minutes,
+        'time_seconds': time_seconds,
+        'all_attempts': attempts_data,
+        'total_attempts': len(attempts_data),
+        'best_score': all_attempts.first().percentage_score if all_attempts else 0,
+        'cart_count': get_cart_count(request),
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+    }
+    
+    return render(request, 'mainApp/quiz_results.html', context)
 
 @login_required
 @require_http_methods(["POST"])
@@ -1428,8 +1756,35 @@ def mark_lecture_complete(request):
         return JsonResponse({'success': False, 'error': 'No access to this course'})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
-    
+
+
 # ==================== INVOICE VIEWS ====================
+
+@login_required
+def get_course_progress(request, course_id):
+    """AJAX endpoint to get current course progress"""
+    try:
+        profile = Profile.objects.get(user=request.user)
+        course = Course.objects.get(id=course_id, is_active=True)
+        access = profile.course_access.filter(course=course, is_active=True).first()
+        
+        if access and access.has_access():
+            return JsonResponse({
+                'success': True,
+                'percentage': access.completion_percentage,
+                'completed_count': access.completed_lectures.count(),
+                'total_lectures': course.total_lectures,
+                'is_completed': access.is_completed
+            })
+        else:
+            return JsonResponse({'success': False, 'error': 'No access to this course'}, status=403)
+    except Profile.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Profile not found'}, status=404)
+    except Course.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Course not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
 
 @login_required
 def my_invoices(request):
@@ -1538,3 +1893,20 @@ def invoice_detail(request, invoice_id):
         'cart_count': get_cart_count(request)
     }
     return render(request, 'mainApp/invoice_detail.html', context)
+
+@login_required
+def get_quiz_questions_api(request):
+    """API endpoint to get quiz questions for AJAX"""
+    quiz_id = request.GET.get('quiz_id')
+    if not quiz_id:
+        return JsonResponse({'error': 'Quiz ID required'}, status=400)
+    
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+        questions = quiz.questions.all().values(
+            'id', 'question_text', 'question_type', 'points', 
+            'option_a', 'option_b', 'option_c', 'option_d', 'image'
+        )
+        return JsonResponse({'questions': list(questions)})
+    except Quiz.DoesNotExist:
+        return JsonResponse({'error': 'Quiz not found'}, status=404)

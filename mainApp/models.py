@@ -315,6 +315,52 @@ class Lecture(models.Model):
         if hours > 0:
             return f"{hours}h {minutes}m"
         return f"{minutes}m"
+    
+    @property
+    def has_quiz(self):
+        """Check if lecture has an attached quiz"""
+        return hasattr(self, 'quiz') and self.quiz.is_active
+    
+    def get_user_quiz_attempt(self, profile):
+        """Get the latest quiz attempt for a user"""
+        if self.has_quiz:
+            return self.quiz.attempts.filter(profile=profile).order_by('-started_at').first()
+        return None
+    
+    def get_user_best_quiz_score(self, profile):
+        """Get user's best score for this lecture's quiz"""
+        if self.has_quiz:
+            best_attempt = self.quiz.attempts.filter(
+                profile=profile, 
+                status='completed'
+            ).order_by('-percentage_score').first()
+            return best_attempt.percentage_score if best_attempt else 0
+        return 0
+    
+    def can_user_take_quiz(self, profile):
+        """Check if user can take the quiz"""
+        if not self.has_quiz:
+            return False
+        
+        # Check if quiz is not time-limited
+        quiz = self.quiz
+        
+        # Check attempts limit
+        attempts_count = quiz.attempts.filter(profile=profile).count()
+        if attempts_count >= quiz.max_attempts:
+            return False
+        
+        # Check if user has access to the course
+        course_access = UserCourseAccess.objects.filter(
+            user=profile, 
+            course=self.chapter.course, 
+            is_active=True
+        ).first()
+        
+        if not course_access or not course_access.has_access():
+            return False
+        
+        return True
 
 
 class UserCourseAccess(models.Model):
@@ -441,6 +487,287 @@ class LectureProgress(models.Model):
                 self.mark_completed()
 
 
+# ==================== QUIZ MODELS ====================
+
+class Quiz(models.Model):
+    """Quiz model attached to lectures for assessment"""
+    QUIZ_TYPES = [
+        ('mcq', 'Multiple Choice Questions'),
+        ('one_line', 'One Line Answer'),
+        ('mixed', 'Mixed (MCQ & One Line)'),
+    ]
+    
+    lecture = models.OneToOneField(Lecture, on_delete=models.CASCADE, related_name='quiz')
+    title = models.CharField(max_length=200, help_text="Quiz title")
+    description = models.TextField(blank=True, help_text="Instructions for the quiz")
+    quiz_type = models.CharField(max_length=20, choices=QUIZ_TYPES, default='mcq')
+    
+    # Quiz settings
+    time_limit_minutes = models.PositiveIntegerField(default=0, help_text="Time limit in minutes (0 = no limit)")
+    max_attempts = models.PositiveIntegerField(default=1, help_text="Maximum number of attempts allowed")
+    passing_score = models.PositiveIntegerField(default=70, help_text="Passing score percentage (0-100)")
+    is_active = models.BooleanField(default=True)
+    shuffle_questions = models.BooleanField(default=False, help_text="Randomize question order")
+    show_results_immediately = models.BooleanField(default=True, help_text="Show results after submission")
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Quiz'
+        verbose_name_plural = 'Quizzes'
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f"Quiz: {self.title} ({self.get_quiz_type_display()})"
+    
+    @property
+    def total_questions(self):
+        return self.questions.count()
+    
+    @property
+    def total_points(self):
+        return sum(question.points for question in self.questions.all())
+    
+    @property
+    def mcq_questions(self):
+        return self.questions.filter(question_type='mcq')
+    
+    @property
+    def one_line_questions(self):
+        return self.questions.filter(question_type='one_line')
+    
+    def get_user_attempts(self, profile):
+        """Get number of attempts by a user"""
+        return self.attempts.filter(profile=profile).count()
+    
+    def can_attempt(self, profile):
+        """Check if user can attempt the quiz"""
+        attempts_count = self.get_user_attempts(profile)
+        return attempts_count < self.max_attempts
+
+
+class QuizQuestion(models.Model):
+    """Individual questions within a quiz"""
+    QUESTION_TYPES = [
+        ('mcq', 'Multiple Choice Question'),
+        ('one_line', 'One Line Answer'),
+    ]
+    
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
+    question_text = models.TextField(help_text="The question text")
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPES, default='mcq')
+    
+    # Common fields
+    points = models.PositiveIntegerField(default=1, help_text="Points for correct answer")
+    order = models.PositiveIntegerField(default=0, help_text="Order of question in quiz")
+    
+    # For MCQ questions
+    option_a = models.CharField(max_length=500, blank=True, help_text="Option A")
+    option_b = models.CharField(max_length=500, blank=True, help_text="Option B")
+    option_c = models.CharField(max_length=500, blank=True, help_text="Option C")
+    option_d = models.CharField(max_length=500, blank=True, help_text="Option D")
+    correct_option = models.CharField(
+        max_length=1, 
+        choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')],
+        blank=True,
+        help_text="Correct answer for MCQ"
+    )
+    
+    # For one-line answer questions
+    expected_answer = models.TextField(blank=True, help_text="Expected answer for one-line question")
+    case_sensitive = models.BooleanField(default=False, help_text="For one-line answers: check case sensitivity")
+    allow_partial_match = models.BooleanField(default=True, help_text="Allow partial matching for one-line answers")
+    
+    # Explanation for feedback
+    explanation = models.TextField(blank=True, help_text="Explanation of correct answer")
+    
+    # Media support
+    image = models.ImageField(upload_to='quiz_questions/', blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = 'Quiz Question'
+        verbose_name_plural = 'Quiz Questions'
+    
+    def __str__(self):
+        return f"Q{self.order}: {self.question_text[:50]}"
+    
+    def get_options(self):
+        """Return list of options for MCQ"""
+        if self.question_type == 'mcq':
+            options = []
+            if self.option_a:
+                options.append({'letter': 'A', 'text': self.option_a})
+            if self.option_b:
+                options.append({'letter': 'B', 'text': self.option_b})
+            if self.option_c:
+                options.append({'letter': 'C', 'text': self.option_c})
+            if self.option_d:
+                options.append({'letter': 'D', 'text': self.option_d})
+            return options
+        return []
+    
+    def check_answer(self, user_answer):
+        """Check if user's answer is correct based on question type"""
+        if self.question_type == 'mcq':
+            # user_answer should be 'A', 'B', 'C', or 'D'
+            return user_answer and user_answer.upper() == self.correct_option
+        
+        elif self.question_type == 'one_line':
+            if not user_answer:
+                return False
+            
+            if self.case_sensitive:
+                user_ans = user_answer.strip()
+                expected = self.expected_answer.strip()
+            else:
+                user_ans = user_answer.strip().lower()
+                expected = self.expected_answer.strip().lower()
+            
+            if self.allow_partial_match:
+                # Check if expected answer is contained in user's answer
+                return expected in user_ans
+            else:
+                return user_ans == expected
+        
+        return False
+
+
+class QuizAttempt(models.Model):
+    """Track each user's quiz attempt"""
+    STATUS_CHOICES = [
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('abandoned', 'Abandoned'),
+    ]
+    
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='attempts')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='quiz_attempts')
+    lecture_progress = models.ForeignKey(LectureProgress, on_delete=models.CASCADE, related_name='quiz_attempt_records', null=True, blank=True)
+    
+    # Attempt tracking
+    attempt_number = models.PositiveIntegerField(default=1)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='in_progress')
+    
+    # Score tracking
+    score = models.PositiveIntegerField(default=0, help_text="Points earned")
+    total_points = models.PositiveIntegerField(default=0, help_text="Total possible points")
+    percentage_score = models.FloatField(default=0.0, help_text="Percentage score (0-100)")
+    is_passed = models.BooleanField(default=False)
+    
+    # Timing
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    time_taken_seconds = models.PositiveIntegerField(default=0, help_text="Time taken in seconds")
+    
+    # Metadata
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-started_at']
+        unique_together = ['quiz', 'profile', 'attempt_number']
+        verbose_name = 'Quiz Attempt'
+        verbose_name_plural = 'Quiz Attempts'
+    
+    def __str__(self):
+        return f"{self.profile.user.username} - {self.quiz.title} - Attempt {self.attempt_number} ({self.percentage_score}%)"
+    
+    def calculate_score(self):
+        """Calculate total score based on answers"""
+        total_points = 0
+        earned_points = 0
+        
+        for answer in self.answers.all():
+            total_points += answer.question.points
+            if answer.is_correct:
+                earned_points += answer.question.points
+        
+        self.total_points = total_points
+        self.score = earned_points
+        
+        if total_points > 0:
+            self.percentage_score = (earned_points / total_points) * 100
+        else:
+            self.percentage_score = 0
+        
+        self.is_passed = self.percentage_score >= self.quiz.passing_score
+        
+        if self.status == 'in_progress':
+            self.status = 'completed'
+            self.completed_at = timezone.now()
+        
+        self.save()
+        return self.percentage_score
+    
+    def mark_completed(self):
+        """Mark attempt as completed and update lecture progress"""
+        if self.status != 'completed':
+            self.calculate_score()
+            
+            # Update lecture progress if linked
+            if self.lecture_progress:
+                self.lecture_progress.quiz_score = self.score
+                self.lecture_progress.quiz_attempts = self.attempt_number
+                self.lecture_progress.is_passed = self.is_passed
+                self.lecture_progress.save()
+                
+                # If passed, mark lecture as completed
+                if self.is_passed and not self.lecture_progress.is_completed:
+                    self.lecture_progress.mark_completed()
+            
+            return True
+        return False
+
+class QuizAnswer(models.Model):
+    """Store individual answers for each question in an attempt"""
+    attempt = models.ForeignKey(QuizAttempt, on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey(QuizQuestion, on_delete=models.CASCADE)
+    
+    # User's answer
+    user_answer = models.TextField(help_text="User's submitted answer")
+    is_correct = models.BooleanField(default=False)
+    
+    # For MCQ - store selected option
+    selected_option = models.CharField(max_length=1, blank=True, help_text="Selected option (A/B/C/D)")
+    
+    # For one-line - store text answer
+    text_answer = models.TextField(blank=True, help_text="Text answer for one-line questions")
+    
+    # Points earned for this question
+    points_earned = models.PositiveIntegerField(default=0)
+    
+    # Feedback
+    feedback = models.TextField(blank=True, help_text="Feedback on the answer")
+    
+    answered_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['id']
+        unique_together = ['attempt', 'question']
+        verbose_name = 'Quiz Answer'
+        verbose_name_plural = 'Quiz Answers'
+    
+    def __str__(self):
+        correct_symbol = "✓" if self.is_correct else "✗"
+        return f"{correct_symbol} {self.attempt.profile.user.username} - Q{self.question.order}"
+    
+    def save(self, *args, **kwargs):
+        """Override save to determine if answer is correct"""
+        if not self.pk:  # Only on creation
+            self.is_correct = self.question.check_answer(self.user_answer)
+            self.points_earned = self.question.points if self.is_correct else 0
+        super().save(*args, **kwargs)
+
+
 class PasswordResetOTP(models.Model):
     """
     Model to store OTP for password reset/forgot password functionality
@@ -520,7 +847,6 @@ class CourseTransaction(models.Model):
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, blank=True)
     receipt = models.FileField(upload_to='transactions/receipts/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
-    # REMOVED course_type field - it's redundant since this is only for normal courses
 
     class Meta:
         ordering = ['-purchase_date']
@@ -912,3 +1238,38 @@ def create_invoice_for_live_course_transaction(sender, instance, created, **kwar
                 logger.info(f"PDF auto-generated for invoice {invoice.invoice_number}")
             except Exception as e:
                 logger.error(f"Failed to auto-generate PDF for invoice {invoice.invoice_number}: {str(e)}")
+
+
+# ==================== SIGNAL FOR AUTO-CREATING QUIZ ====================
+
+@receiver(post_save, sender=Lecture)
+def create_quiz_for_quiz_lecture(sender, instance, created, **kwargs):
+    """
+    Automatically create a quiz when a lecture of type 'quiz' is created
+    """
+    if instance.lecture_type == 'quiz' and created:
+        # Check if quiz doesn't already exist
+        if not hasattr(instance, 'quiz'):
+            Quiz.objects.create(
+                lecture=instance,
+                title=f"Quiz: {instance.title}",
+                description="Please answer all questions to complete this quiz.",
+                quiz_type='mcq',
+                max_attempts=2,
+                passing_score=70
+            )
+            logger.info(f"Auto-created quiz for lecture: {instance.title}")
+
+@receiver(models.signals.post_save, sender=QuizAttempt)
+def update_progress_on_quiz_complete(sender, instance, created, **kwargs):
+    """
+    Ensure lecture is marked complete if quiz is passed (safety net)
+    """
+    if instance.status == 'completed' and instance.is_passed and not created:
+        try:
+            lecture_progress = instance.lecture_progress
+            if lecture_progress and not lecture_progress.is_completed:
+                lecture_progress.mark_completed()
+                logger.info(f"Quiz pass auto-completed lecture progress for user {instance.profile.user.username}")
+        except LectureProgress.DoesNotExist:
+            pass

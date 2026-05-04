@@ -26,7 +26,7 @@
             {% if 'youtube.com' in lecture.video_url or 'youtu.be' in lecture.video_url %}
               <!-- YouTube Video Player -->
               <div class="ratio ratio-16x9 mb-4">
-                {% with video_id=lecture.video_url|cut:'https://www.youtube.com/watch?v='|cut:'https://youtu.be/'|cut:'https://m.youtube.com/watch?v=' %}
+                {% with video_id=lecture.video_url|cut:'https://www.youtube.com/watch?v='|cut:'https://youtu.be/'|cut:'https://m.youtube.com/watch?v='|cut:'https://www.youtube.com/embed/' %}
                   <iframe src="https://www.youtube.com/embed/{{ video_id|slice:':11' }}" 
                           title="{{ lecture.title }}" 
                           frameborder="0" 
@@ -85,11 +85,18 @@
             </div>
           {% endif %}
 
-          {% if user_access %}
+          {% if user_access and not lecture.has_quiz %}
           <div class="d-flex gap-2 mt-4">
             <button class="btn btn-success btn-sm mark-complete-btn" data-lecture="{{ lecture.id }}">
               <i class="fas fa-check me-1"></i>Mark Complete
             </button>
+          </div>
+          {% endif %}
+          
+          {% if lecture.has_quiz and user_access %}
+          <div class="alert alert-info mt-4">
+            <i class="fas fa-info-circle me-2"></i>
+            This lecture has a quiz. You can take the quiz to test your understanding.
           </div>
           {% endif %}
         </div>
@@ -220,7 +227,34 @@ document.addEventListener('DOMContentLoaded', function() {
           btnElement.innerHTML = '<i class="fas fa-check-double me-1"></i>Completed ✓';
           btnElement.classList.add('btn-success', 'disabled');
           btnElement.disabled = true;
-          setTimeout(() => location.reload(), 1000);
+          
+          // Update course progress bar immediately
+          if (data.percentage !== undefined) {
+            const progressBar = document.querySelector('.progress-bar');
+            const progressText = document.querySelector('.text-muted small');
+            const courseId = {{ course.id }};
+            if (progressBar) {
+              progressBar.style.width = data.percentage + '%';
+              progressBar.textContent = data.percentage.toFixed(0) + '%';
+              progressBar.setAttribute('aria-valuenow', data.percentage);
+            }
+            if (progressText) {
+              progressText.textContent = `${data.completed_count || 0} / {{ course.total_lectures }} lectures`;
+            }
+          }
+          
+          // Mark this lecture as completed in chapter navigation
+          const currentLectureLink = document.querySelector('.bg-primary');
+          if (currentLectureLink) {
+            currentLectureLink.classList.remove('bg-primary', 'text-white', 'fw-bold');
+            currentLectureLink.classList.add('text-success');
+            const icon = currentLectureLink.querySelector('i');
+            if (icon) {
+              icon.className = 'fas fa-check-circle text-success';
+            }
+          }
+          
+          setTimeout(() => location.reload(), 1500);
         } else {
           alert('Error: ' + (data.error || 'Could not mark lecture as complete'));
         }

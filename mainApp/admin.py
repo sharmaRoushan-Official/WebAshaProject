@@ -3,7 +3,8 @@ from .models import (
     Course, CourseDetails, Chapter, Lecture, Profile, 
     UserCourseAccess, LectureProgress, PasswordResetOTP,
     CourseTransaction, TeamMember, LiveCourse, Contact,
-    LiveCourseRegistration, LiveCourseTransaction
+    LiveCourseRegistration, LiveCourseTransaction,
+    Quiz, QuizQuestion, QuizAttempt, QuizAnswer
 )
 
 # Register your models here.
@@ -29,6 +30,25 @@ class LectureInline(admin.TabularInline):
     fields = ('title', 'lecture_type', 'order', 'duration_minutes', 'is_free_preview', 'is_downloadable')
     extra = 1
     ordering = ['order']
+
+
+class QuizQuestionInline(admin.TabularInline):
+    """Inline for questions within Quiz admin"""
+    model = QuizQuestion
+    fields = ('question_text', 'question_type', 'points', 'order', 'correct_option', 'expected_answer')
+    extra = 1
+    ordering = ['order']
+    show_change_link = True
+
+
+class QuizAttemptAnswerInline(admin.TabularInline):
+    """Inline for answers within QuizAttempt admin"""
+    model = QuizAnswer
+    fields = ('question', 'user_answer', 'is_correct', 'points_earned')
+    readonly_fields = ('question', 'user_answer', 'is_correct', 'points_earned')
+    extra = 0
+    can_delete = False
+    max_num = 0
 
 
 @admin.register(Course)
@@ -59,7 +79,7 @@ class ChapterAdmin(admin.ModelAdmin):
 
 @admin.register(Lecture)
 class LectureAdmin(admin.ModelAdmin):
-    list_display = ('title', 'chapter', 'lecture_type', 'order', 'duration_minutes', 'is_free_preview', 'created_at')
+    list_display = ('title', 'chapter', 'lecture_type', 'order', 'duration_minutes', 'is_free_preview', 'has_quiz_badge', 'created_at')
     search_fields = ('title', 'chapter__title', 'chapter__course__title')
     list_filter = ('lecture_type', 'is_free_preview', 'is_downloadable', 'chapter__course')
     list_editable = ('order', 'duration_minutes', 'is_free_preview')
@@ -80,6 +100,11 @@ class LectureAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+    
+    def has_quiz_badge(self, obj):
+        return obj.has_quiz
+    has_quiz_badge.boolean = True
+    has_quiz_badge.short_description = 'Has Quiz'
 
 
 @admin.register(Profile)
@@ -124,7 +149,7 @@ class UserCourseAccessAdmin(admin.ModelAdmin):
 
 @admin.register(LectureProgress)
 class LectureProgressAdmin(admin.ModelAdmin):
-    list_display = ('user', 'lecture', 'is_completed', 'watch_time_display', 'quiz_score', 'updated_at')
+    list_display = ('user', 'lecture', 'is_completed', 'watch_time_display', 'quiz_score', 'is_passed', 'updated_at')
     search_fields = ('user__user__username', 'lecture__title')
     list_filter = ('is_completed', 'is_passed', 'created_at')
     readonly_fields = ('created_at', 'updated_at')
@@ -153,7 +178,6 @@ class PasswordResetOTPAdmin(admin.ModelAdmin):
 class CourseTransactionAdmin(admin.ModelAdmin):
     list_display = ('transaction_id', 'user', 'course', 'amount', 'status', 'purchase_date', 'payment_method')
     search_fields = ('transaction_id', 'user__user__username', 'course__title')
-    # REMOVED 'course_type' from list_filter - line 157 fixed
     list_filter = ('status', 'payment_method', 'purchase_date')
     readonly_fields = ('transaction_id', 'purchase_date')
     list_editable = ('status',)
@@ -255,3 +279,125 @@ class LiveCourseTransactionAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('profile', 'live_course')
+
+
+# ==================== QUIZ MODELS ADMIN REGISTRATION ====================
+
+class QuizQuestionInline(admin.TabularInline):
+    """Inline for questions within Quiz admin"""
+    model = QuizQuestion
+    fields = ('question_text', 'question_type', 'points', 'order', 'correct_option', 'expected_answer')
+    extra = 1
+    ordering = ['order']
+    show_change_link = True
+
+
+@admin.register(Quiz)
+class QuizAdmin(admin.ModelAdmin):
+    list_display = ('title', 'lecture', 'quiz_type', 'max_attempts', 'passing_score', 'total_questions', 'is_active')
+    list_filter = ('quiz_type', 'is_active', 'created_at')
+    search_fields = ('title', 'lecture__title', 'lecture__chapter__course__title')
+    list_editable = ('max_attempts', 'passing_score', 'is_active')
+    inlines = [QuizQuestionInline]
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('lecture', 'title', 'description', 'quiz_type')
+        }),
+        ('Quiz Settings', {
+            'fields': ('time_limit_minutes', 'max_attempts', 'passing_score', 'shuffle_questions', 'show_results_immediately'),
+            'classes': ('wide',)
+        }),
+        ('Status', {
+            'fields': ('is_active',)
+        }),
+    )
+    readonly_fields = ('created_at', 'updated_at')
+    
+    def total_questions(self, obj):
+        return obj.total_questions
+    total_questions.short_description = 'Total Questions'
+
+
+@admin.register(QuizQuestion)
+class QuizQuestionAdmin(admin.ModelAdmin):
+    list_display = ('question_text_short', 'quiz', 'question_type', 'points', 'order', 'created_at')
+    list_filter = ('question_type', 'quiz', 'created_at')
+    search_fields = ('question_text', 'quiz__title')
+    list_editable = ('points', 'order')
+    fieldsets = (
+        ('Question Information', {
+            'fields': ('quiz', 'question_text', 'question_type', 'points', 'order')
+        }),
+        ('MCQ Options (for MCQ type)', {
+            'fields': ('option_a', 'option_b', 'option_c', 'option_d', 'correct_option'),
+            'classes': ('collapse',)
+        }),
+        ('One-Line Answer (for one_line type)', {
+            'fields': ('expected_answer', 'case_sensitive', 'allow_partial_match'),
+            'classes': ('collapse',)
+        }),
+        ('Feedback & Media', {
+            'fields': ('explanation', 'image'),
+            'classes': ('wide',)
+        }),
+    )
+    
+    def question_text_short(self, obj):
+        return obj.question_text[:50] + '...' if len(obj.question_text) > 50 else obj.question_text
+    question_text_short.short_description = 'Question'
+
+
+@admin.register(QuizAttempt)
+class QuizAttemptAdmin(admin.ModelAdmin):
+    list_display = ('profile', 'quiz', 'attempt_number', 'percentage_score', 'is_passed', 'status', 'completed_at')
+    list_filter = ('is_passed', 'status', 'quiz', 'created_at')
+    search_fields = ('profile__user__username', 'quiz__title')
+    readonly_fields = ('started_at', 'completed_at', 'created_at', 'updated_at')
+    fieldsets = (
+        ('Attempt Information', {
+            'fields': ('quiz', 'profile', 'lecture_progress', 'attempt_number', 'status')
+        }),
+        ('Score Details', {
+            'fields': ('score', 'total_points', 'percentage_score', 'is_passed')
+        }),
+        ('Timing', {
+            'fields': ('started_at', 'completed_at', 'time_taken_seconds')
+        }),
+        ('Metadata', {
+            'fields': ('ip_address', 'user_agent'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('profile', 'quiz')
+
+
+@admin.register(QuizAnswer)
+class QuizAnswerAdmin(admin.ModelAdmin):
+    list_display = ('attempt', 'question', 'user_answer_short', 'is_correct', 'points_earned', 'answered_at')
+    list_filter = ('is_correct', 'answered_at')
+    search_fields = ('attempt__profile__user__username', 'question__question_text')
+    readonly_fields = ('answered_at',)
+    fieldsets = (
+        ('Answer Information', {
+            'fields': ('attempt', 'question', 'user_answer', 'is_correct', 'points_earned')
+        }),
+        ('Detailed Answer (for MCQ/One-line)', {
+            'fields': ('selected_option', 'text_answer'),
+            'classes': ('collapse',)
+        }),
+        ('Feedback', {
+            'fields': ('feedback',)
+        }),
+    )
+    
+    def user_answer_short(self, obj):
+        return obj.user_answer[:50] + '...' if len(obj.user_answer) > 50 else obj.user_answer
+    user_answer_short.short_description = 'Answer'
+    
+    def has_add_permission(self, request):
+        return False  # Answers are created automatically when user takes quiz
+    
+    def has_delete_permission(self, request, obj=None):
+        return False  # Prevent deletion of quiz answers for data integrity

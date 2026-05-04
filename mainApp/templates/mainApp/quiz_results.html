@@ -1,0 +1,195 @@
+{% extends 'mainApp/base.html' %}
+{% load static %}
+
+{% block title %}Quiz Results: {{ quiz.title }} — {{ course.title }}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      
+      <!-- Attempt Selector Card -->
+      {% if total_attempts > 1 %}
+      <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="fas fa-history me-2"></i>Your Attempts ({{ total_attempts }})</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for attempt in all_attempts %}
+            <div class="col-md-4 mb-2">
+              <a href="{% url 'quiz_results_attempt' course.id lecture.id attempt.id %}" 
+                 class="btn {% if attempt.is_current %}btn-primary{% elif attempt.is_passed %}btn-success{% else %}btn-outline-danger{% endif %} w-100">
+                Attempt {{ attempt.attempt_number }}: {{ attempt.percentage_score|floatformat:0 }}%
+                {% if attempt.is_current %}<i class="fas fa-star ms-2"></i>{% endif %}
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+          <small class="text-muted mt-2 d-block">
+            <i class="fas fa-info-circle me-1"></i>
+            Showing best attempt by default. Click any attempt to view details.
+          </small>
+        </div>
+      </div>
+      {% endif %}
+      
+      <!-- Result Summary Card -->
+      <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header {% if current_attempt.is_passed %}bg-success{% else %}bg-danger{% endif %} text-white py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Quiz Results</h4>
+              <small>{{ quiz.title }} • {{ course.title }}</small>
+            </div>
+            {% if total_attempts > 1 %}
+            <span class="badge bg-light text-dark">
+              Attempt {{ current_attempt.attempt_number }} of {{ total_attempts }}
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-body p-4">
+          
+          <!-- Score Display -->
+          <div class="text-center mb-4">
+            <div class="display-1 fw-bold {% if current_attempt.is_passed %}text-success{% else %}text-danger{% endif %}">
+              {{ current_attempt.percentage_score|floatformat:0 }}%
+            </div>
+            <div class="mt-2">
+              <h5>
+                {% if current_attempt.is_passed %}
+                  <i class="fas fa-trophy text-success me-2"></i>Congratulations! You Passed!
+                {% else %}
+                  <i class="fas fa-exclamation-triangle text-danger me-2"></i>Sorry, You Did Not Pass
+                {% endif %}
+              </h5>
+            </div>
+            <div class="mt-3">
+              <p class="mb-1">Your Score: <strong>{{ current_attempt.score }} / {{ current_attempt.total_points }}</strong> points</p>
+              <p class="mb-1">Passing Score Required: <strong>{{ quiz.passing_score }}%</strong></p>
+              <p class="mb-0">Attempt: <strong>{{ current_attempt.attempt_number }} of {{ quiz.max_attempts }}</strong></p>
+            </div>
+          </div>
+          
+          <!-- Best Score Badge -->
+          {% if current_attempt.percentage_score == best_score and total_attempts > 1 %}
+          <div class="alert alert-success text-center mb-4">
+            <i class="fas fa-crown me-2"></i>
+            <strong>This is your best attempt!</strong> ({{ best_score|floatformat:0 }}%)
+          </div>
+          {% endif %}
+          
+          <!-- Action Buttons -->
+          <div class="d-flex justify-content-center gap-3 mb-4">
+            {% if quiz.can_attempt and not current_attempt.is_passed %}
+              <a href="{% url 'take_quiz' course.id lecture.id %}" class="btn btn-primary">
+                <i class="fas fa-redo me-2"></i>Retake Quiz
+              </a>
+            {% endif %}
+            <script>
+              // Trigger course progress update after quiz
+              if (window.updateCourseProgress) {
+                updateCourseProgress({{ course.id }});
+              }
+              // Dispatch custom event for other listeners
+              window.dispatchEvent(new CustomEvent('courseProgressUpdate', { detail: {{ course.id }} }));
+            </script>
+            <a href="{% url 'lectureDetail' course.id lecture.id %}" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left me-2"></i>Back to Lecture
+            </a>
+            <a href="{% url 'courseDetail' course.id %}" class="btn btn-outline-primary">
+              <i class="fas fa-list me-2"></i>Course Overview
+            </a>
+          </div>
+          
+          <!-- Performance Breakdown -->
+          <div class="alert alert-info">
+            <h6><i class="fas fa-chart-pie me-2"></i>Performance Breakdown:</h6>
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <small>Total Questions: <strong>{{ quiz.total_questions }}</strong></small><br>
+                <small>Correct Answers: <strong>{{ correct_answers_count }}</strong></small>
+              </div>
+              <div class="col-md-6">
+                <small>Incorrect Answers: <strong>{{ incorrect_answers_count }}</strong></small><br>
+                <small>Time Taken: <strong>{{ time_minutes }} minutes {{ time_seconds }} seconds</strong></small>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- Detailed Answers -->
+      <div class="card shadow-lg border-0">
+        <div class="card-header bg-dark text-white py-3">
+          <h5 class="mb-0"><i class="fas fa-list-alt me-2"></i>Detailed Answers (Attempt {{ current_attempt.attempt_number }})</h5>
+        </div>
+        <div class="card-body p-0">
+          {% for answer in answers %}
+          <div class="p-4 border-bottom {% if answer.is_correct %}bg-success bg-opacity-10{% else %}bg-danger bg-opacity-10{% endif %}">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <strong class="{% if answer.is_correct %}text-success{% else %}text-danger{% endif %}">
+                Question {{ forloop.counter }}: {{ answer.question.question_text }}
+              </strong>
+              <span class="badge {% if answer.is_correct %}bg-success{% else %}bg-danger{% endif %}">
+                {{ answer.points_earned }} / {{ answer.question.points }} points
+              </span>
+            </div>
+            
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <small class="text-muted">Your Answer:</small>
+                <div class="p-2 bg-light rounded mt-1">
+                  {% if answer.question.question_type == 'mcq' %}
+                    <strong>{{ answer.user_answer }}.</strong> 
+                    {% if answer.user_answer == 'A' %}{{ answer.question.option_a }}
+                    {% elif answer.user_answer == 'B' %}{{ answer.question.option_b }}
+                    {% elif answer.user_answer == 'C' %}{{ answer.question.option_c }}
+                    {% elif answer.user_answer == 'D' %}{{ answer.question.option_d }}
+                    {% else %}{{ answer.user_answer }}
+                    {% endif %}
+                  {% else %}
+                    "{{ answer.user_answer }}"
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <small class="text-muted">Correct Answer:</small>
+                <div class="p-2 bg-success bg-opacity-25 rounded mt-1 text-success">
+                  {% if answer.question.question_type == 'mcq' %}
+                    <strong>{{ answer.question.correct_option }}.</strong>
+                    {% if answer.question.correct_option == 'A' %}{{ answer.question.option_a }}
+                    {% elif answer.question.correct_option == 'B' %}{{ answer.question.option_b }}
+                    {% elif answer.question.correct_option == 'C' %}{{ answer.question.option_c }}
+                    {% elif answer.question.correct_option == 'D' %}{{ answer.question.option_d }}
+                    {% endif %}
+                  {% else %}
+                    "{{ answer.question.expected_answer }}"
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            {% if answer.question.explanation %}
+            <div class="mt-3">
+              <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Explanation:</small>
+              <div class="p-2 bg-light rounded mt-1">
+                {{ answer.question.explanation }}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          {% empty %}
+          <div class="p-4 text-center">
+            <p class="text-muted">No answers found for this attempt.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+{% endblock %}

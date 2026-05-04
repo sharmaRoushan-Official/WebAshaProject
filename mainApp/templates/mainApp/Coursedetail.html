@@ -616,12 +616,12 @@ body { font-family: var(--font-b); background: var(--page-bg); }
         <!-- Syllabus / Curriculum -->
         <div class="cd-section">
           <div class="cd-sec-title"><i class="fas fa-layer-group"></i> Course Curriculum</div>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:18px;" data-course="{{ course.id }}">
             <strong style="color:var(--ink);">
               {{ course.total_lectures|default:details.total_lessons|default:0 }} lectures · 
               {% if course.total_duration %}{{ course.total_duration|floatformat:0 }}m{% else %}{{ details.duration|default:"TBD" }}{% endif %}
               {% if is_enrolled %}
-                · <span style="color:var(--green);">Your progress: {{ user_access.completion_percentage|floatformat:0 }}%</span>
+                · <span class="course-progress-text" style="color:var(--green);">Your progress: {{ user_access.completion_percentage|floatformat:0 }}%</span>
               {% endif %}
             </strong>
           </p>
