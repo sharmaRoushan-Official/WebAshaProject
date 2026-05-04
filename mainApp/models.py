@@ -207,7 +207,24 @@ class Lecture(models.Model):
             if match:
                 video_id = match.group(1)
         
+        # Pattern for m.youtube.com format
+        if not video_id:
+            youtube_mobile_pattern = r'm\.youtube\.com/watch\?v=([a-zA-Z0-9_-]+)'
+            match = re.search(youtube_mobile_pattern, url)
+            if match:
+                video_id = match.group(1)
+        
+        # Pattern for youtube.com/v/ format
+        if not video_id:
+            youtube_v_pattern = r'youtube\.com/v/([a-zA-Z0-9_-]+)'
+            match = re.search(youtube_v_pattern, url)
+            if match:
+                video_id = match.group(1)
+        
         if video_id:
+            # Clean video_id (remove any parameters)
+            video_id = video_id.split('?')[0].split('&')[0]
+            # Return proper embed URL with required parameters
             return f"https://www.youtube.com/embed/{video_id}?rel=0&modestbranding=1&autoplay=0&enablejsapi=1"
         
         # If no pattern matched, return original URL
@@ -217,11 +234,27 @@ class Lecture(models.Model):
         """Convert Vimeo URL to embed URL"""
         if not self.video_url:
             return ""
-        match = re.search(r'https://vimeo\.com/(\d+)', self.video_url)
+        
+        url = self.video_url.strip()
+        video_id = None
+        
+        # Pattern for vimeo.com/ID
+        vimeo_pattern = r'vimeo\.com/(\d+)'
+        match = re.search(vimeo_pattern, url)
         if match:
             video_id = match.group(1)
+        
+        # Pattern for player.vimeo.com/video/ID
+        if not video_id:
+            vimeo_player_pattern = r'player\.vimeo\.com/video/(\d+)'
+            match = re.search(vimeo_player_pattern, url)
+            if match:
+                video_id = match.group(1)
+        
+        if video_id:
             return f"https://player.vimeo.com/video/{video_id}?rel=0"
-        return self.video_url
+        
+        return url
     
     def get_video_embed_url(self):
         """Get embed URL for YouTube or Vimeo, fallback to original"""
@@ -239,6 +272,35 @@ class Lecture(models.Model):
         
         # Return original URL for other platforms
         return self.video_url
+    
+    @property
+    def youtube_embed_url(self):
+        """Get clean YouTube embed URL - USE THIS IN TEMPLATE"""
+        if not self.video_url:
+            return ""
+        
+        url = self.video_url.strip()
+        
+        # Extract video ID
+        video_id = None
+        
+        # Handle youtu.be/
+        if 'youtu.be/' in url:
+            video_id = url.split('youtu.be/')[-1].split('?')[0].split('&')[0]
+        # Handle youtube.com/watch
+        elif 'youtube.com/watch' in url:
+            video_id = url.split('v=')[-1].split('&')[0]
+        # Handle youtube.com/embed/
+        elif 'youtube.com/embed/' in url:
+            video_id = url.split('/embed/')[-1].split('?')[0].split('&')[0]
+        # Handle youtube.com/shorts/
+        elif 'youtube.com/shorts/' in url:
+            video_id = url.split('/shorts/')[-1].split('?')[0].split('&')[0]
+        
+        if video_id:
+            return f"https://www.youtube.com/embed/{video_id}"
+        
+        return url
     
     @property
     def has_content(self):
@@ -630,7 +692,6 @@ class LiveCourseTransaction(models.Model):
     def __str__(self):
         return f"{self.profile.user.username} - {self.live_course.title} - ₹{self.total_amount} ({self.status})"
     
-# Add this model to your existing models.py file
 
 class Invoice(models.Model):
     """
@@ -721,11 +782,8 @@ class Invoice(models.Model):
         
         return f"INV-{date_prefix}-{new_seq:04d}"
     
-# ==================== SIGNALS FOR AUTO-INVOICE CREATION ====================
 
-# FIXED: Auto-sync Profile.email when User.email changes (admin updates)
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+# ==================== SIGNALS FOR AUTO-INVOICE CREATION ====================
 
 @receiver(post_save, sender=User)
 def sync_profile_email(sender, instance, created, **kwargs):
@@ -740,7 +798,6 @@ def sync_profile_email(sender, instance, created, **kwargs):
             profile.save(update_fields=['email'])
     except Profile.DoesNotExist:
         pass
-
 
 
 @receiver(post_save, sender=CourseTransaction)
@@ -779,7 +836,7 @@ def create_invoice_for_course_transaction(sender, instance, created, **kwargs):
                 payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
                 payment_transaction_id=instance.transaction_id,
                 customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
-                customer_email=profile.user.email,  # FIXED: Always use User.email as source of truth
+                customer_email=profile.user.email,
                 customer_phone=profile.phone or '',
                 customer_address=profile.address or '',
             )
@@ -791,6 +848,7 @@ def create_invoice_for_course_transaction(sender, instance, created, **kwargs):
                 logger.info(f"PDF auto-generated for invoice {invoice.invoice_number}")
             except Exception as e:
                 logger.error(f"Failed to auto-generate PDF for invoice {invoice.invoice_number}: {str(e)}")
+
 
 @receiver(post_save, sender=Invoice)
 def send_email_on_invoice_creation(sender, instance, created, **kwargs):
@@ -842,7 +900,7 @@ def create_invoice_for_live_course_transaction(sender, instance, created, **kwar
                 payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
                 payment_transaction_id=instance.transaction_id,
                 customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
-                customer_email=profile.user.email,  # FIXED: Always use User.email as source of truth
+                customer_email=profile.user.email,
                 customer_phone=profile.phone or '',
                 customer_address=profile.address or '',
             )

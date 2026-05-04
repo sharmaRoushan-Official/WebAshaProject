@@ -15,66 +15,52 @@
         </div>
         <div class="card-body p-4">
           
-          {% if lecture.video_url %}
-            <!-- YouTube/Vimeo Video -->
+          {% if lecture.video_embed_code %}
+            <!-- Use embed code first (most reliable) -->
+            <div class="ratio ratio-16x9 mb-4">
+              {{ lecture.video_embed_code|safe }}
+            </div>
+            
+          {% elif lecture.video_url %}
+            <!-- YouTube/Vimeo Video from URL -->
             {% if 'youtube.com' in lecture.video_url or 'youtu.be' in lecture.video_url %}
-              <div class="ratio ratio-16x9 mb-4" id="youtube-video-container">
-                <iframe id="youtube-iframe"
-                        src="{{ lecture.get_video_embed_url }}" 
-                        title="{{ lecture.title }}" 
-                        allowfullscreen 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        class="rounded shadow-sm"
-                        onerror="handleVideoError()"></iframe>
+              <!-- YouTube Video Player -->
+              <div class="ratio ratio-16x9 mb-4">
+                {% with video_id=lecture.video_url|cut:'https://www.youtube.com/watch?v='|cut:'https://youtu.be/'|cut:'https://m.youtube.com/watch?v=' %}
+                  <iframe src="https://www.youtube.com/embed/{{ video_id|slice:':11' }}" 
+                          title="{{ lecture.title }}" 
+                          frameborder="0" 
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowfullscreen>
+                  </iframe>
+                {% endwith %}
               </div>
-              
-              <!-- Fallback for blocked content (Brave, etc.) -->
-              <div id="video-fallback" style="display: none;" class="alert alert-warning text-center p-4">
-                <i class="fas fa-shield-alt fa-3x mb-3 text-warning"></i>
-                <h5>Video player is blocked</h5>
-                <p>This could be due to browser privacy settings (Brave Shields), ad blocker, or network restrictions.</p>
-                <div class="mt-3">
-                  <button onclick="openInNewTab()" class="btn btn-primary me-2">
-                    <i class="fab fa-youtube me-2"></i>Open in YouTube
-                  </button>
-                  <button onclick="retryVideo()" class="btn btn-outline-secondary">
-                    <i class="fas fa-sync-alt me-2"></i>Retry
-                  </button>
-                </div>
-                <div class="mt-3 small text-muted">
-                  <strong>Brave Users:</strong> Click the lion icon 🦁 in address bar → Disable Shields for this site
-                </div>
-              </div>
-              
-              <!-- Direct link for all users -->
               <div class="text-center mt-2">
-                <a href="{{ lecture.video_url }}" target="_blank" class="text-muted small" id="direct-link">
+                <a href="{{ lecture.video_url }}" target="_blank" class="text-muted small">
                   <i class="fab fa-youtube me-1"></i>Watch on YouTube (opens in new tab)
                 </a>
               </div>
               
             {% elif 'vimeo.com' in lecture.video_url %}
+              <!-- Vimeo Video Player -->
               <div class="ratio ratio-16x9 mb-4">
-                <iframe src="{{ lecture.get_video_embed_url }}" 
+                <iframe src="https://player.vimeo.com/video/{{ lecture.video_url|cut:'https://vimeo.com/' }}" 
                         title="{{ lecture.title }}" 
-                        allowfullscreen 
-                        class="rounded shadow-sm"
-                        onerror="handleVimeoError(this)"></iframe>
+                        frameborder="0" 
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowfullscreen>
+                </iframe>
               </div>
-              <div id="vimeo-fallback" style="display: none;" class="alert alert-warning text-center">
-                <p>Vimeo video cannot be loaded. <a href="{{ lecture.video_url }}" target="_blank">Click here to watch on Vimeo</a></p>
-              </div>
+              
             {% else %}
-              <!-- Generic video URL -->
-              <video class="w-100 rounded shadow-sm" controls preload="metadata" id="html5-video">
+              <!-- Generic video URL (MP4, etc.) -->
+              <video class="w-100 rounded shadow-sm" controls preload="metadata">
                 <source src="{{ lecture.video_url }}" type="video/mp4">
                 Your browser does not support video playback.
                 <a href="{{ lecture.video_url }}" target="_blank">Download video</a>
               </video>
             {% endif %}
-          {% elif lecture.video_embed_code %}
-            <!-- Custom embed code -->
-            <div class="mb-4">{{ lecture.video_embed_code|safe }}</div>
+            
           {% elif lecture.resource_file %}
             <!-- Downloadable resource -->
             <div class="text-center py-5">
@@ -85,11 +71,13 @@
                 <i class="fas fa-download me-2"></i>Download File
               </a>
             </div>
+            
           {% elif lecture.content %}
             <!-- Article/Text content -->
             <div class="lecture-content">
               {{ lecture.content|linebreaks }}
             </div>
+            
           {% else %}
             <div class="text-center py-5">
               <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
@@ -118,9 +106,13 @@
           <a href="{% url 'lectureDetail' course.id lec.id %}" 
              class="d-flex align-items-center p-3 border-bottom {% if lec == lecture %}bg-primary text-white fw-bold{% elif user_access and lec in user_access.completed_lectures.all %}text-success{% endif %}">
             <span class="me-3">
-              {% if user_access and lec in user_access.completed_lectures.all %}<i class="fas fa-check-circle text-success"></i>
-              {% elif lec == lecture %}<i class="fas fa-play-circle text-white"></i>
-              {% else %}<i class="fas fa-circle text-muted"></i>{% endif %}
+              {% if user_access and lec in user_access.completed_lectures.all %}
+                <i class="fas fa-check-circle text-success"></i>
+              {% elif lec == lecture %}
+                <i class="fas fa-play-circle text-white"></i>
+              {% else %}
+                <i class="fas fa-circle text-muted"></i>
+              {% endif %}
             </span>
             <div class="flex-grow-1">
               <div>{{ lec.title }}</div>
@@ -153,34 +145,7 @@
       </div>
       {% endif %}
 
-      <!-- Next Lectures -->
-      <div class="card mt-4">
-        <div class="card-header">
-          <h6 class="mb-0">Next Lectures</h6>
-        </div>
-        <div class="card-body">
-          {% if course.chapters.exists %}
-            {% for lec in course.chapters.first.lectures.all|slice:":3" %}
-              {% if lec != lecture %}
-                <a href="{% url 'lectureDetail' course.id lec.id %}" class="d-flex align-items-center p-2 border-bottom-small text-decoration-none">
-                  <i class="fas fa-play-circle text-muted me-3"></i>
-                  <div>
-                    <div class="small fw-medium">{{ lec.title|truncatechars:40 }}</div>
-                    <div class="tiny text-muted">{{ lec.duration_display }}</div>
-                  </div>
-                </a>
-              {% endif %}
-            {% empty %}
-              <p class="text-muted small mb-0">No more lectures</p>
-            {% endfor %}
-          {% else %}
-            <p class="text-muted small mb-0">No chapters available</p>
-          {% endif %}
-        </div>
-      </div>
-
       <!-- Quick Course Actions -->
-      {% if user_access %}
       <div class="card mt-4">
         <div class="card-body text-center p-4">
           <a href="{% url 'courseDetail' course.id %}" class="btn btn-outline-primary w-100 mb-2">
@@ -191,7 +156,6 @@
           </a>
         </div>
       </div>
-      {% endif %}
     </div>
   </div>
 </div>
@@ -213,11 +177,6 @@
 .tiny { font-size: 0.75rem !important; }
 .border-bottom-small { border-bottom: 1px solid #eee !important; }
 .border-bottom:last-child { border-bottom: none !important; }
-.alert-warning {
-  background-color: #fff3cd;
-  border-color: #ffecb5;
-  color: #856404;
-}
 </style>
 
 <script>
@@ -273,97 +232,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
-
-// YouTube video error handling for all browsers
-function handleVideoError() {
-  console.log('Video failed to load');
-  const container = document.getElementById('youtube-video-container');
-  const fallback = document.getElementById('video-fallback');
-  if (container && fallback) {
-    container.style.display = 'none';
-    fallback.style.display = 'block';
-  }
-}
-
-function openInNewTab() {
-  const videoUrl = "{{ lecture.video_url|escapejs }}";
-  if (videoUrl) {
-    window.open(videoUrl, '_blank');
-  }
-}
-
-function retryVideo() {
-  const container = document.getElementById('youtube-video-container');
-  const fallback = document.getElementById('video-fallback');
-  const iframe = document.getElementById('youtube-iframe');
-  
-  if (container && fallback && iframe) {
-    // Reset iframe src to retry loading
-    const currentSrc = iframe.src;
-    iframe.src = '';
-    setTimeout(() => {
-      iframe.src = currentSrc;
-    }, 100);
-    
-    container.style.display = 'block';
-    fallback.style.display = 'none';
-  }
-}
-
-// Detect Brave browser and other blockers
-async function detectBrave() {
-  // Check for Brave
-  if (navigator.brave && await navigator.brave.isBrave()) {
-    return 'brave';
-  }
-  // Check user agent for Brave
-  if (navigator.userAgent.includes('Brave')) {
-    return 'brave';
-  }
-  return 'other';
-}
-
-// Check if iframe is blocked
-function checkIframeBlocked() {
-  const iframe = document.getElementById('youtube-iframe');
-  if (iframe) {
-    // Try to access iframe content - will throw error if blocked
-    try {
-      const iframeDoc = iframe.contentWindow || iframe.contentDocument;
-      if (iframeDoc === null) {
-        handleVideoError();
-      }
-    } catch (e) {
-      console.log('Iframe access blocked:', e);
-      handleVideoError();
-    }
-  }
-}
-
-// Run detection after page load
-document.addEventListener('DOMContentLoaded', async function() {
-  const browser = await detectBrave();
-  if (browser === 'brave') {
-    console.log('Brave browser detected - checking video player');
-    setTimeout(checkIframeBlocked, 2000);
-  }
-  
-  // Also check after 3 seconds for any loading issues
-  setTimeout(checkIframeBlocked, 3000);
-});
-
-// Vimeo error handling
-function handleVimeoError(iframe) {
-  const fallback = document.getElementById('vimeo-fallback');
-  if (fallback) {
-    iframe.style.display = 'none';
-    fallback.style.display = 'block';
-  }
-}
-
-
-
-
 </script>
 
 {% endblock %}
