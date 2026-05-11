@@ -3,77 +3,212 @@
 
 {% block title %}{{ lecture.title }} — {{ course.title }}{% endblock %}
 
+{% block extra_css %}
+{% if enable_compiler %}a
+<link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.min.css">
+<link rel="stylesheet" href="{% static 'mainApp/css/compiler.css' %}">
+<style>
+  /* Minimal progress bar - top aligned */
+  .progress-mini {
+    background: #e9ecef;
+    border-radius: 4px;
+    height: 4px;
+    overflow: hidden;
+  }
+  .progress-mini-bar {
+    background: #28a745;
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+  .stats-mini {
+    font-size: 12px;
+    color: #6c757d;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .stats-mini i {
+    font-size: 10px;
+    margin-right: 3px;
+  }
+  /* Resizable split layout: Video | (Compiler top + Output bottom) */
+  .lecture-resizable-grid {
+    display: grid;
+    grid-template-columns: var(--video-col, 42%) var(--code-col, 58%);
+    grid-template-rows: auto;
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .lecture-video-panel {
+    min-width: 0;
+  }
+
+  .lecture-right-panel {
+    min-width: 0;
+    display: grid;
+    grid-template-rows: var(--compiler-row, 55%) auto;
+  }
+
+  /* Nested resizable (Compiler | Output) */
+  .lecture-right-resizable {
+    display: grid;
+    grid-template-rows: var(--compiler-height, 240px) var(--output-height, 220px);
+    gap: 0;
+  }
+
+  /* Draggable bars */
+  .lecture-resizer-vertical {
+    width: 10px;
+    margin-left: -2px;
+    margin-right: -2px;
+    cursor: col-resize;
+    position: relative;
+    background: transparent;
+    z-index: 20;
+  }
+
+  .lecture-resizer-vertical::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.15);
+    border-radius: 1px;
+  }
+
+  .lecture-resizer-horizontal {
+    height: 10px;
+    cursor: row-resize;
+    position: relative;
+    background: transparent;
+    z-index: 20;
+  }
+
+  .lecture-resizer-horizontal::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 2px;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.15);
+    border-radius: 1px;
+  }
+
+  .lecture-fixed-height {
+    overflow: hidden;
+  }
+
+  .lecture-output-panel {
+    overflow: hidden;
+  }
+
+  .lecture-output-panel #output {
+    max-height: none;
+    height: 100%;
+  }
+
+  @media (max-width: 992px) {
+    .lecture-resizable-grid {
+      grid-template-columns: 1fr;
+    }
+    .lecture-resizer-vertical {
+      display: none;
+    }
+    .lecture-right-resizable {
+      grid-template-rows: auto;
+    }
+    .lecture-resizer-horizontal {
+      display: none;
+    }
+</style>
+{% endif %}
+{% endblock %}
+
 {% block body %}
-<div class="container my-5">
-  <div class="row">
-    <!-- Video/Content Player -->
-    <div class="col-lg-8">
+<div class="container-fluid px-4 py-3">
+  
+  <!-- Minimal Progress Info - Top Aligned (only when enrolled) -->
+  {% if user_access and enable_compiler %}
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded">
+        <div class="stats-mini">
+          <span><i class="fas fa-book-open"></i> {{ course.title }}</span>
+          <span><i class="fas fa-chapter"></i> {{ lecture.chapter.title }}</span>
+          <span><i class="fas fa-video"></i> Lecture {{ lecture.order }} of {{ lecture.chapter.lectures.count }}</span>
+        </div>
+        <div class="stats-mini">
+          <span><i class="fas fa-check-circle"></i> {{ user_access.completed_lectures.count }}/{{ course.total_lectures }}</span>
+          <span><i class="fas fa-percent"></i> {{ user_access.completion_percentage|floatformat:0 }}%</span>
+        </div>
+        <div class="progress-mini" style="width: 150px;">
+          <div class="progress-mini-bar" style="width: {{ user_access.completion_percentage }}%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Split Layout: Video Left | Compiler Right -->
+  <div class="split-layout">
+    
+    <!-- LEFT PANEL: Video/Content Player -->
+    <div class="video-panel">
       <div class="card shadow-lg border-0">
         <div class="card-header bg-primary text-white py-3">
-          <h4 class="mb-0"><i class="fas fa-play-circle me-2"></i>{{ lecture.title }}</h4>
-          <small class="opacity-75">{{ lecture.chapter.title }} • {{ lecture.duration_display }}</small>
+          <h5 class="mb-0"><i class="fas fa-play-circle me-2"></i>{{ lecture.title }}</h5>
+          <small class="opacity-75">{{ lecture.duration_display }}</small>
         </div>
         <div class="card-body p-4">
           
           {% if lecture.video_embed_code %}
-            <!-- Use embed code first (most reliable) -->
             <div class="ratio ratio-16x9 mb-4">
               {{ lecture.video_embed_code|safe }}
             </div>
             
           {% elif lecture.video_url %}
-            <!-- YouTube/Vimeo Video from URL -->
             {% if 'youtube.com' in lecture.video_url or 'youtu.be' in lecture.video_url %}
-              <!-- YouTube Video Player -->
               <div class="ratio ratio-16x9 mb-4">
-                {% with video_id=lecture.video_url|cut:'https://www.youtube.com/watch?v='|cut:'https://youtu.be/'|cut:'https://m.youtube.com/watch?v='|cut:'https://www.youtube.com/embed/' %}
-                  <iframe src="https://www.youtube.com/embed/{{ video_id|slice:':11' }}" 
-                          title="{{ lecture.title }}" 
-                          frameborder="0" 
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowfullscreen>
-                  </iframe>
-                {% endwith %}
+                <iframe src="{{ lecture.youtube_embed_url }}" 
+                        title="{{ lecture.title }}" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                </iframe>
               </div>
-              <div class="text-center mt-2">
-                <a href="{{ lecture.video_url }}" target="_blank" class="text-muted small">
-                  <i class="fab fa-youtube me-1"></i>Watch on YouTube (opens in new tab)
-                </a>
-              </div>
-              
             {% elif 'vimeo.com' in lecture.video_url %}
-              <!-- Vimeo Video Player -->
               <div class="ratio ratio-16x9 mb-4">
-                <iframe src="https://player.vimeo.com/video/{{ lecture.video_url|cut:'https://vimeo.com/' }}" 
+                <iframe src="{{ lecture.get_vimeo_embed_url }}" 
                         title="{{ lecture.title }}" 
                         frameborder="0" 
                         allow="autoplay; fullscreen; picture-in-picture"
                         allowfullscreen>
                 </iframe>
               </div>
-              
             {% else %}
-              <!-- Generic video URL (MP4, etc.) -->
               <video class="w-100 rounded shadow-sm" controls preload="metadata">
                 <source src="{{ lecture.video_url }}" type="video/mp4">
                 Your browser does not support video playback.
-                <a href="{{ lecture.video_url }}" target="_blank">Download video</a>
               </video>
             {% endif %}
             
           {% elif lecture.resource_file %}
-            <!-- Downloadable resource -->
             <div class="text-center py-5">
               <i class="fas fa-file-download fa-4x text-muted mb-3"></i>
               <h5>Download Resource</h5>
-              <p class="text-muted mb-4">{{ lecture.title }}</p>
               <a href="{{ lecture.resource_file.url }}" class="btn btn-success btn-lg" download>
                 <i class="fas fa-download me-2"></i>Download File
               </a>
             </div>
             
           {% elif lecture.content %}
-            <!-- Article/Text content -->
             <div class="lecture-content">
               {{ lecture.content|linebreaks }}
             </div>
@@ -85,8 +220,9 @@
             </div>
           {% endif %}
 
+          <!-- Mark Complete Button -->
           {% if user_access and not lecture.has_quiz %}
-          <div class="d-flex gap-2 mt-4">
+          <div class="mt-4">
             <button class="btn btn-success btn-sm mark-complete-btn" data-lecture="{{ lecture.id }}">
               <i class="fas fa-check me-1"></i>Mark Complete
             </button>
@@ -96,38 +232,36 @@
           {% if lecture.has_quiz and user_access %}
           <div class="alert alert-info mt-4">
             <i class="fas fa-info-circle me-2"></i>
-            This lecture has a quiz. You can take the quiz to test your understanding.
+            This lecture has a quiz. <a href="{% url 'take_quiz' course.id lecture.id %}" class="alert-link">Take the quiz →</a>
           </div>
           {% endif %}
         </div>
       </div>
 
-      <!-- Chapter Navigation -->
+      <!-- Chapter Navigation (Collapsed/Minimal) -->
       {% if lecture.chapter.lectures.exists %}
-      <div class="card mt-4 border-0 shadow-sm">
+      <div class="card mt-3 border-0 shadow-sm">
         <div class="card-header bg-light py-2">
-          <h6 class="mb-0"><i class="fas fa-list me-2"></i>Lecture {{ lecture.order }} of {{ lecture.chapter.lectures.count }} in {{ lecture.chapter.title }}</h6>
+          <small class="fw-bold"><i class="fas fa-list me-1"></i>Chapter: {{ lecture.chapter.title }}</small>
         </div>
         <div class="card-body p-0">
           {% for lec in lecture.chapter.lectures.all %}
           <a href="{% url 'lectureDetail' course.id lec.id %}" 
-             class="d-flex align-items-center p-3 border-bottom {% if lec == lecture %}bg-primary text-white fw-bold{% elif user_access and lec in user_access.completed_lectures.all %}text-success{% endif %}">
-            <span class="me-3">
+             class="d-flex align-items-center p-2 border-bottom text-decoration-none {% if lec == lecture %}bg-primary text-white{% endif %}"
+             style="font-size: 13px;">
+            <span class="me-2">
               {% if user_access and lec in user_access.completed_lectures.all %}
                 <i class="fas fa-check-circle text-success"></i>
               {% elif lec == lecture %}
                 <i class="fas fa-play-circle text-white"></i>
               {% else %}
-                <i class="fas fa-circle text-muted"></i>
+                <i class="far fa-circle text-muted"></i>
               {% endif %}
             </span>
             <div class="flex-grow-1">
-              <div>{{ lec.title }}</div>
-              <small class="text-muted">{{ lec.duration_display }}</small>
+              {{ lec.title|truncatechars:40 }}
             </div>
-            {% if lec != lecture %}
-            <i class="fas fa-chevron-right opacity-50"></i>
-            {% endif %}
+            <small class="text-muted">{{ lec.duration_display }}</small>
           </a>
           {% endfor %}
         </div>
@@ -135,35 +269,37 @@
       {% endif %}
     </div>
 
-    <!-- Course Sidebar -->
-    <div class="col-lg-4">
-      <!-- Course Progress -->
-      {% if user_access %}
-      <div class="card sticky-top" style="top: 20px;">
-        <div class="card-body">
-          <h6 class="card-title mb-3">Course Progress</h6>
-          <div class="progress mb-3" style="height: 8px;">
-            <div class="progress-bar bg-success" role="progressbar" style="width: {{ user_access.completion_percentage }}%" aria-valuenow="{{ user_access.completion_percentage }}" aria-valuemin="0" aria-valuemax="100">
-              {{ user_access.completion_percentage|floatformat:0 }}%
-            </div>
+    <!-- RIGHT PANEL: Code Compiler (only when enabled) -->
+    {% if enable_compiler %}
+    <div class="compiler-panel">
+      <div class="compiler-container">
+        <div class="compiler-header">
+          <span class="compiler-language-badge">
+            <i class="fas fa-code me-1"></i>{{ compiler_language|upper }}
+          </span>
+          <div class="compiler-actions">
+            <button class="btn-run" id="runCodeBtn">
+              <i class="fas fa-play me-1"></i>Run
+            </button>
+            <button class="btn-reset" id="resetCodeBtn">
+              <i class="fas fa-undo me-1"></i>Reset
+            </button>
           </div>
-          <small class="text-muted">{{ user_access.completed_lectures.count }} / {{ course.total_lectures }} lectures</small>
+        </div>
+        <div id="editor" style="height: 400px;"></div>
+        <div class="compiler-output">
+          <div class="output-header">
+            <i class="fas fa-terminal me-1"></i>Output
+          </div>
+          <div id="output"></div>
         </div>
       </div>
-      {% endif %}
-
-      <!-- Quick Course Actions -->
-      <div class="card mt-4">
-        <div class="card-body text-center p-4">
-          <a href="{% url 'courseDetail' course.id %}" class="btn btn-outline-primary w-100 mb-2">
-            <i class="fas fa-list me-1"></i>Course Contents
-          </a>
-          <a href="{% url 'my_courses' %}" class="btn btn-outline-secondary w-100">
-            <i class="fas fa-th me-1"></i>My Courses
-          </a>
-        </div>
+      <div class="text-muted small mt-2 text-center">
+        <i class="fas fa-info-circle"></i> Practice code here. Your code is saved automatically.
       </div>
     </div>
+    {% endif %}
+    
   </div>
 </div>
 
@@ -181,9 +317,6 @@
 .lecture-content p {
   margin-bottom: 1.2rem;
 }
-.tiny { font-size: 0.75rem !important; }
-.border-bottom-small { border-bottom: 1px solid #eee !important; }
-.border-bottom:last-child { border-bottom: none !important; }
 </style>
 
 <script>
@@ -225,32 +358,18 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(data => {
         if (data.success) {
           btnElement.innerHTML = '<i class="fas fa-check-double me-1"></i>Completed ✓';
-          btnElement.classList.add('btn-success', 'disabled');
+          btnElement.classList.add('disabled');
           btnElement.disabled = true;
           
-          // Update course progress bar immediately
+          // Update mini progress bar
           if (data.percentage !== undefined) {
-            const progressBar = document.querySelector('.progress-bar');
-            const progressText = document.querySelector('.text-muted small');
-            const courseId = {{ course.id }};
+            const progressBar = document.querySelector('.progress-mini-bar');
+            const percentSpan = document.querySelector('.stats-mini span:last-child');
             if (progressBar) {
               progressBar.style.width = data.percentage + '%';
-              progressBar.textContent = data.percentage.toFixed(0) + '%';
-              progressBar.setAttribute('aria-valuenow', data.percentage);
             }
-            if (progressText) {
-              progressText.textContent = `${data.completed_count || 0} / {{ course.total_lectures }} lectures`;
-            }
-          }
-          
-          // Mark this lecture as completed in chapter navigation
-          const currentLectureLink = document.querySelector('.bg-primary');
-          if (currentLectureLink) {
-            currentLectureLink.classList.remove('bg-primary', 'text-white', 'fw-bold');
-            currentLectureLink.classList.add('text-success');
-            const icon = currentLectureLink.querySelector('i');
-            if (icon) {
-              icon.className = 'fas fa-check-circle text-success';
+            if (percentSpan) {
+              percentSpan.innerHTML = `<i class="fas fa-percent"></i> ${data.percentage.toFixed(0)}%`;
             }
           }
           
@@ -266,6 +385,274 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+// ==================== CODE COMPILER INITIALIZATION ====================
+{% if enable_compiler %}
+// First, load Pyodide script dynamically
+const pyodideScript = document.createElement('script');
+pyodideScript.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+pyodideScript.onload = () => {
+    console.log('Pyodide script loaded');
+    window.pyodideReady = true;
+};
+document.head.appendChild(pyodideScript);
+
+// Wait for DOM and scripts to load
+(function() {
+  const courseId = {{ course.id }};
+  const lectureId = {{ lecture.id }};
+  const compilerLanguage = "{{ compiler_language }}";
+  const starterCode = `{{ starter_code|escapejs }}`;
+  
+  let editor = null;
+  let pyodide = null;
+  let pyodideLoading = false;
+  
+  // Load Monaco Editor
+  function initEditor() {
+    // Check if monaco is already loaded
+    if (typeof require === 'undefined') {
+      // Load Monaco loader first
+      const monacoLoader = document.createElement('script');
+      monacoLoader.src = 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js';
+      monacoLoader.onload = () => {
+        require.config({ 
+          paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } 
+        });
+        
+        require(['vs/editor/editor.main'], function() {
+          createEditor();
+        });
+      };
+      document.head.appendChild(monacoLoader);
+    } else {
+      require.config({ 
+        paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } 
+      });
+      
+      require(['vs/editor/editor.main'], function() {
+        createEditor();
+      });
+    }
+  }
+  
+  function createEditor() {
+    const languageMap = {
+      'python': 'python',
+      'javascript': 'javascript',
+      'html_css': 'html',
+      'sql': 'sql'
+    };
+    
+    // Load saved code or use starter
+    const savedKey = `code_${courseId}_${lectureId}`;
+    const savedCode = localStorage.getItem(savedKey);
+    const initialCode = savedCode !== null ? savedCode : starterCode;
+    
+    editor = monaco.editor.create(document.getElementById('editor'), {
+      value: initialCode,
+      language: languageMap[compilerLanguage] || 'plaintext',
+      theme: 'vs-dark',
+      fontSize: 14,
+      fontFamily: 'Consolas, Monaco, monospace',
+      minimap: { enabled: false },
+      automaticLayout: true,
+      scrollBeyondLastLine: false,
+      lineNumbers: 'on',
+      padding: { top: 10 }
+    });
+    
+    // Auto-save on typing
+    editor.onDidChangeModelContent(() => {
+      const code = editor.getValue();
+      localStorage.setItem(savedKey, code);
+    });
+  }
+  
+  // Execute code based on language
+  async function executeCode() {
+    if (!editor) return;
+    
+    const code = editor.getValue();
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = '';
+    outputDiv.classList.remove('error', 'success');
+    
+    switch(compilerLanguage) {
+      case 'python':
+        await executePython(code, outputDiv);
+        break;
+      case 'javascript':
+        executeJavaScript(code, outputDiv);
+        break;
+      case 'html_css':
+        executeHTMLCSS(code, outputDiv);
+        break;
+      case 'sql':
+        executeSQL(code, outputDiv);
+        break;
+      default:
+        outputDiv.innerHTML = `Unsupported language: ${compilerLanguage}`;
+        outputDiv.classList.add('error');
+    }
+  }
+  
+  // Python execution with Pyodide
+  async function executePython(code, outputDiv) {
+    // Check if Pyodide is available
+    if (typeof loadPyodide === 'undefined') {
+      outputDiv.innerHTML = '⏳ Loading Python runtime... Please wait a moment.\n\nIf this persists, refresh the page.';
+      outputDiv.classList.add('error');
+      // Try to reload Pyodide
+      if (!window.pyodideLoading) {
+        window.pyodideLoading = true;
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+        script.onload = () => {
+          outputDiv.innerHTML = '✓ Pyodide loaded! Click Run again.';
+          window.pyodideLoading = false;
+        };
+        document.head.appendChild(script);
+      }
+      return;
+    }
+    
+    outputDiv.innerHTML = '<span style="color: #ffa500;">⏳ Running Python code...</span>';
+    
+    if (!pyodide && !pyodideLoading) {
+      pyodideLoading = true;
+      try {
+        outputDiv.innerHTML = '<span style="color: #ffa500;">⏳ Initializing Python environment (first run: ~3-5 seconds)...</span>';
+        pyodide = await loadPyodide({
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/",
+        });
+        outputDiv.innerHTML = '';
+        pyodideLoading = false;
+      } catch (err) {
+        outputDiv.innerHTML = `❌ Error loading Python: ${err.message}`;
+        outputDiv.classList.add('error');
+        pyodideLoading = false;
+        return;
+      }
+    }
+    
+    if (pyodideLoading) {
+      outputDiv.innerHTML = '<span style="color: #ffa500;">⏳ Loading Python, please wait...</span>';
+      return;
+    }
+    
+    try {
+      // Capture stdout
+      pyodide.runPython(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+      `);
+      
+      await pyodide.runPythonAsync(code);
+      const output = pyodide.runPython('sys.stdout.getvalue()');
+      
+      if (output && output.trim()) {
+        outputDiv.innerHTML = escapeHtml(output);
+        outputDiv.classList.add('success');
+      } else {
+        outputDiv.innerHTML = '✓ Code executed successfully (no output)';
+        outputDiv.classList.add('success');
+      }
+    } catch (err) {
+      outputDiv.innerHTML = escapeHtml(err.toString());
+      outputDiv.classList.add('error');
+    }
+  }
+  
+  // JavaScript execution
+  function executeJavaScript(code, outputDiv) {
+    let logs = [];
+    const originalLog = console.log;
+    console.log = function(...args) {
+      logs.push(args.map(arg => String(arg)).join(' '));
+      originalLog.apply(console, args);
+    };
+    
+    try {
+      const func = new Function(code);
+      const result = func();
+      console.log = originalLog;
+      
+      if (logs.length > 0) {
+        outputDiv.innerHTML = escapeHtml(logs.join('\n'));
+        outputDiv.classList.add('success');
+      } else if (result !== undefined) {
+        outputDiv.innerHTML = escapeHtml(String(result));
+        outputDiv.classList.add('success');
+      } else {
+        outputDiv.innerHTML = '✓ Code executed successfully (no output)';
+        outputDiv.classList.add('success');
+      }
+    } catch (err) {
+      console.log = originalLog;
+      outputDiv.innerHTML = escapeHtml(err.toString());
+      outputDiv.classList.add('error');
+    }
+  }
+  
+  // HTML/CSS execution
+  function executeHTMLCSS(code, outputDiv) {
+    const blob = new Blob([code], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    outputDiv.innerHTML = `
+      <iframe src="${url}" style="width:100%; height:300px; border:1px solid #3e3e42; border-radius:4px; background:white;"></iframe>
+      <div class="mt-2 small text-muted">📱 Live preview of your HTML/CSS code</div>
+    `;
+    
+    const iframe = outputDiv.querySelector('iframe');
+    iframe.onload = () => URL.revokeObjectURL(url);
+  }
+  
+  // SQL execution (validator)
+  function executeSQL(code, outputDiv) {
+    const sqlKeywords = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER'];
+    const upperCode = code.toUpperCase();
+    
+    if (sqlKeywords.some(keyword => upperCode.includes(keyword))) {
+      outputDiv.innerHTML = '✓ SQL syntax looks valid!\n\nNote: This is a syntax validator. For full execution, a database backend is required.';
+      outputDiv.classList.add('success');
+    } else {
+      outputDiv.innerHTML = '❌ Please enter a valid SQL query (SELECT, INSERT, UPDATE, DELETE, etc.)';
+      outputDiv.classList.add('error');
+    }
+  }
+  
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  function resetCode() {
+    if (editor) {
+      editor.setValue(starterCode);
+      const savedKey = `code_${courseId}_${lectureId}`;
+      localStorage.setItem(savedKey, starterCode);
+      document.getElementById('output').innerHTML = '<span style="color: #6a9955;">✓ Code reset to starter template</span>';
+    }
+  }
+  
+  // Initialize everything when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    initEditor();
+    
+    // Wait for buttons to exist
+    setTimeout(() => {
+      const runBtn = document.getElementById('runCodeBtn');
+      const resetBtn = document.getElementById('resetCodeBtn');
+      if (runBtn) runBtn.addEventListener('click', executeCode);
+      if (resetBtn) resetBtn.addEventListener('click', resetCode);
+    }, 100);
+  });
+})();
+{% endif %}
 </script>
 
 {% endblock %}

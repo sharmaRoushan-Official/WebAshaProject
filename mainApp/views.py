@@ -1399,6 +1399,23 @@ def lecture_detail(request, course_id, lecture_id):
             course_access=user_access
         )
     
+    # ==================== CODE COMPILER SETUP ====================
+    # Check if compiler should be enabled for this lecture
+    enable_compiler = False
+    compiler_language = 'python'  # default
+    starter_code = ''
+    
+    # Get course programming language
+    if hasattr(course, 'programming_language'):
+        compiler_language = course.programming_language or 'python'
+    
+    # Enable compiler only for video/article lectures (not quizzes)
+    if lecture.lecture_type in ['video', 'article'] and compiler_language:
+        enable_compiler = True
+        # FIXED: Remove lecture.custom_starter_code reference
+        starter_code = course.starter_code_template or get_default_starter_code(compiler_language)
+    # ==================== END COMPILER SETUP ====================
+    
     # Check if lecture has quiz
     has_quiz = lecture.has_quiz
     quiz_data = None
@@ -1407,9 +1424,7 @@ def lecture_detail(request, course_id, lecture_id):
     
     if has_quiz and user_access:
         quiz = lecture.quiz
-        # Check if user can take quiz
         can_take_quiz = quiz.can_attempt(user_access.user)
-        # Get latest attempt
         quiz_attempt = quiz.attempts.filter(profile=user_access.user).order_by('-started_at').first()
         
         quiz_data = {
@@ -1434,6 +1449,10 @@ def lecture_detail(request, course_id, lecture_id):
         'lecture_progress': lecture_progress,
         'has_quiz': has_quiz,
         'quiz_data': quiz_data,
+        # Compiler context variables
+        'enable_compiler': enable_compiler,
+        'compiler_language': compiler_language,
+        'starter_code': starter_code,
         'login_form': LoginForm(),
         'register_form': RegisterForm(),
         'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
@@ -1445,6 +1464,78 @@ def lecture_detail(request, course_id, lecture_id):
     
     return render(request, 'mainApp/lecture.html', context)
 
+
+def get_default_starter_code(language):
+    """Return default starter code template for each programming language"""
+    defaults = {
+        'python': '''# Welcome to Python Practice!
+# Write your code below and click Run
+
+print("Hello, World!")
+
+# Try more examples:
+# name = input("Enter your name: ")
+# print(f"Hello, {name}!")
+''',
+        'javascript': '''// Welcome to JavaScript Practice!
+// Write your code below and click Run
+
+console.log("Hello, World!");
+
+// Try more examples:
+// let name = prompt("Enter your name:");
+// console.log(`Hello, ${name}!`);
+''',
+        'html_css': '''<!-- Welcome to HTML/CSS Practice! -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Practice Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+        button {
+            background: white;
+            color: #764ba2;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hello, World!</h1>
+        <button onclick="alert('Hello from JavaScript!')">Click Me</button>
+    </div>
+</body>
+</html>
+''',
+        'sql': '''-- Welcome to SQL Practice!
+-- Write your SQL queries below
+
+SELECT 'Hello, World!' AS message;
+
+-- Try more queries:
+-- CREATE TABLE users (id INTEGER, name TEXT);
+-- INSERT INTO users VALUES (1, 'John');
+-- SELECT * FROM users;
+''',
+    }
+    return defaults.get(language, defaults['python'])
 
 @login_required
 def take_quiz(request, course_id, lecture_id):

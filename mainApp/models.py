@@ -14,6 +14,13 @@ logger = logging.getLogger(__name__)
 
 
 class Course(models.Model):
+    PROGRAMMING_LANGUAGE_CHOICES = [
+        ('python', 'Python'),
+        ('javascript', 'JavaScript'),
+        ('html_css', 'HTML/CSS'),
+        ('sql', 'SQL'),
+    ]
+    
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=300)
     image = models.ImageField(upload_to='course_images/')
@@ -22,6 +29,19 @@ class Course(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Code compiler fields
+    programming_language = models.CharField(
+        max_length=20,
+        choices=PROGRAMMING_LANGUAGE_CHOICES,
+        default='python',
+        blank=True,
+        help_text="Programming language for in-lecture code compiler"
+    )
+    starter_code_template = models.TextField(
+        blank=True, 
+        help_text="Default code shown in editor for practice exercises"
+    )
 
     def __str__(self):
         return self.title
@@ -41,7 +61,6 @@ class Course(models.Model):
         total_minutes = sum(lecture.duration_minutes for chapter in self.chapters.all() 
                            for lecture in chapter.lectures.all() if lecture.duration_minutes)
         return total_minutes
-
 
 class CourseDetails(models.Model):
     course = models.OneToOneField(Course, on_delete=models.CASCADE, related_name='details')
