@@ -509,7 +509,6 @@ def error404Page(request):
         return render(request, "mainApp/404.html", context)
 
 
-# Authentication Views
 def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST, request.FILES)
@@ -523,14 +522,16 @@ def register_view(request):
                     email=data['email'],
                     password=data['password']
                 )
-                profile = Profile.objects.create(
-                    user=user,
-                    first_name=data['first_name'],
-                    last_name=data['last_name'],
-                    email=data['email'],
-                    phone=data['phone'],
-                    address=data['address']
-                )
+                # Profile is auto-created by the signal, so we just update it
+                # instead of creating a new one
+                profile = user.profile  # This gets the auto-created profile
+                profile.first_name = data['first_name']
+                profile.last_name = data['last_name']
+                profile.email = data['email']
+                profile.phone = data['phone']
+                profile.address = data['address']
+                profile.save()
+                
                 # Merge session cart into user's pending transactions after registration
                 merge_session_cart_to_user(request, profile)
                 messages.success(request, 'Registration successful! Welcome to WebAsha.')
@@ -547,7 +548,6 @@ def register_view(request):
         'cart_count': get_cart_count(request)
     }
     return render(request, 'mainApp/register.html', context)
-
 
 def login_view(request):
     if request.method == 'POST':
@@ -946,7 +946,7 @@ def add_to_cart(request):
                 transaction.gst_amount = gst_amount
                 transaction.amount = total_amount
                 transaction.save()
-                return JsonResponse({'success': False, 'error': 'Course already in cart'})
+                return JsonResponse({'success': False, 'error': 'Course added in cart'})
         
         elif course_type == 1:  # Live course -> LiveCourseTransaction
             try:

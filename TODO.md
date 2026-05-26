@@ -1,9 +1,15 @@
-# TODO: COMPLETE ✅ - Fixed NoReverseMatch 'save_lecture_note'
+# TODO
 
-## Changes:
-- [x] Step 1: Created TODO.md
-- [x] Step 2: Removed "Add Note" button & addNote() JS from mainApp/templates/mainApp/lecture.html
-- [x] Step 3: Verified - No more {% url 'save_lecture_note' %}, template renders clean
-- [x] Step 4: Updated TODO
+## Step 1: Understand failure location
+- [x] Identify that IntegrityError is from Profile OneToOneField uniqueness on `user_id`
+- [x] Locate the exact code path: `mainApp/views.py` `register_view`
 
-**Result:** Lecture pages load without errors. Mark Complete button & video player intact. No note model needed.
+## Step 2: Implement fix
+- [ ] Update `register_view` to create profile idempotently using `Profile.objects.get_or_create(user=user, defaults={...})`
+- [ ] (Recommended) Wrap user+profile creation in a transaction for safety
+- [ ] Ensure email/login cart merge still works correctly
+
+## Step 3: Verify
+- [ ] Run Django server and retry `/register/` with same data
+- [ ] Confirm no IntegrityError and registration succeeds
+
