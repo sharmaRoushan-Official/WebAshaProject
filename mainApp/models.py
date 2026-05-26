@@ -19,6 +19,7 @@ class Course(models.Model):
         ('javascript', 'JavaScript'),
         ('html_css', 'HTML/CSS'),
         ('sql', 'SQL'),
+        ('java', 'Java'), 
     ]
     
     title = models.CharField(max_length=200)

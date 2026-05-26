@@ -1848,7 +1848,274 @@ def mark_lecture_complete(request):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
+@login_required
+@csrf_exempt
+@require_http_methods(["POST"])
+def execute_code(request):
+    """API endpoint to execute code."""
+    import requests
+    import json
+    import sqlite3
+    import io
+    import sys
 
+    try:
+        data = json.loads(request.body)
+        code = data.get('code', '')
+        language = data.get('language', 'python')
+
+        if not code:
+            return JsonResponse({
+                'success': False,
+                'error': 'No code provided'
+            }, status=400)
+
+        # Handle HTML/CSS
+        if language.lower() == 'html_css':
+            return JsonResponse({
+                'success': True,
+                'output': code,
+                'is_html': True,
+                'language': 'html'
+            })
+
+        # Handle JavaScript
+        if language.lower() == 'javascript':
+            return JsonResponse({
+                'success': True,
+                'output': code,
+                'is_javascript': True,
+                'language': 'javascript'
+            })
+
+        # Handle SQL with actual SQLite execution
+        if language.lower() == 'sql':
+            import sqlite3
+
+            try:
+                # Create in-memory SQLite database
+                conn = sqlite3.connect(':memory:')
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+
+                # Split by semicolon but keep statements together
+                statements = []
+                current_statement = []
+
+                for line in code.split('\n'):
+                    line = line.strip()
+                    if line.startswith('--'):
+                        continue  # Skip comments
+                    current_statement.append(line)
+                    if line.endswith(';'):
+                        statements.append(' '.join(current_statement).rstrip(';'))
+                        current_statement = []
+
+                if current_statement:
+                    statements.append(' '.join(current_statement).rstrip(';'))
+
+                results = []
+                query_count = 0
+
+                for stmt in statements:
+                    stmt = stmt.strip()
+                    if not stmt or stmt.startswith('--'):
+                        continue
+
+                    try:
+                        # Check if SELECT query
+                        is_select = stmt.upper().strip().startswith('SELECT')
+
+                        cursor.execute(stmt)
+
+                        if is_select:
+                            rows = cursor.fetchall()
+                            query_count += 1
+
+                            if rows:
+                                # Get column names
+                                columns = [description[0] for description in cursor.description]
+
+                                # Build formatted table
+                                results.append(f"\n📊 Query {query_count} Results:")
+                                results.append("=" * 50)
+
+                                # Header
+                                header = " | ".join(f"{col:<15}" for col in columns)
+                                results.append(header)
+                                results.append("-" * len(header))
+
+                                # Data rows
+                                for row in rows:
+                                    row_str = " | ".join(f"{str(row[col])[:15]:<15}" for col in columns)
+                                    results.append(row_str)
+
+                                results.append("=" * 50)
+                                results.append(f"Total: {len(rows)} row(s) returned")
+                            else:
+                                results.append(f"\n📊 Query {query_count + 1}: (No rows returned)")
+                        else:
+                            # INSERT, UPDATE, DELETE, CREATE, etc.
+                            conn.commit()
+                            if cursor.rowcount >= 0:
+                                results.append(f"✓ {cursor.rowcount} row(s) affected")
+                            else:
+                                results.append("✓ Query executed successfully")
+
+                    except sqlite3.Error as e:
+                        results.append(f"❌ SQL Error: {str(e)}")
+
+                conn.close()
+
+                if not results:
+                    final_output = "No valid SQL statements found"
+                else:
+                    final_output = "\n".join(results)
+
+                return JsonResponse({
+                    'success': True,
+                    'output': final_output,
+                    'language': 'sql'
+                })
+
+            except Exception as e:
+                return JsonResponse({
+                    'success': True,
+                    'output': f"❌ Database Error: {str(e)}",
+                    'language': 'sql'
+                })
+        current_statement = []
+        
+        for line in code.split('\n'):
+            line = line.strip()
+            if line.startswith('--'):
+                continue  # Skip comments
+            current_statement.append(line)
+            if line.endswith(';'):
+                statements.append(' '.join(current_statement).rstrip(';'))
+                current_statement = []
+        
+        if current_statement:
+            statements.append(' '.join(current_statement).rstrip(';'))
+        
+        results = []
+        query_count = 0
+        
+        for stmt in statements:
+            stmt = stmt.strip()
+            if not stmt or stmt.startswith('--'):
+                continue
+            
+            try:
+                # Check if SELECT query
+                is_select = stmt.upper().strip().startswith('SELECT')
+                
+                cursor.execute(stmt)
+                
+                if is_select:
+                    rows = cursor.fetchall()
+                    query_count += 1
+                    
+                    if rows:
+                        # Get column names
+                        columns = [description[0] for description in cursor.description]
+                        
+                        # Build formatted table
+                        results.append(f"\n📊 Query {query_count} Results:")
+                        results.append("=" * 50)
+                        
+                        # Header
+                        header = " | ".join(f"{col:<15}" for col in columns)
+                        results.append(header)
+                        results.append("-" * len(header))
+                        
+                        # Data rows
+                        for row in rows:
+                            row_str = " | ".join(f"{str(row[col])[:15]:<15}" for col in columns)
+                            results.append(row_str)
+                        
+                        results.append("=" * 50)
+                        results.append(f"Total: {len(rows)} row(s) returned")
+                    else:
+                        results.append(f"\n📊 Query {query_count + 1}: (No rows returned)")
+                else:
+                    # INSERT, UPDATE, DELETE, CREATE, etc.
+                    conn.commit()
+                    if cursor.rowcount >= 0:
+                        results.append(f"✓ {cursor.rowcount} row(s) affected")
+                    else:
+                        results.append("✓ Query executed successfully")
+                        
+            except sqlite3.Error as e:
+                results.append(f"❌ SQL Error: {str(e)}")
+        
+        conn.close()
+        
+        if not results:
+            final_output = "No valid SQL statements found"
+        else:
+            final_output = "\n".join(results)
+        
+        return JsonResponse({
+            'success': True,
+            'output': final_output,
+            'language': 'sql'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': True,
+            'output': f"❌ Database Error: {str(e)}",
+            'language': 'sql'
+        })
+
+        # For Java and Python, use JDoodle
+        language_map = {
+            'java': 'java',
+            'python': 'python3',
+            'py': 'python3',
+        }
+
+        jdoodle_language = language_map.get((language or '').lower(), 'python3')
+
+        JDODDLE_CLIENT_ID = "b3a95f790d4bdb0f7d88687c958e737e"
+        JDODDLE_CLIENT_SECRET = "78d17fac22abdaa41c6a85f897583061fbb2fbd84fb9e5715a85c2ba1c5adbc5"
+
+        payload = {
+            "clientId": JDODDLE_CLIENT_ID,
+            "clientSecret": JDODDLE_CLIENT_SECRET,
+            "script": code,
+            "language": jdoodle_language,
+            "versionIndex": "0",
+            "stdin": ""
+        }
+
+        response = requests.post("https://api.jdoodle.com/v1/execute", json=payload, timeout=10)
+
+        if response.status_code == 200:
+            result = response.json()
+            output = result.get('output', '')
+            error = result.get('error', '')
+            final_output = output if output else error
+            if not final_output:
+                final_output = '(No output)'
+
+            return JsonResponse({
+                'success': True,
+                'output': final_output,
+                'language': jdoodle_language
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': 'Code execution failed. Please try again.'
+            }, status=500)
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': f'Error: {str(e)}'
+        }, status=500)
 # ==================== INVOICE VIEWS ====================
 
 @login_required

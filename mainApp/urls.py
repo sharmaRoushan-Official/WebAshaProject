@@ -71,7 +71,9 @@ urlpatterns = [
     path("complete-quiz/", complete_quiz, name="complete_quiz"),
     path("course/<int:course_id>/lecture/<int:lecture_id>/results/", quiz_results, name="quiz_results"),
     path("course/<int:course_id>/lecture/<int:lecture_id>/results/<int:attempt_id>/", quiz_results, name="quiz_results_attempt"),
-    # Add this line with other quiz URLs
-path("api/quiz-questions/", get_quiz_questions_api, name="get_quiz_questions_api"),
+    path("api/quiz-questions/", get_quiz_questions_api, name="get_quiz_questions_api"),
     path("ajax/course-progress/<int:course_id>/", get_course_progress, name="course_progress"),
+    
+    # ==================== PISTON CODE EXECUTION API ====================
+path("api/execute-code/", execute_code, name="execute_code"),
 ]
