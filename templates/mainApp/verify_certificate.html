@@ -1,0 +1,58 @@
+{% extends 'mainApp/base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block title %}Verify Certificate{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="h4 mb-3"><i class="fas fa-shield-alt me-2"></i>Certificate Verification</h2>
+
+                    {% if is_valid %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Certificate is valid.
+                        </div>
+
+                        <div class="mb-3">
+                            <p class="mb-1"><strong>Certificate ID:</strong> {{ certificate.certificate_id }}</p>
+                            <p class="mb-1"><strong>Course:</strong> {{ certificate.course_title }}</p>
+                            <p class="mb-1"><strong>Issued:</strong> {{ certificate.formatted_date }}</p>
+                            <p class="mb-0"><strong>Name:</strong> {{ certificate.full_name }}</p>
+                        </div>
+
+                        <div class="text-center mb-2">
+                            {% if certificate.certificate_image and certificate.certificate_image.name %}
+                                <img
+                                    src="{% url 'view_certificate' certificate.id %}"
+                                    alt="Certificate"
+                                    class="img-fluid rounded"
+                                    style="max-height: 520px; object-fit: contain;"
+                                />
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-3">
+                            <a class="btn btn-primary" href="{% url 'certificate_preview' certificate.id %}">
+                                <i class="fas fa-eye me-2"></i>Preview
+                            </a>
+                        </div>
+
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle me-2"></i>
+                            Certificate is not valid.
+                        </div>
+                        <p class="text-muted mb-0"><strong>Error:</strong> {{ error_message }}</p>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+

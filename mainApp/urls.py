@@ -75,5 +75,17 @@ urlpatterns = [
     path("ajax/course-progress/<int:course_id>/", get_course_progress, name="course_progress"),
     
     # ==================== PISTON CODE EXECUTION API ====================
-path("api/execute-code/", execute_code, name="execute_code"),
+    path("api/execute-code/", execute_code, name="execute_code"),
+
+    # ==================== CERTIFICATE URLs ====================
+    path('my-certificates/', my_certificates, name='my_certificates'),
+    path('certificate-dashboard/', certificate_dashboard, name='certificate_dashboard'),
+    path('download-certificate/<int:certificate_id>/', download_certificate_pdf, name='download_certificate'),
+    path('view-certificate/<int:certificate_id>/', view_certificate_image, name='view_certificate'),
+    path('certificate-preview/<int:certificate_id>/', certificate_preview, name='certificate_preview'),
+    path('share-certificate/<int:certificate_id>/', share_certificate, name='share_certificate'),
+    path('share-certificate/<int:certificate_id>/<str:platform>/', share_certificate_social, name='share_certificate_social'),
+    path('regenerate-certificate/<int:certificate_id>/', regenerate_certificate, name='regenerate_certificate'),
+    path('api/certificate/<int:certificate_id>/', get_certificate_info_api, name='get_certificate_info_api'),
+    path('verify-certificate/<str:verification_code>/', verify_certificate_public, name='verify_certificate_public'),
 ]

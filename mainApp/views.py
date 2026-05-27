@@ -3,6 +3,11 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
+from .models import Certificate, CertificateActivityLog
+from django.http import Http404
+from django.core.exceptions import PermissionDenied
+from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Sum
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
@@ -1890,6 +1895,184 @@ def execute_code(request):
 
         # Handle SQL with actual SQLite execution
         if language.lower() == 'sql':
+            try:
+                # Create in-memory SQLite database
+                conn = sqlite3.connect(':memory:')
+                conn.row_factory = sqlite3.Row
+                cursor = conn.cursor()
+
+                # Split by semicolon but keep statements together
+                statements = []
+                current_statement = []
+
+                for line in code.split('\n'):
+                    line = line.strip()
+                    if line.startswith('--'):
+                        continue  # Skip comments
+                    current_statement.append(line)
+                    if line.endswith(';'):
+                        statements.append(' '.join(current_statement).rstrip(';'))
+                        current_statement = []
+
+                if current_statement:
+                    statements.append(' '.join(current_statement).rstrip(';'))
+
+                results = []
+                query_count = 0
+
+                for stmt in statements:
+                    stmt = stmt.strip()
+                    if not stmt or stmt.startswith('--'):
+                        continue
+
+                    try:
+                        # Check if SELECT query
+                        is_select = stmt.upper().strip().startswith('SELECT')
+
+                        cursor.execute(stmt)
+
+                        if is_select:
+                            rows = cursor.fetchall()
+                            query_count += 1
+
+                            if rows:
+                                # Get column names
+                                columns = [description[0] for description in cursor.description]
+
+                                # Build formatted table
+                                results.append(f"\n📊 Query {query_count} Results:")
+                                results.append("=" * 50)
+
+                                # Header
+                                header = " | ".join(f"{col:<15}" for col in columns)
+                                results.append(header)
+                                results.append("-" * len(header))
+
+                                # Data rows
+                                for row in rows:
+                                    row_str = " | ".join(f"{str(row[col])[:15]:<15}" for col in columns)
+                                    results.append(row_str)
+
+                                results.append("=" * 50)
+                                results.append(f"Total: {len(rows)} row(s) returned")
+                            else:
+                                results.append(f"\n📊 Query {query_count}: (No rows returned)")
+                        else:
+                            # INSERT, UPDATE, DELETE, CREATE, etc.
+                            conn.commit()
+                            if cursor.rowcount >= 0:
+                                results.append(f"✓ {cursor.rowcount} row(s) affected")
+                            else:
+                                results.append("✓ Query executed successfully")
+
+                    except sqlite3.Error as e:
+                        results.append(f"❌ SQL Error: {str(e)}")
+
+                conn.close()
+
+                if not results:
+                    final_output = "No valid SQL statements found"
+                else:
+                    final_output = "\n".join(results)
+
+                return JsonResponse({
+                    'success': True,
+                    'output': final_output,
+                    'language': 'sql'
+                })
+
+            except Exception as e:
+                return JsonResponse({
+                    'success': True,
+                    'output': f"❌ Database Error: {str(e)}",
+                    'language': 'sql'
+                })
+
+        # For Java and Python, use JDoodle
+        language_map = {
+            'java': 'java',
+            'python': 'python3',
+            'py': 'python3',
+        }
+
+        jdoodle_language = language_map.get((language or '').lower(), 'python3')
+
+        JDODDLE_CLIENT_ID = "b3a95f790d4bdb0f7d88687c958e737e"
+        JDODDLE_CLIENT_SECRET = "78d17fac22abdaa41c6a85f897583061fbb2fbd84fb9e5715a85c2ba1c5adbc5"
+
+        payload = {
+            "clientId": JDODDLE_CLIENT_ID,
+            "clientSecret": JDODDLE_CLIENT_SECRET,
+            "script": code,
+            "language": jdoodle_language,
+            "versionIndex": "0",
+            "stdin": ""
+        }
+
+        response = requests.post("https://api.jdoodle.com/v1/execute", json=payload, timeout=10)
+
+        if response.status_code == 200:
+            result = response.json()
+            output = result.get('output', '')
+            error = result.get('error', '')
+            final_output = output if output else error
+            if not final_output:
+                final_output = '(No output)'
+
+            return JsonResponse({
+                'success': True,
+                'output': final_output,
+                'language': jdoodle_language
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': 'Code execution failed. Please try again.'
+            }, status=500)
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': f'Error: {str(e)}'
+        }, status=500)
+    """API endpoint to execute code."""
+    import requests
+    import json
+    import sqlite3
+    import io
+    import sys
+
+    try:
+        data = json.loads(request.body)
+        code = data.get('code', '')
+        language = data.get('language', 'python')
+
+        if not code:
+            return JsonResponse({
+                'success': False,
+                'error': 'No code provided'
+            }, status=400)
+
+        # Handle HTML/CSS
+        if language.lower() == 'html_css':
+            return JsonResponse({
+                'success': True,
+                'output': code,
+                'is_html': True,
+                'language': 'html'
+            })
+
+        # Handle JavaScript
+        if language.lower() == 'javascript':
+            return JsonResponse({
+                'success': True,
+                'output': code,
+                'is_javascript': True,
+                'language': 'javascript'
+            })
+
+        # Handle SQL with actual SQLite execution
+        if language.lower() == 'sql':
             import sqlite3
 
             try:
@@ -2268,3 +2451,336 @@ def get_quiz_questions_api(request):
         return JsonResponse({'questions': list(questions)})
     except Quiz.DoesNotExist:
         return JsonResponse({'error': 'Quiz not found'}, status=404)
+
+# ==================== CERTIFICATE VIEWS ====================
+
+@login_required
+def my_certificates(request):
+    """Display all certificates earned by the user"""
+    profile = get_profile_or_create(request)
+    certificates = Certificate.objects.filter(
+        user=profile, 
+        is_active=True
+    ).select_related('course').order_by('-issued_date')
+    
+    context = {
+        'certificates': certificates,
+        'profile': profile,
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+        'cart_count': get_cart_count(request)
+    }
+    return render(request, 'mainApp/my_certificates.html', context)
+
+
+@login_required
+def download_certificate_pdf(request, certificate_id):
+    """Download certificate as PDF"""
+    profile = get_profile_or_create(request)
+    
+    try:
+        certificate = Certificate.objects.get(
+            id=certificate_id, 
+            user=profile,
+            is_active=True
+        )
+    except Certificate.DoesNotExist:
+        raise Http404("Certificate not found")
+    
+    # Check ownership
+    if certificate.user != profile:
+        raise PermissionDenied("You don't have permission to download this certificate")
+    
+    # Check if PDF exists
+    if not certificate.certificate_pdf or not certificate.certificate_pdf.name:
+        # Generate on the fly
+        from .services.certificate_service import generate_certificate_pdf
+        generate_certificate_pdf(certificate)
+        certificate.save()
+    
+    # Increment download count
+    certificate.increment_download()
+    
+    # Log activity
+    try:
+        CertificateActivityLog.objects.create(
+            certificate=certificate,
+            activity_type='downloaded',
+            ip_address=get_client_ip(request),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')
+        )
+    except Exception as e:
+        logger.error(f"Failed to log certificate download: {str(e)}")
+    
+    # Serve PDF
+    if certificate.certificate_pdf and certificate.certificate_pdf.name:
+        response = HttpResponse(
+            certificate.certificate_pdf.read(), 
+            content_type='application/pdf'
+        )
+        response['Content-Disposition'] = f'attachment; filename="certificate_{certificate.certificate_id}.pdf"'
+        return response
+    
+    raise Http404("Certificate PDF not found")
+
+
+@login_required
+def view_certificate_image(request, certificate_id):
+    """View certificate as image"""
+    profile = get_profile_or_create(request)
+    
+    try:
+        certificate = Certificate.objects.get(
+            id=certificate_id, 
+            user=profile,
+            is_active=True
+        )
+    except Certificate.DoesNotExist:
+        raise Http404("Certificate not found")
+    
+    if certificate.certificate_image and certificate.certificate_image.name:
+        return HttpResponse(certificate.certificate_image.read(), content_type='image/png')
+    
+    raise Http404("Certificate image not found")
+
+
+def verify_certificate_public(request, verification_code):
+    """
+    Public view to verify certificate authenticity
+    No login required - anyone can verify
+    """
+    try:
+        certificate = Certificate.objects.get(
+            verification_code=verification_code,
+            is_active=True
+        )
+        
+        # Log verification
+        try:
+            CertificateActivityLog.objects.create(
+                certificate=certificate,
+                activity_type='verified',
+                ip_address=get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')
+            )
+        except Exception as e:
+            logger.error(f"Failed to log certificate verification: {str(e)}")
+        
+        context = {
+            'certificate': certificate,
+            'is_valid': True,
+            'verification_code': verification_code,
+            'login_form': LoginForm(),
+            'register_form': RegisterForm(),
+            'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+            'cart_count': get_cart_count(request)
+        }
+        return render(request, 'mainApp/verify_certificate.html', context)
+        
+    except Certificate.DoesNotExist:
+        context = {
+            'is_valid': False,
+            'error_message': 'Invalid certificate code or certificate has been revoked.',
+            'login_form': LoginForm(),
+            'register_form': RegisterForm(),
+            'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+            'cart_count': get_cart_count(request)
+        }
+        return render(request, 'mainApp/verify_certificate.html', context, status=404)
+
+
+@login_required
+def share_certificate(request, certificate_id):
+    """Share certificate on social media or generate shareable link"""
+    profile = get_profile_or_create(request)
+    
+    try:
+        certificate = Certificate.objects.get(id=certificate_id, user=profile, is_active=True)
+    except Certificate.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Certificate not found'}, status=404)
+    
+    # Increment share count
+    certificate.shared_count += 1
+    certificate.save(update_fields=['shared_count'])
+    
+    # Log activity
+    try:
+        CertificateActivityLog.objects.create(
+            certificate=certificate,
+            activity_type='shared',
+            ip_address=get_client_ip(request),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')
+        )
+    except Exception as e:
+        logger.error(f"Failed to log certificate share: {str(e)}")
+    
+    # Get site URL from settings or request
+    site_url = request.build_absolute_uri('/').rstrip('/')
+    
+    # Generate share URLs
+    share_data = {
+        'success': True,
+        'share_url': f"{site_url}/verify-certificate/{certificate.verification_code}/",
+        'certificate_id': certificate.certificate_id,
+        'user_name': certificate.full_name,
+        'course_name': certificate.course_title,
+        'issued_date': certificate.formatted_date,
+    }
+    
+    return JsonResponse(share_data)
+
+
+def get_client_ip(request):
+    """Get client IP address from request"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+@login_required
+def certificate_dashboard(request):
+    """Dashboard showing certificate statistics"""
+    profile = get_profile_or_create(request)
+    
+    certificates = Certificate.objects.filter(user=profile, is_active=True)
+    
+    stats = {
+        'total_certificates': certificates.count(),
+        'total_downloads': certificates.aggregate(total=Sum('downloaded_count'))['total'] or 0,
+        'total_shares': certificates.aggregate(total=Sum('shared_count'))['total'] or 0,
+        'recent_certificates': certificates.order_by('-issued_date')[:5],
+    }
+    
+    context = {
+        'stats': stats,
+        'certificates': certificates,
+        'profile': profile,
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+        'cart_count': get_cart_count(request)
+    }
+    return render(request, 'mainApp/certificate_dashboard.html', context)
+
+
+@login_required
+def regenerate_certificate(request, certificate_id):
+    """Regenerate certificate PDF/Image (admin or user request)"""
+    profile = get_profile_or_create(request)
+    
+    try:
+        certificate = Certificate.objects.get(id=certificate_id, user=profile, is_active=True)
+    except Certificate.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Certificate not found'}, status=404)
+    
+    try:
+        from .services.certificate_service import generate_certificate_pdf, generate_certificate_image
+        
+        # Regenerate files
+        pdf_result = generate_certificate_pdf(certificate)
+        img_result = generate_certificate_image(certificate)
+        certificate.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Certificate regenerated successfully',
+            'pdf_generated': pdf_result is not None,
+            'image_generated': img_result is not None
+        })
+    except Exception as e:
+        logger.error(f"Failed to regenerate certificate: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@login_required
+def get_certificate_info_api(request, certificate_id):
+    """API endpoint to get certificate information (JSON)"""
+    profile = get_profile_or_create(request)
+    
+    try:
+        certificate = Certificate.objects.get(id=certificate_id, user=profile, is_active=True)
+        
+        data = {
+            'success': True,
+            'certificate_id': certificate.certificate_id,
+            'verification_code': certificate.verification_code,
+            'verification_url': certificate.verification_url,
+            'user_name': certificate.full_name,
+            'course_name': certificate.course_title,
+            'issued_date': certificate.formatted_date,
+            'completion_percentage': certificate.completion_percentage,
+            'grade': certificate.grade,
+            'score_percentage': certificate.score_percentage,
+            'downloaded_count': certificate.downloaded_count,
+            'shared_count': certificate.shared_count,
+            'has_pdf': bool(certificate.certificate_pdf),
+            'has_image': bool(certificate.certificate_image),
+        }
+        return JsonResponse(data)
+        
+    except Certificate.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Certificate not found'}, status=404)
+
+
+@login_required
+def share_certificate_social(request, certificate_id, platform):
+    """Share certificate on specific social media platform"""
+    profile = get_profile_or_create(request)
+    
+    try:
+        certificate = Certificate.objects.get(id=certificate_id, user=profile, is_active=True)
+    except Certificate.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Certificate not found'}, status=404)
+    
+    # Get site URL
+    site_url = request.build_absolute_uri('/').rstrip('/')
+    share_url = f"{site_url}/verify-certificate/{certificate.verification_code}/"
+    
+    # Prepare social media share URLs
+    share_links = {
+        'facebook': f"https://www.facebook.com/sharer/sharer.php?u={share_url}",
+        'twitter': f"https://twitter.com/intent/tweet?text=I%20just%20earned%20a%20certificate%20in%20{certificate.course_title}%20from%20WebAsha!&url={share_url}",
+        'linkedin': f"https://www.linkedin.com/shareArticle?mini=true&url={share_url}&title=Certificate%20of%20Completion&summary=I%20completed%20{certificate.course_title}%20course%20from%20WebAsha!",
+        'whatsapp': f"https://wa.me/?text=I%20just%20earned%20a%20certificate%20in%20{certificate.course_title}%20from%20WebAsha!%20{share_url}"
+    }
+    
+    if platform in share_links:
+        # Increment share count
+        certificate.shared_count += 1
+        certificate.save(update_fields=['shared_count'])
+        
+        return JsonResponse({
+            'success': True,
+            'share_url': share_links[platform],
+            'platform': platform
+        })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid platform'}, status=400)
+
+
+@login_required
+def certificate_preview(request, certificate_id):
+    """Preview certificate before download"""
+    profile = get_profile_or_create(request)
+    
+    try:
+        certificate = Certificate.objects.get(id=certificate_id, user=profile, is_active=True)
+    except Certificate.DoesNotExist:
+        raise Http404("Certificate not found")
+    
+    context = {
+        'certificate': certificate,
+        'profile': profile,
+        'login_form': LoginForm(),
+        'register_form': RegisterForm(),
+        'change_password_form': ChangePasswordForm(request.user) if request.user.is_authenticated else None,
+        'cart_count': get_cart_count(request)
+    }
+    return render(request, 'mainApp/certificate_preview.html', context)

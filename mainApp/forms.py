@@ -13,29 +13,39 @@ class LoginForm(forms.Form):
 
 
 class RegisterForm(forms.ModelForm):
-    password_confirm = forms.CharField(label='Confirm Password', widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password'}))
+    password = forms.CharField(
+        label='Password',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password (min 6 chars: upper, lower, number, special @$!%*?& )'}),
+        validators=[
+            RegexValidator(
+                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$',
+                message="Password must contain uppercase, lowercase, number, special char (@$!%*?&), min 6 chars."
+            )
+        ]
+    )
+    password_confirm = forms.CharField(
+        label='Confirm Password',
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password'})
+    )
     
     class Meta:
         model = Profile
-        fields = ['first_name', 'last_name', 'email', 'phone', 'address', 'password']
+        fields = ['first_name', 'last_name', 'email', 'phone', 'address']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Address', 'rows': 3}),
-            'password': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password (min 6 chars: upper, lower, number, special @$!%*?& )'}),
         }
 
-    def clean_password(self):
-        password = self.cleaned_data.get('password')
-        if password:
-            validator = RegexValidator(
-                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$',
-                message="Password must contain uppercase, lowercase, number, special char (@$!%*?&), min 6 chars."
-            )
-            validator(password)
-        return password
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            # Check if email already exists in User model
+            if User.objects.filter(email=email).exists():
+                raise ValidationError("This email is already registered. Please use a different email or login.")
+        return email
 
     def clean(self):
         cleaned_data = super().clean()

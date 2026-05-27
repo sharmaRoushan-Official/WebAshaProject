@@ -8,7 +8,12 @@ import re
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from decimal import Decimal
-
+from django.core.files.base import ContentFile
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from PIL import Image, ImageDraw, ImageFont
+from io import BytesIO
+import hashlib
 import logging
 logger = logging.getLogger(__name__)
 
@@ -44,6 +49,12 @@ class Course(models.Model):
         help_text="Default code shown in editor for practice exercises"
     )
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['is_active']),
+            models.Index(fields=['course_number']),
+        ]
+
     def __str__(self):
         return self.title
 
@@ -62,6 +73,7 @@ class Course(models.Model):
         total_minutes = sum(lecture.duration_minutes for chapter in self.chapters.all() 
                            for lecture in chapter.lectures.all() if lecture.duration_minutes)
         return total_minutes
+
 
 class CourseDetails(models.Model):
     course = models.OneToOneField(Course, on_delete=models.CASCADE, related_name='details')
@@ -93,17 +105,6 @@ class Profile(models.Model):
     date_joined_institute = models.DateField(auto_now_add=True)
     is_student = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
-    password = models.CharField(
-        max_length=128,
-        blank=True,
-        validators=[
-            RegexValidator(
-                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$',
-                message="Password must contain uppercase, lowercase, number, special char, min 6 chars."
-            )
-        ],
-        help_text="At least 6 chars: 1 uppercase, 1 lowercase, 1 number, 1 special (@$!%*?&)."
-    )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
@@ -188,6 +189,11 @@ class Lecture(models.Model):
     class Meta:
         ordering = ['order', 'created_at']
         unique_together = ['chapter', 'order']
+        indexes = [
+            models.Index(fields=['chapter', 'order']),
+            models.Index(fields=['lecture_type']),
+            models.Index(fields=['is_free_preview']),
+        ]
 
     def __str__(self):
         return f"{self.chapter.title} - {self.title}"
@@ -404,6 +410,11 @@ class UserCourseAccess(models.Model):
     class Meta:
         unique_together = ['user', 'course']
         ordering = ['-access_granted_at']
+        indexes = [
+            models.Index(fields=['user', 'is_active']),
+            models.Index(fields=['course', 'is_active']),
+            models.Index(fields=['completion_percentage']),
+        ]
     
     def __str__(self):
         return f"{self.user.user.username} - {self.course.title} (Access: {self.is_active})"
@@ -746,6 +757,7 @@ class QuizAttempt(models.Model):
             
             return True
         return False
+
 
 class QuizAnswer(models.Model):
     """Store individual answers for each question in an attempt"""
@@ -1132,18 +1144,18 @@ class Invoice(models.Model):
 # ==================== SIGNALS FOR AUTO-INVOICE CREATION ====================
 
 @receiver(post_save, sender=User)
-def sync_profile_email(sender, instance, created, **kwargs):
-    """
-    Automatically sync Profile.email when User.email changes (admin update)
-    Makes User.email the single source of truth for email across system
-    """
-    try:
-        profile, _ = Profile.objects.get_or_create(user=instance)
-        if profile.email != instance.email:
-            profile.email = instance.email
-            profile.save(update_fields=['email'])
-    except Profile.DoesNotExist:
-        pass
+def create_user_profile(sender, instance, created, **kwargs):
+    """Create Profile when User is created"""
+    if created:
+        Profile.objects.get_or_create(user=instance)
+
+
+@receiver(post_save, sender=Profile)
+def sync_email_from_user(sender, instance, **kwargs):
+    """Sync Profile email from User.email (User is source of truth)"""
+    if instance.user.email != instance.email:
+        instance.email = instance.user.email
+        instance.save(update_fields=['email'])
 
 
 @receiver(post_save, sender=CourseTransaction)
@@ -1280,7 +1292,8 @@ def create_quiz_for_quiz_lecture(sender, instance, created, **kwargs):
             )
             logger.info(f"Auto-created quiz for lecture: {instance.title}")
 
-@receiver(models.signals.post_save, sender=QuizAttempt)
+
+@receiver(post_save, sender=QuizAttempt)
 def update_progress_on_quiz_complete(sender, instance, created, **kwargs):
     """
     Ensure lecture is marked complete if quiz is passed (safety net)
@@ -1293,3 +1306,285 @@ def update_progress_on_quiz_complete(sender, instance, created, **kwargs):
                 logger.info(f"Quiz pass auto-completed lecture progress for user {instance.profile.user.username}")
         except LectureProgress.DoesNotExist:
             pass
+class Certificate(models.Model):
+    """
+    Certificate model for users who complete courses 100%
+    """
+    # Certificate unique identifier
+    certificate_id = models.CharField(max_length=50, unique=True, editable=False)
+    
+    # Relationships
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='certificates')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='certificates')
+    course_access = models.OneToOneField(
+        'UserCourseAccess', 
+        on_delete=models.CASCADE, 
+        related_name='certificate',
+        help_text="Link to the course access record that triggered this certificate"
+    )
+    
+    # Certificate details
+    issued_date = models.DateTimeField(auto_now_add=True)
+    completion_percentage = models.FloatField(default=100.0)
+    grade = models.CharField(max_length=10, blank=True, help_text="Grade achieved (e.g., A, B, C)")
+    score_percentage = models.FloatField(default=0.0, help_text="Overall course score if applicable")
+    
+    # Certificate file
+    certificate_pdf = models.FileField(upload_to='certificates/', blank=True, null=True)
+    certificate_image = models.ImageField(upload_to='certificates/images/', blank=True, null=True)
+    
+    # Verification
+    verification_url = models.URLField(blank=True, help_text="Public verification URL")
+    verification_code = models.CharField(max_length=100, unique=True, editable=False)
+    is_verified = models.BooleanField(default=True)
+    
+    # Metadata
+    downloaded_count = models.PositiveIntegerField(default=0)
+    shared_count = models.PositiveIntegerField(default=0)
+    last_downloaded_at = models.DateTimeField(null=True, blank=True)
+    
+    # Status
+    is_active = models.BooleanField(default=True)
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    revocation_reason = models.TextField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-issued_date']
+        unique_together = ['user', 'course']  # One certificate per user per course
+        indexes = [
+            models.Index(fields=['certificate_id']),
+            models.Index(fields=['verification_code']),
+            models.Index(fields=['user', 'course']),
+            models.Index(fields=['issued_date']),
+        ]
+    
+    def __str__(self):
+        return f"Certificate: {self.user.user.username} - {self.course.title}"
+    
+    def save(self, *args, **kwargs):
+        """Generate certificate ID and verification code if not exists"""
+        if not self.certificate_id:
+            self.certificate_id = self.generate_certificate_id()
+        if not self.verification_code:
+            self.verification_code = self.generate_verification_code()
+        if not self.verification_url:
+            self.verification_url = f"/verify-certificate/{self.verification_code}/"
+        super().save(*args, **kwargs)
+    
+    def generate_certificate_id(self):
+        """
+        Generate unique certificate ID
+        Format: CERT-YYYYMMDD-XXXXX
+        """
+        from datetime import datetime
+        date_prefix = datetime.now().strftime('%Y%m%d')
+        last_cert = Certificate.objects.filter(
+            certificate_id__startswith=f"CERT-{date_prefix}"
+        ).order_by('-certificate_id').first()
+        
+        if last_cert:
+            last_num = int(last_cert.certificate_id.split('-')[-1])
+            new_num = last_num + 1
+        else:
+            new_num = 1
+        
+        return f"CERT-{date_prefix}-{new_num:05d}"
+    
+    def generate_verification_code(self):
+        """
+        Generate unique verification code
+        Format: 16 character alphanumeric hash
+        """
+        import hashlib
+        import secrets
+        
+        # Create unique string using user ID, course ID, and current timestamp
+        unique_string = f"{self.user.user.id}_{self.course.id}_{secrets.token_hex(8)}"
+        verification_hash = hashlib.sha256(unique_string.encode()).hexdigest()[:16].upper()
+        return verification_hash
+    
+    @property
+    def full_name(self):
+        """Get user's full name"""
+        return f"{self.user.first_name} {self.user.last_name}".strip() or self.user.user.username
+    
+    @property
+    def course_title(self):
+        return self.course.title
+    
+    @property
+    def formatted_date(self):
+        """Return formatted issued date"""
+        return self.issued_date.strftime("%B %d, %Y")
+    
+    def increment_download(self):
+        """Increment download counter"""
+        self.downloaded_count += 1
+        self.last_downloaded_at = timezone.now()
+        self.save(update_fields=['downloaded_count', 'last_downloaded_at'])
+    
+    def revoke(self, reason=""):
+        """Revoke the certificate"""
+        self.is_active = False
+        self.revoked_at = timezone.now()
+        self.revocation_reason = reason
+        self.save(update_fields=['is_active', 'revoked_at', 'revocation_reason'])
+
+
+class CertificateTemplate(models.Model):
+    """
+    Certificate template for customization
+    """
+    TEMPLATE_STYLES = [
+        ('professional', 'Professional Blue'),
+        ('elegant', 'Elegant Gold'),
+        ('modern', 'Modern Gradient'),
+        ('simple', 'Simple Classic'),
+        ('premium', 'Premium Dark'),
+    ]
+    
+    name = models.CharField(max_length=100)
+    style = models.CharField(max_length=20, choices=TEMPLATE_STYLES, default='professional')
+    background_image = models.ImageField(upload_to='certificate_templates/', blank=True, null=True)
+    
+    # Customizable text fields
+    title_text = models.CharField(max_length=200, default="Certificate of Completion")
+    subtitle_text = models.CharField(max_length=200, blank=True, default="This certificate is proudly presented to")
+    completion_text = models.CharField(max_length=200, default="for successfully completing the course")
+    
+    # Design settings
+    primary_color = models.CharField(max_length=20, default="#1a56db")
+    secondary_color = models.CharField(max_length=20, default="#e5e7eb")
+    font_family = models.CharField(max_length=50, default="Arial")
+    
+    # Layout settings
+    signature_image = models.ImageField(upload_to='certificate_signatures/', blank=True, null=True)
+    seal_image = models.ImageField(upload_to='certificate_seals/', blank=True, null=True)
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+
+class CertificateActivityLog(models.Model):
+    """
+    Log all certificate-related activities
+    """
+    ACTIVITY_TYPES = [
+        ('generated', 'Generated'),
+        ('downloaded', 'Downloaded'),
+        ('shared', 'Shared'),
+        ('verified', 'Verified'),
+        ('revoked', 'Revoked'),
+    ]
+    
+    certificate = models.ForeignKey(Certificate, on_delete=models.CASCADE, related_name='activities')
+    activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPES)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.certificate.certificate_id} - {self.activity_type}"
+    
+# Add at the end of models.py
+
+@receiver(post_save, sender=UserCourseAccess)
+def check_and_generate_certificate(sender, instance, created, **kwargs):
+    """Auto-generate certificate (PDF + image) when a user completes a course."""
+    from django.db import transaction
+
+    # Only generate if course is completed (100%)
+    if not (instance.completion_percentage >= 99.9 and instance.is_completed):
+        return
+
+    # Avoid running on unrelated saves too often.
+    # Still allow generation when certificate doesn't exist (e.g., first time reaching 100%).
+    with transaction.atomic():
+        certificate, cert_created = Certificate.objects.select_for_update().get_or_create(
+            user=instance.user,
+            course=instance.course,
+            defaults={
+                'course_access': instance,
+                'completion_percentage': instance.completion_percentage,
+            }
+        )
+
+        # Always keep the completion percentage in sync.
+        if certificate.completion_percentage != instance.completion_percentage:
+            certificate.completion_percentage = instance.completion_percentage
+            certificate.save(update_fields=['completion_percentage'])
+
+        if not cert_created:
+            # If files are missing (common cause of “no files generated”), try again.
+            need_pdf = not certificate.certificate_pdf or not certificate.certificate_pdf.name
+            need_img = not certificate.certificate_image or not certificate.certificate_image.name
+            if not (need_pdf or need_img):
+                return
+
+    logger.info(
+        f"Generating certificate files for {instance.user.user.username} - {instance.course.title}"
+    )
+
+    try:
+        # Re-fetch latest certificate state before generating files.
+        certificate.refresh_from_db()
+
+        from .services.certificate_service import (
+            generate_certificate_pdf,
+            generate_certificate_image,
+        )
+
+        pdf_result = None
+        img_result = None
+
+        if not certificate.certificate_pdf or not certificate.certificate_pdf.name:
+            pdf_result = generate_certificate_pdf(certificate)
+
+        if not certificate.certificate_image or not certificate.certificate_image.name:
+            img_result = generate_certificate_image(certificate)
+
+        # Ensure DB saves file fields after service methods
+        certificate.save()
+
+        # Log activity
+        CertificateActivityLog.objects.create(
+            certificate=certificate,
+            activity_type='generated',
+            metadata={
+                'completion_percentage': instance.completion_percentage,
+                'pdf_generated': pdf_result is not None,
+                'image_generated': img_result is not None,
+            },
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to generate certificate files: {str(e)}")
+
+
+@receiver(post_save, sender=UserCourseAccess)
+def update_certificate_on_recompletion(sender, instance, **kwargs):
+    """Update certificate if user improves completion percentage."""
+    if not (instance.completion_percentage >= 99.9 and instance.is_completed):
+        return
+
+    try:
+        certificate = Certificate.objects.get(user=instance.user, course=instance.course)
+        if certificate.completion_percentage != instance.completion_percentage:
+            certificate.completion_percentage = instance.completion_percentage
+            certificate.save(update_fields=['completion_percentage'])
+            logger.info(f"Certificate updated for {certificate.certificate_id}")
+    except Certificate.DoesNotExist:
+        pass

@@ -1,0 +1,50 @@
+{% extends 'mainApp/base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block title %}My Certificates{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="mb-0">My Certificates</h2>
+    </div>
+
+    {% if certificates %}
+    <div class="row g-3">
+        {% for cert in certificates %}
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ cert.course_title }}</h5>
+                    <p class="card-text mb-2">
+                        <small class="text-muted">Issued: {{ cert.formatted_date }}</small>
+                    </p>
+                    <p class="card-text mb-3">
+                        <small class="text-muted">Certificate ID: {{ cert.certificate_id }}</small>
+                    </p>
+
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" href="{% url 'download_certificate' cert.id %}">
+                            <i class="fas fa-download me-2"></i>Download PDF
+                        </a>
+                        <a class="btn btn-outline-primary" href="{% url 'certificate_preview' cert.id %}">
+                            <i class="fas fa-eye me-2"></i>Preview
+                        </a>
+                        <a class="btn btn-outline-secondary" target="_blank" href="{% url 'view_certificate' cert.id %}">
+                            <i class="fas fa-image me-2"></i>View Image
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-certificate me-2"></i>
+        No certificates found for your account.
+    </div>
+    {% endif %}
+</div>
+{% endblock body %}
+

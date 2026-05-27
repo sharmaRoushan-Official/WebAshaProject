@@ -1,0 +1,82 @@
+{% extends 'mainApp/base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block title %}Certificate Dashboard{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Certificate Dashboard</h2>
+        <a class="btn btn-outline-primary" href="{% url 'my_certificates' %}"><i class="fas fa-certificate me-2"></i>My Certificates</a>
+    </div>
+
+
+    <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted">Total Certificates</div>
+                    <div class="fs-3 fw-bold">{{ stats.total_certificates }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted">Total Downloads</div>
+                    <div class="fs-3 fw-bold">{{ stats.total_downloads }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted">Total Shares</div>
+                    <div class="fs-3 fw-bold">{{ stats.total_shares }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted">Recent</div>
+                    <div class="fs-3 fw-bold">{{ stats.recent_certificates|length }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h4 class="mb-3"><i class="fas fa-clock me-2"></i>Recent Certificates</h4>
+
+        {% if certificates %}
+        <div class="row g-3">
+            {% for cert in certificates|slice:':5' %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start justify-content-between">
+                                <div>
+                                    <h5 class="card-title mb-1">{{ cert.course_title }}</h5>
+                                    <div class="text-muted small">Issued: {{ cert.formatted_date }}</div>
+                                </div>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-3">
+                                <a class="btn btn-primary" href="{% url 'download_certificate' cert.id %}"><i class="fas fa-download me-2"></i>Download</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <div class="alert alert-info mb-0">
+                No certificates found.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock body %}
+

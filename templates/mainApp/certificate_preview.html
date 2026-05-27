@@ -1,0 +1,88 @@
+{% extends 'mainApp/base.html' %}
+{% load static crispy_forms_tags %}
+
+{% block title %}Certificate Preview{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row g-3 align-items-start">
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="h5 mb-0">
+                            <i class="fas fa-certificate me-2"></i>
+                            {{ certificate.course_title }}
+                        </h3>
+                        <span class="badge bg-primary">Preview</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if certificate.certificate_image and certificate.certificate_image.name %}
+                        <div class="text-center">
+                            <img
+                                src="{% url 'view_certificate' certificate.id %}"
+                                alt="Certificate"
+                                class="img-fluid rounded"
+                                style="max-height: 600px; object-fit: contain;"
+                            />
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Certificate image is not available yet. You can download the PDF.
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <p class="mb-1"><strong>Issued:</strong> {{ certificate.formatted_date }}</p>
+                        <p class="mb-0"><strong>Certificate ID:</strong> {{ certificate.certificate_id }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm sticky-top" style="top: 90px;">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Actions</h5>
+
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" href="{% url 'download_certificate' certificate.id %}">
+                            <i class="fas fa-download me-2"></i>Download PDF
+                        </a>
+
+                        <a class="btn btn-outline-primary" href="{% url 'view_certificate' certificate.id %}" target="_blank" rel="noopener">
+                            <i class="fas fa-image me-2"></i>Open Image
+                        </a>
+
+                        <a class="btn btn-outline-secondary" href="{% url 'my_certificates' %}">
+                            <i class="fas fa-list me-2"></i>Back to My Certificates
+                        </a>
+                    </div>
+
+                    <hr />
+
+                    <div class="small text-muted">
+                        <p class="mb-2"><strong>Share Link:</strong></p>
+                        <div class="input-group">
+                            <input
+                                type="text"
+                                class="form-control"
+                                value="{{ certificate.verification_url|default:'' }}"
+                                readonly
+                            />
+                        </div>
+                        <p class="mt-2 mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Use the verification page to prove authenticity.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
+
