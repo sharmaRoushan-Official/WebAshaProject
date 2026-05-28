@@ -9,11 +9,10 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from decimal import Decimal
 from django.core.files.base import ContentFile
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 import hashlib
+import secrets
 import logging
 logger = logging.getLogger(__name__)
 
@@ -1141,171 +1140,8 @@ class Invoice(models.Model):
         return f"INV-{date_prefix}-{new_seq:04d}"
     
 
-# ==================== SIGNALS FOR AUTO-INVOICE CREATION ====================
+# ==================== CERTIFICATE MODELS ====================
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    """Create Profile when User is created"""
-    if created:
-        Profile.objects.get_or_create(user=instance)
-
-
-@receiver(post_save, sender=Profile)
-def sync_email_from_user(sender, instance, **kwargs):
-    """Sync Profile email from User.email (User is source of truth)"""
-    if instance.user.email != instance.email:
-        instance.email = instance.user.email
-        instance.save(update_fields=['email'])
-
-
-@receiver(post_save, sender=CourseTransaction)
-def create_invoice_for_course_transaction(sender, instance, created, **kwargs):
-    """
-    Automatically create an invoice when a CourseTransaction is marked as 'completed'
-    """
-    if instance.status == 'completed' and instance.is_active:
-        # Check if invoice already exists for this transaction
-        if not Invoice.objects.filter(course_transaction=instance).exists():
-            profile = instance.user
-            course = instance.course
-            
-            # Use stored amounts from the transaction (base_amount, gst_amount already calculated)
-            base_amount = instance.base_amount
-            tax_amount = instance.gst_amount
-            total_amount = instance.amount
-            tax_rate = Decimal('18.00')
-            
-            # Generate invoice number
-            invoice_number = Invoice.generate_invoice_number()
-            
-            # Create the invoice
-            invoice = Invoice.objects.create(
-                invoice_number=invoice_number,
-                profile=profile,
-                course=course,
-                live_course=None,
-                course_transaction=instance,
-                live_transaction=None,
-                base_amount=base_amount,
-                tax_amount=tax_amount,
-                tax_rate=tax_rate,
-                total_amount=total_amount,
-                payment_status='paid',
-                payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
-                payment_transaction_id=instance.transaction_id,
-                customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
-                customer_email=profile.user.email,
-                customer_phone=profile.phone or '',
-                customer_address=profile.address or '',
-            )
-            
-            # Auto-generate and save PDF for the invoice
-            try:
-                from .services.invoice_pdf import save_pdf_to_model
-                save_pdf_to_model(invoice)
-                logger.info(f"PDF auto-generated for invoice {invoice.invoice_number}")
-            except Exception as e:
-                logger.error(f"Failed to auto-generate PDF for invoice {invoice.invoice_number}: {str(e)}")
-
-
-@receiver(post_save, sender=Invoice)
-def send_email_on_invoice_creation(sender, instance, created, **kwargs):
-    """
-    Automatically send invoice email after invoice is created with paid status
-    """
-    if created and instance.payment_status == 'paid':
-        try:
-            from .services.emailjs_service import send_invoice_email
-            send_invoice_email(instance, request=None)
-            logger.info(f"Invoice email sent for {instance.invoice_number}")
-        except Exception as e:
-            logger.error(f"Failed to send invoice email: {str(e)}")
-
-
-@receiver(post_save, sender=LiveCourseTransaction)
-def create_invoice_for_live_course_transaction(sender, instance, created, **kwargs):
-    """
-    Automatically create an invoice when a LiveCourseTransaction is marked as 'completed'
-    """
-    if instance.status == 'completed' and instance.is_active:
-        # Check if invoice already exists for this transaction
-        if not Invoice.objects.filter(live_transaction=instance).exists():
-            profile = instance.profile
-            live_course = instance.live_course
-            
-            # Use the stored amounts from the transaction
-            base_amount = instance.base_amount
-            tax_amount = instance.gst_amount
-            total_amount = instance.total_amount
-            tax_rate = Decimal('18.00')
-            
-            # Generate invoice number
-            invoice_number = Invoice.generate_invoice_number()
-            
-            # Create the invoice
-            invoice = Invoice.objects.create(
-                invoice_number=invoice_number,
-                profile=profile,
-                course=None,
-                live_course=live_course,
-                course_transaction=None,
-                live_transaction=instance,
-                base_amount=base_amount,
-                tax_amount=tax_amount,
-                tax_rate=tax_rate,
-                total_amount=total_amount,
-                payment_status='paid',
-                payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
-                payment_transaction_id=instance.transaction_id,
-                customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
-                customer_email=profile.user.email,
-                customer_phone=profile.phone or '',
-                customer_address=profile.address or '',
-            )
-            
-            # Auto-generate and save PDF for the invoice
-            try:
-                from .services.invoice_pdf import save_pdf_to_model
-                save_pdf_to_model(invoice)
-                logger.info(f"PDF auto-generated for invoice {invoice.invoice_number}")
-            except Exception as e:
-                logger.error(f"Failed to auto-generate PDF for invoice {invoice.invoice_number}: {str(e)}")
-
-
-# ==================== SIGNAL FOR AUTO-CREATING QUIZ ====================
-
-@receiver(post_save, sender=Lecture)
-def create_quiz_for_quiz_lecture(sender, instance, created, **kwargs):
-    """
-    Automatically create a quiz when a lecture of type 'quiz' is created
-    """
-    if instance.lecture_type == 'quiz' and created:
-        # Check if quiz doesn't already exist
-        if not hasattr(instance, 'quiz'):
-            Quiz.objects.create(
-                lecture=instance,
-                title=f"Quiz: {instance.title}",
-                description="Please answer all questions to complete this quiz.",
-                quiz_type='mcq',
-                max_attempts=2,
-                passing_score=70
-            )
-            logger.info(f"Auto-created quiz for lecture: {instance.title}")
-
-
-@receiver(post_save, sender=QuizAttempt)
-def update_progress_on_quiz_complete(sender, instance, created, **kwargs):
-    """
-    Ensure lecture is marked complete if quiz is passed (safety net)
-    """
-    if instance.status == 'completed' and instance.is_passed and not created:
-        try:
-            lecture_progress = instance.lecture_progress
-            if lecture_progress and not lecture_progress.is_completed:
-                lecture_progress.mark_completed()
-                logger.info(f"Quiz pass auto-completed lecture progress for user {instance.profile.user.username}")
-        except LectureProgress.DoesNotExist:
-            pass
 class Certificate(models.Model):
     """
     Certificate model for users who complete courses 100%
@@ -1317,7 +1153,7 @@ class Certificate(models.Model):
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='certificates')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='certificates')
     course_access = models.OneToOneField(
-        'UserCourseAccess', 
+        UserCourseAccess, 
         on_delete=models.CASCADE, 
         related_name='certificate',
         help_text="Link to the course access record that triggered this certificate"
@@ -1498,8 +1334,176 @@ class CertificateActivityLog(models.Model):
     
     def __str__(self):
         return f"{self.certificate.certificate_id} - {self.activity_type}"
-    
-# Add at the end of models.py
+
+
+# ==================== SIGNALS FOR AUTO-INVOICE CREATION ====================
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    """Create Profile when User is created"""
+    if created:
+        Profile.objects.get_or_create(user=instance)
+
+
+@receiver(post_save, sender=Profile)
+def sync_email_from_user(sender, instance, **kwargs):
+    """Sync Profile email from User.email (User is source of truth)"""
+    if instance.user.email != instance.email:
+        instance.email = instance.user.email
+        instance.save(update_fields=['email'])
+
+
+@receiver(post_save, sender=CourseTransaction)
+def create_invoice_for_course_transaction(sender, instance, created, **kwargs):
+    """
+    Automatically create an invoice when a CourseTransaction is marked as 'completed'
+    """
+    if instance.status == 'completed' and instance.is_active:
+        # Check if invoice already exists for this transaction
+        if not Invoice.objects.filter(course_transaction=instance).exists():
+            profile = instance.user
+            course = instance.course
+            
+            # Use stored amounts from the transaction (base_amount, gst_amount already calculated)
+            base_amount = instance.base_amount
+            tax_amount = instance.gst_amount
+            total_amount = instance.amount
+            tax_rate = Decimal('18.00')
+            
+            # Generate invoice number
+            invoice_number = Invoice.generate_invoice_number()
+            
+            # Create the invoice
+            invoice = Invoice.objects.create(
+                invoice_number=invoice_number,
+                profile=profile,
+                course=course,
+                live_course=None,
+                course_transaction=instance,
+                live_transaction=None,
+                base_amount=base_amount,
+                tax_amount=tax_amount,
+                tax_rate=tax_rate,
+                total_amount=total_amount,
+                payment_status='paid',
+                payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
+                payment_transaction_id=instance.transaction_id,
+                customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
+                customer_email=profile.user.email,
+                customer_phone=profile.phone or '',
+                customer_address=profile.address or '',
+            )
+            
+            # Auto-generate and save PDF for the invoice
+            try:
+                from .services.invoice_pdf import save_pdf_to_model
+                save_pdf_to_model(invoice)
+                logger.info(f"PDF auto-generated for invoice {invoice.invoice_number}")
+            except Exception as e:
+                logger.error(f"Failed to auto-generate PDF for invoice {invoice.invoice_number}: {str(e)}")
+
+
+@receiver(post_save, sender=Invoice)
+def send_email_on_invoice_creation(sender, instance, created, **kwargs):
+    """
+    Automatically send invoice email after invoice is created with paid status
+    """
+    if created and instance.payment_status == 'paid':
+        try:
+            from .services.emailjs_service import send_invoice_email
+            send_invoice_email(instance, request=None)
+            logger.info(f"Invoice email sent for {instance.invoice_number}")
+        except Exception as e:
+            logger.error(f"Failed to send invoice email: {str(e)}")
+
+
+@receiver(post_save, sender=LiveCourseTransaction)
+def create_invoice_for_live_course_transaction(sender, instance, created, **kwargs):
+    """
+    Automatically create an invoice when a LiveCourseTransaction is marked as 'completed'
+    """
+    if instance.status == 'completed' and instance.is_active:
+        # Check if invoice already exists for this transaction
+        if not Invoice.objects.filter(live_transaction=instance).exists():
+            profile = instance.profile
+            live_course = instance.live_course
+            
+            # Use the stored amounts from the transaction
+            base_amount = instance.base_amount
+            tax_amount = instance.gst_amount
+            total_amount = instance.total_amount
+            tax_rate = Decimal('18.00')
+            
+            # Generate invoice number
+            invoice_number = Invoice.generate_invoice_number()
+            
+            # Create the invoice
+            invoice = Invoice.objects.create(
+                invoice_number=invoice_number,
+                profile=profile,
+                course=None,
+                live_course=live_course,
+                course_transaction=None,
+                live_transaction=instance,
+                base_amount=base_amount,
+                tax_amount=tax_amount,
+                tax_rate=tax_rate,
+                total_amount=total_amount,
+                payment_status='paid',
+                payment_method=instance.payment_method if hasattr(instance, 'payment_method') else '',
+                payment_transaction_id=instance.transaction_id,
+                customer_name=f"{profile.first_name} {profile.last_name}".strip() or profile.user.username,
+                customer_email=profile.user.email,
+                customer_phone=profile.phone or '',
+                customer_address=profile.address or '',
+            )
+            
+            # Auto-generate and save PDF for the invoice
+            try:
+                from .services.invoice_pdf import save_pdf_to_model
+                save_pdf_to_model(invoice)
+                logger.info(f"PDF auto-generated for invoice {invoice.invoice_number}")
+            except Exception as e:
+                logger.error(f"Failed to auto-generate PDF for invoice {invoice.invoice_number}: {str(e)}")
+
+
+# ==================== SIGNAL FOR AUTO-CREATING QUIZ ====================
+
+@receiver(post_save, sender=Lecture)
+def create_quiz_for_quiz_lecture(sender, instance, created, **kwargs):
+    """
+    Automatically create a quiz when a lecture of type 'quiz' is created
+    """
+    if instance.lecture_type == 'quiz' and created:
+        # Check if quiz doesn't already exist
+        if not hasattr(instance, 'quiz'):
+            Quiz.objects.create(
+                lecture=instance,
+                title=f"Quiz: {instance.title}",
+                description="Please answer all questions to complete this quiz.",
+                quiz_type='mcq',
+                max_attempts=2,
+                passing_score=70
+            )
+            logger.info(f"Auto-created quiz for lecture: {instance.title}")
+
+
+@receiver(post_save, sender=QuizAttempt)
+def update_progress_on_quiz_complete(sender, instance, created, **kwargs):
+    """
+    Ensure lecture is marked complete if quiz is passed (safety net)
+    """
+    if instance.status == 'completed' and instance.is_passed and not created:
+        try:
+            lecture_progress = instance.lecture_progress
+            if lecture_progress and not lecture_progress.is_completed:
+                lecture_progress.mark_completed()
+                logger.info(f"Quiz pass auto-completed lecture progress for user {instance.profile.user.username}")
+        except LectureProgress.DoesNotExist:
+            pass
+
+
+# ==================== SIGNAL FOR AUTO-CERTIFICATE GENERATION ====================
 
 @receiver(post_save, sender=UserCourseAccess)
 def check_and_generate_certificate(sender, instance, created, **kwargs):
@@ -1510,8 +1514,6 @@ def check_and_generate_certificate(sender, instance, created, **kwargs):
     if not (instance.completion_percentage >= 99.9 and instance.is_completed):
         return
 
-    # Avoid running on unrelated saves too often.
-    # Still allow generation when certificate doesn't exist (e.g., first time reaching 100%).
     with transaction.atomic():
         certificate, cert_created = Certificate.objects.select_for_update().get_or_create(
             user=instance.user,
@@ -1528,7 +1530,7 @@ def check_and_generate_certificate(sender, instance, created, **kwargs):
             certificate.save(update_fields=['completion_percentage'])
 
         if not cert_created:
-            # If files are missing (common cause of “no files generated”), try again.
+            # If files are missing (common cause of "no files generated"), try again.
             need_pdf = not certificate.certificate_pdf or not certificate.certificate_pdf.name
             need_img = not certificate.certificate_image or not certificate.certificate_image.name
             if not (need_pdf or need_img):
